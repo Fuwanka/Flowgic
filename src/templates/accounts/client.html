@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Клиентская панель</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+        }
+        header {
+            background: #007BFF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .delivery-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .delivery-card p {
+            margin: 8px 0;
+        }
+        .status {
+            font-weight: bold;
+            color: #555;
+        }
+        .status.in-transit { color: #FFA500; }
+        .status.delivered { color: #28a745; }
+        .status.delayed { color: #dc3545; }
+        .timeline {
+            margin-top: 15px;
+            list-style: none;
+            padding-left: 0;
+        }
+        .timeline li {
+            padding: 6px 0;
+        }
+        .timeline li.done::before {
+            content: "✓ ";
+            color: #28a745;
+        }
+        .timeline li.current::before {
+            content: "→ ";
+            color: #FFA500;
+        }
+        .timeline li.pending::before {
+            content: "□ ";
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Клиентская панель
+    </header>
+    <div class="container">
+        <h2>Мои перевозки</h2>
+        {% for d in deliveries %}
+        <div class="delivery-card">
+            <p><strong>Откуда:</strong> {{ d.from }}</p>
+            <p><strong>Куда:</strong> {{ d.to }}</p>
+            <p><strong>Водитель:</strong> {{ d.driver }}</p>
+            <p><strong>Статус:</strong> 
+                <span class="status 
+                    {% if d.status == 'В пути' %}in-transit{% elif d.status == 'Доставлен' %}delivered{% elif d.status == 'Задержан' %}delayed{% endif %}">
+                    {{ d.status }}
+                </span>
+            </p>
+            <ul class="timeline">
+                {% for t in d.timeline %}
+                    <li class="{{ t.state }}">{{ t.step }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
