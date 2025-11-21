@@ -16,11 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from src.accounts.views import role_redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),  # сначала подключаем все маршруты из accounts
-    path('', role_redirect),  # пустой путь для редиректа, сработает только если другие не совпали
     path('', include('logistics.urls')),
 ]

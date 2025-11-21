@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from src.accounts.decorators import role_required
+from accounts.decorators import role_required
 
 
 @role_required(['dispatcher'])

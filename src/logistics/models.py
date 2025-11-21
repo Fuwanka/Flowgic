@@ -1,47 +1,115 @@
 from django.db import models
-from src.accounts.models import User
+from django.conf import settings
+from django.utils import timezone
 
-class Cargo(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Название груза')
-    description = models.TextField(blank=True, verbose_name='Описание')
-    weight = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Вес (кг)')
-    category = models.CharField(max_length=50, verbose_name='Категория')
+
+# ---------------------------------------------------------
+# 1. Компания
+# ---------------------------------------------------------
+class Company(models.Model):
+    name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.name} ({self.weight} кг)"
+        return self.name
 
+
+# ---------------------------------------------------------
+# 2. Водитель (сущность, связанная с пользователем)
+# ---------------------------------------------------------
 class Driver(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, limit_choices_to={'role': 'driver'})
-    license_number = models.CharField(max_length=50, verbose_name='Номер лицензии')
-    vehicle = models.CharField(max_length=100, verbose_name='Транспортное средство')
-    status = models.CharField(
-        max_length=20,
-        choices=[('available', 'Свободен'), ('busy', 'В рейсе')],
-        default='available'
-    )
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="drivers")
+
+    license_number = models.CharField(max_length=100, blank=True)
+    phone = models.CharField(max_length=30, blank=True)
 
     def __str__(self):
-        return f"{self.user.username} — {self.vehicle}"
-    
-class Route(models.Model):
-    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE)
-    driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, blank=True)
-    customer = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'customer'})
-    start_point = models.CharField(max_length=100, verbose_name='Пункт отправления')
-    end_point = models.CharField(max_length=100, verbose_name='Пункт назначения')
-    date_start = models.DateField()
-    date_end = models.DateField(null=True, blank=True)
-    status = models.CharField(
-        max_length=20,
-        choices=[
-            ('created', 'Создан'),
-            ('in_transit', 'В пути'),
-            ('completed', 'Завершён'),
-            ('canceled', 'Отменён')
-        ],
-        default='created'
-    )
+        return f"Водитель {self.user.username}"
+
+
+# ---------------------------------------------------------
+# 3. Транспорт
+# ---------------------------------------------------------
+class Vehicle(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="vehicles")
+
+    plate_number = models.CharField(max_length=50)      # Госномер
+    model = models.CharField(max_length=100)
+    capacity_kg = models.PositiveIntegerField(default=0)
+    volume_m3 = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.cargo.name}: {self.start_point} → {self.end_point}"
+        return f"{self.plate_number} ({self.model})"
+
+
+# ---------------------------------------------------------
+# 4. Заказ
+# ---------------------------------------------------------
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ("created", "Создан"),
+        ("assigned", "Назначен водителю"),
+        ("in_progress", "В пути"),
+        ("delivered", "Доставлен"),
+        ("cancelled", "Отменён"),
+    ]
+
+    # Кто создал заказ (диспетчер)
+    dispatcher = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="dispatcher_orders"
+    )
+
+    # Кто является заказчиком
+    customer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="customer_orders"
+    )
+
+    driver = models.ForeignKey(
+        Driver,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders"
+    )
+
+    vehicle = models.ForeignKey(
+        Vehicle,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    # Информация о грузе
+    cargo_type = models.CharField(max_length=255)
+    weight = models.PositiveIntegerField()       # в кг
+    volume = models.PositiveIntegerField()       # в литрах или м³ — на твой выбор
+
+    # Адреса
+    pickup_address = models.CharField(max_length=500)
+    delivery_address = models.CharField(max_length=500)
+
+    # Время
+    pickup_time = models.DateTimeField(null=True, blank=True)
+    delivery_time = models.DateTimeField(null=True, blank=True)
+
+    # Статус
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="created"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"Заказ #{self.id} — {self.cargo_type}"
