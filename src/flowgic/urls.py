@@ -20,5 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),  # сначала подключаем все маршруты из accounts
-    path('', include('logistics.urls')),
+    path('logistics/', include('logistics.urls')),
 ]
