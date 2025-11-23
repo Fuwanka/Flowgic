@@ -1,0 +1,41 @@
+{
+  "user": {
+    "name": "Demo User",
+    "email": "lizaled2005@mail.ru",
+    "role": "Dispatcher"
+  },
+  "requests": [
+    {
+      "id": "REQ-001",
+      "cargo": "Medical Supplies - Temperature Controlled",
+      "route": "Los Angeles, CA → San Francisco, CA",
+      "driver": "Mike Davis",
+      "status": "In Transit",
+      "actions": "View"
+    },
+    {
+      "id": "REQ-002",
+      "cargo": "Electronics - Fragile (15 Pallets)",
+      "route": "Seattle, WA → Portland, OR",
+      "driver": "Emily Chen",
+      "status": "Completed",
+      "actions": "View"
+    },
+    {
+      "id": "REQ-003",
+      "cargo": "Construction Materials - Heavy Load",
+      "route": "Phoenix, AZ → Las Vegas, NV",
+      "driver": "James Wilson",
+      "status": "New",
+      "actions": "View"
+    },
+    {
+      "id": "REQ-004",
+      "cargo": "Perishable Food Items - Refrigerated",
+      "route": "Denver, CO → Salt Lake City, UT",
+      "driver": "Robert Martinez",
+      "status": "Cancelled",
+      "actions": "View"
+    }
+  ]
+}
