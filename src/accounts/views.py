@@ -38,4 +38,4 @@ def custom_login_view(request):
                 return redirect('customer_dashboard')
     else:
         form = AuthenticationForm()
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'accounts/login_register.html', {'form': form})

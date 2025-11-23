@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FlowGic Login & Register</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">
+            <span>🚚</span> <!-- Замени на реальный логотип или SVG -->
+            <div>
+                <h1>FlowGic</h1>
+                <p>Logistics Coordination Platform</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="login">Login</div>
+            <div class="tab" data-tab="register">Register</div>
+        </div>
+
+        <!-- Форма Login -->
+        <div class="form-container active" id="login-form">
+            <h2 class="form-title">Welcome back</h2>
+            <p class="form-subtitle">Sign in to your FlowGic account</p>
+
+            <div class="input-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="you@company.com">
+            </div>
+
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="••••••••">
+            </div>
+
+            <button class="btn-primary">Sign In</button>
+
+            <p class="demo-text">Demo: dispatcher@flowgic.com or driver@flowgic.com</p>
+        </div>
+
+        <!-- Форма Register -->
+        <div class="form-container" id="register-form">
+            <h2 class="form-title">Create account</h2>
+            <p class="form-subtitle">Get started with FlowGic today</p>
+
+            <div class="input-group">
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" placeholder="John Doe">
+            </div>
+
+            <div class="input-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" placeholder="you@company.com">
+            </div>
+
+            <div class="input-group">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" placeholder="••••••••">
+            </div>
+
+            <div class="input-group">
+                <label for="company-name">Company Name</label>
+                <input type="text" id="company-name" placeholder="ACME Logistics">
+            </div>
+
+            <div class="input-group">
+                <label for="role">Role</label>
+                <select id="role">
+                    <option value="dispatcher">dispatcher</option>
+                    <option value="driver">driver</option>
+                    <option value="admin">admin</option>
+                </select>
+            </div>
+
+            <button class="btn-primary">Create Account</button>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Убираем активный класс со всех табов
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                // Добавляем активный класс текущему табу
+                this.classList.add('active');
+
+                // Скрываем все формы
+                document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
+                // Показываем нужную форму
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-form`).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
