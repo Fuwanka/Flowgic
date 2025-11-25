@@ -3,97 +3,108 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FlowGic Login & Register</title>
-    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"> <!-- твои стили -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .auth-card {
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .nav-tabs .nav-link {
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="logo">
-            <span>🚚</span> <!-- Замени на реальный логотип или SVG -->
-            <div>
-                <h1>FlowGic</h1>
-                <p>Logistics Coordination Platform</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="auth-card">
+
+                <!-- Django Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Вкладки Login / Register -->
+                <ul class="nav nav-tabs mb-4" id="authTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if tab == 'login' %}active{% endif %}" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Login</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if tab == 'register' %}active{% endif %}" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Register</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="authTabContent">
+                    <!-- LOGIN -->
+                    <div class="tab-pane fade {% if tab == 'login' %}show active{% endif %}" id="login" role="tabpanel">
+                        <form method="POST" action="{% url 'login' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                        </form>
+                    </div>
+
+                    <!-- REGISTER -->
+                    <div class="tab-pane fade {% if tab == 'register' %}show active{% endif %}" id="register" role="tabpanel">
+                        <form method="POST" action="{% url 'register' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="full_name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="company" class="form-label">Company</label>
+                                <input type="text" class="form-control" id="company" name="company" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="dispatcher">Dispatcher</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="driver">Driver</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Register</button>
+                        </form>
+                    </div>
+                </div>
+
             </div>
-        </div>
 
-        <div class="tabs">
-            <div class="tab active" data-tab="login">Login</div>
-            <div class="tab" data-tab="register">Register</div>
-        </div>
-
-        <!-- Форма Login -->
-        <div class="form-container active" id="login-form">
-            <h2 class="form-title">Welcome back</h2>
-            <p class="form-subtitle">Sign in to your FlowGic account</p>
-
-            <div class="input-group">
-                <label for="login-email">Email</label>
-                <input type="email" id="login-email" placeholder="you@company.com">
-            </div>
-
-            <div class="input-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" placeholder="••••••••">
-            </div>
-
-            <button class="btn-primary">Sign In</button>
-
-            <p class="demo-text">Demo: dispatcher@flowgic.com or driver@flowgic.com</p>
-        </div>
-
-        <!-- Форма Register -->
-        <div class="form-container" id="register-form">
-            <h2 class="form-title">Create account</h2>
-            <p class="form-subtitle">Get started with FlowGic today</p>
-
-            <div class="input-group">
-                <label for="full-name">Full Name</label>
-                <input type="text" id="full-name" placeholder="John Doe">
-            </div>
-
-            <div class="input-group">
-                <label for="register-email">Email</label>
-                <input type="email" id="register-email" placeholder="you@company.com">
-            </div>
-
-            <div class="input-group">
-                <label for="register-password">Password</label>
-                <input type="password" id="register-password" placeholder="••••••••">
-            </div>
-
-            <div class="input-group">
-                <label for="company-name">Company Name</label>
-                <input type="text" id="company-name" placeholder="ACME Logistics">
-            </div>
-
-            <div class="input-group">
-                <label for="role">Role</label>
-                <select id="role">
-                    <option value="dispatcher">dispatcher</option>
-                    <option value="driver">driver</option>
-                    <option value="admin">admin</option>
-                </select>
-            </div>
-
-            <button class="btn-primary">Create Account</button>
         </div>
     </div>
+</div>
 
-    <script>
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Убираем активный класс со всех табов
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                // Добавляем активный класс текущему табу
-                this.classList.add('active');
-
-                // Скрываем все формы
-                document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
-                // Показываем нужную форму
-                const tabId = this.getAttribute('data-tab');
-                document.getElementById(`${tabId}-form`).classList.add('active');
-            });
-        });
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

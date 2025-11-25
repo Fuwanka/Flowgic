@@ -1,41 +1,59 @@
-from django.shortcuts import redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth.hashers import make_password
+from django.contrib import messages
+from logistics.models import Company  # Импортируем Company из logistics
+from .models import User
 
+User = get_user_model()
 
-def home_view(request):
-    """
-    Главная страница. Перенаправляет пользователя в зависимости от статуса авторизации и роли.
-    """
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
-    # Перенаправление в зависимости от роли
-    if request.user.role == 'dispatcher':
-        return redirect('dispatcher_dashboard')
-    elif request.user.role == 'driver':
-        return redirect('driver_dashboard')
-    elif request.user.role in ['customer', 'manager']:
-        return redirect('customer_dashboard')
-    else:
-        # Если роль не определена, перенаправляем на логин
-        return redirect('login')
+def register_view(request):
+    if request.method == 'POST':
+        full_name = request.POST.get('full_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        company_name = request.POST.get('company')
+        role = request.POST.get('role')
+
+        # Получаем или создаём компанию
+        company_obj, created = Company.objects.get_or_create(name=company_name)
+
+        # Проверяем, что пользователя с таким email ещё нет
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Пользователь с таким email уже существует')
+            return redirect('register')
+
+        # Создаём пользователя
+        user = User.objects.create(
+            full_name=full_name,
+            email=email,
+            password=make_password(password),  # хэшируем пароль
+            company=company_obj,
+            role=role
+        )
+
+        # Автоматически авторизуем пользователя после регистрации
+        login(request, user)
+        messages.success(request, f'Добро пожаловать, {full_name}!')
+        return redirect('home')  # или куда нужно после регистрации
+
+    return render(request, 'accounts/login_register.html', {'tab': 'register'})
 
 
 def custom_login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # Аутентификация пользователя
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
             login(request, user)
-            # Редирект в зависимости от роли
-            if user.role == 'dispatcher':
-                return redirect('dispatcher_dashboard')
-            elif user.role == 'driver':
-                return redirect('driver_dashboard')
-            elif user.role in ['customer', 'manager']:
-                return redirect('customer_dashboard')
-    else:
-        form = AuthenticationForm()
-    return render(request, 'accounts/login_register.html', {'form': form})
+            messages.success(request, f'Добро пожаловать, {user.full_name}!')
+            return redirect('home')  # или куда нужно после логина
+        else:
+            messages.error(request, 'Неверный email или пароль')
+            return redirect('login')
+
+    return render(request, 'accounts/login_register.html', {'tab': 'login'})

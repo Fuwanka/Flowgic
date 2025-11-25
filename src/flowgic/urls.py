@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),  # сначала подключаем все маршруты из accounts
     path('logistics/', include('logistics.urls')),
+    path("accounts/", include("accounts.urls")),
 ]
