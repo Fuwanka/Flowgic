@@ -1,105 +1,57 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>FlowGic Dispatcher Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-    <header>
-        <div class="logo">
-            <span>🚚</span>
-            <span>FlowGic</span>
-            <span style="font-size:12px; color:#666;">Demo Company</span>
-        </div>
-        <div class="user-panel">
-            <div class="user-info">
-                <div class="name">{{ user.name }}</div>
-                <div class="email">{{ user.email }}</div>
-            </div>
-            <div class="user-role">{{ user.role }}</div>
-            <button class="logout-btn">Logout</button>
-            <a href="{% url 'login' %}" style="margin-left: 10px;">Login</a>
-            <a href="{% url 'register' %}" style="margin-left: 10px;">Register</a>
-        </div>
-    </header>
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
 
-    <div class="main-content">
-        <h1 class="dashboard-title">Dispatcher Dashboard</h1>
-        <p class="dashboard-subtitle">Manage and track all shipment requests</p>
+{% block content %}
+<h1 class="mb-3">Dashboard</h1>
 
-        <div class="search-bar">
-            <span class="icon">🔍</span>
-            <input type="text" placeholder="Search by ID, cargo, driver, or location...">
-        </div>
-
-        <!-- Фильтры + Кнопки Export CSV и New Request -->
-        <div class="filters-actions">
-            <div class="filters">
-                <button class="filter-btn active">All (4)</button>
-                <button class="filter-btn">New (1)</button>
-                <button class="filter-btn">In Transit (1)</button>
-                <button class="filter-btn">Completed (1)</button>
-                <button class="filter-btn">Cancelled (1)</button>
-            </div>
-            <div class="actions-buttons">
-                <button class="btn btn-secondary">
-                    <span class="btn-icon">⬇️</span> Export CSV
-                </button>
-                <button class="btn btn-primary">
-                    <a href="{% url 'new_request' %}" class="btn btn-primary">
-                        <span class="btn-icon">➕</span> New Request
-                    </a>
-                </button>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Request ID</th>
-                        <th>Cargo</th>
-                        <th>Route</th>
-                        <th>Driver</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for req in requests %}
-                    <tr>
-                        <td><a href="#">{{ req.id }}</a></td>
-                        <td>{{ req.cargo }}</td>
-                        <td>{{ req.route }}</td>
-                        <td>{{ req.driver }}</td>
-                        <td>
-                            <span class="status-badge status-{{ req.status|lower|slugify }}">
-                                {{ req.status }}
-                            </span>
-                        </td>
-                        <td class="actions">
-                            <a href="{% url 'request_detail' req.id %}">👁 View</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="footer">
-            Showing 4 of 4 requests
-        </div>
+<div class="d-flex justify-content-between mb-3">
+    <div class="filters">
+        <button class="btn btn-outline-primary filter-btn active">All</button>
+        <button class="btn btn-outline-secondary filter-btn">New</button>
+        <button class="btn btn-outline-warning filter-btn">In Transit</button>
+        <button class="btn btn-outline-success filter-btn">Completed</button>
+        <button class="btn btn-outline-danger filter-btn">Cancelled</button>
     </div>
+    <div>
+        <a href="{% url 'new_request' %}" class="btn btn-primary">➕ New Request</a>
+    </div>
+</div>
 
-    <script>
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-    </script>
-</body>
-</html>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cargo</th>
+            <th>Route</th>
+            <th>Driver</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for req in requests %}
+        <tr>
+            <td><a href="{% url 'request_detail' req.id %}">{{ req.id }}</a></td>
+            <td>{{ req.cargo }}</td>
+            <td>{{ req.origin }} → {{ req.destination }}</td>
+            <td>{{ req.driver.full_name if req.driver else '—' }}</td>
+            <td><span class="badge bg-{{ req.status|lower }}">{{ req.status }}</span></td>
+            <td><a href="{% url 'request_detail' req.id %}" class="btn btn-sm btn-outline-primary">View</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        // TODO: добавить фильтрацию по статусу через AJAX
+    });
+});
+</script>
+{% endblock %}
+
