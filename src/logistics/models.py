@@ -190,6 +190,21 @@ class Order(models.Model):
         validators=[MinValueValidator(Decimal('0.00'))],
         verbose_name='Объём груза (м³)'
     )
+    # Поля для маршрута
+    origin = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Пункт отправления',
+        help_text='Адрес или название точки отправления'
+    )
+    destination = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Пункт назначения',
+        help_text='Адрес или название точки назначения'
+    )
     payment_terms = models.CharField(
         max_length=100,
         blank=True,
@@ -218,6 +233,11 @@ class Order(models.Model):
         null=True,
         verbose_name='Причина задержки'
     )
+    is_viewed_by_driver = models.BooleanField(
+        default=False,
+        verbose_name='Просмотрен водителем',
+        help_text='Отмечается True когда водитель открывает заказ'
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
@@ -226,6 +246,11 @@ class Order(models.Model):
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
         ordering = ['-created_at']
+    
+    @property
+    def cargo(self):
+        """Alias for cargo_type for template compatibility"""
+        return self.cargo_type
 
     def __str__(self):
         return f"Заказ #{self.id} — {self.cargo_type}"

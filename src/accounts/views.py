@@ -35,14 +35,13 @@ def register_view(request):
             email=email,
             company=company_obj,
             role=role
-            )
-        user.set_password(password)   # ← правильный способ
+        )
+        user.set_password(password)
         user.save()
 
-        # Автоматически авторизуем пользователя после регистрации
         login(request, user)
         messages.success(request, f'Добро пожаловать, {full_name}!')
-        return redirect('home')  # или куда нужно после регистрации
+        return redirect('home')
 
     return render(request, 'accounts/login_register.html', {'tab': 'register'})
 
@@ -52,32 +51,17 @@ def custom_login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # так как в модели User указано USERNAME_FIELD = 'email'
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
-            login(request, user)   # авторизуем пользователя
+            login(request, user)
             return redirect('home')
         else:
             messages.error(request, 'Неверный email или пароль')
             return redirect('login')
 
-    # если GET-запрос — просто отрисовываем страницу входа
     return render(request, 'accounts/login_register.html', {'tab': 'login'})
 
-@login_required
-def home_view(request):
-    user = request.user
-    context = {'user': user}
-
-    if user.role == 'dispatcher':
-        return render(request, 'dashboard/dispatcher_home.html', context)
-    elif user.role == 'manager':
-        return render(request, 'dashboard/manager_home.html', context)
-    elif user.role == 'driver':
-        return render(request, 'dashboard/driver_home.html', context)
-    else:
-        return render(request, 'dashboard/home.html', context)
 
 @login_required
 def home_view(request):
@@ -89,7 +73,7 @@ def home_view(request):
         # Все заявки, которые созданы диспетчером или для компании
         requests = Order.objects.filter(created_by=user).order_by('-created_at')
         context['requests'] = requests
-        template_name = 'dashboard/dispatcher_home.html'
+        template_name = 'accounts/dashboard.html'
 
     elif user.role == 'manager':
         # Все заявки для компании менеджера
@@ -99,8 +83,10 @@ def home_view(request):
 
     elif user.role == 'driver':
         # Только заявки, назначенные водителю
-        requests = Order.objects.filter(driver=user).order_by('-created_at')
+        requests = Order.objects.filter(driver=user).order_by('is_viewed_by_driver', '-created_at')
+        unread_count = requests.filter(is_viewed_by_driver=False).count()
         context['requests'] = requests
+        context['unread_count'] = unread_count
         template_name = 'dashboard/driver_home.html'
 
     else:
@@ -108,6 +94,7 @@ def home_view(request):
         template_name = 'dashboard/home.html'
 
     return render(request, template_name, context)
+
 
 @login_required
 def delete_account_view(request):
@@ -117,6 +104,7 @@ def delete_account_view(request):
         messages.success(request, 'Ваш аккаунт был удалён.')
         return redirect('login')
     return render(request, 'accounts/delete_account.html')
+
 
 def password_reset_request_view(request):
     if request.method == 'POST':
@@ -178,3 +166,28 @@ def password_reset_confirm_view(request):
         return redirect('home')
 
     return render(request, 'accounts/password_reset_confirm.html')
+
+
+@login_required
+def create_client_view(request):
+    """View for creating new clients - accessible by dispatchers"""
+    from .forms import ClientForm
+    from logistics.models import Client
+    
+    # Only dispatchers can create clients
+    if request.user.role != 'dispatcher':
+        messages.error(request, 'Only dispatchers can create clients')
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = ClientForm(request.POST)
+        if form.is_valid():
+            client = form.save(commit=False)
+            client.company = request.user.company
+            client.save()
+            messages.success(request, f'Client "{client.name}" created successfully!')
+            return redirect('home')
+    else:
+        form = ClientForm()
+    
+    return render(request, 'logistics/new_client.html', {'form': form})

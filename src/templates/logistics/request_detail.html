@@ -1,19 +1,50 @@
 {% extends 'base.html' %}
-{% block title %}Request {{ request_obj.id }}{% endblock %}
+{% block title %}Request #{{ order.id }}{% endblock %}
 
 {% block content %}
-<h2>Request {{ request_obj.id }}</h2>
-<p><strong>Cargo:</strong> {{ request_obj.cargo }}</p>
-<p><strong>Route:</strong> {{ request_obj.origin }} → {{ request_obj.destination }}</p>
-<p><strong>Driver:</strong> {{ request_obj.driver.full_name if request_obj.driver else '—' }}</p>
-<p><strong>Status:</strong> <span class="badge bg-{{ request_obj.status|lower }}">{{ request_obj.status }}</span></p>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Request #{{ order.id }}</h3>
+                    <div class="d-flex gap-2">
+                        {% if user.role == 'dispatcher' or user.role == 'driver' and order.driver == user %}
+                        <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-warning">✏️ Edit</a>
+                        {% endif %}
+                        <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary">Back</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span
+                            class="badge bg-{% if order.status == 'created' %}secondary{% elif order.status == 'in_transit' %}warning{% elif order.status == 'completed' %}success{% elif order.status == 'cancelled' %}danger{% else %}info{% endif %} fs-6">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
 
-<h4>History</h4>
-<ul>
-    {% for e in request_obj.events.all %}
-    <li>{{ e.created_at }} — {{ e.get_event_type_display }} by {{ e.order.created_by.full_name }}</li>
-    {% endfor %}
-</ul>
+                    <h5>📦 Cargo</h5>
+                    <p><strong>Type:</strong> {{ order.cargo_type }}</p>
+                    <p><strong>Weight:</strong> {{ order.cargo_mass_kg }} kg | <strong>Volume:</strong> {{
+                        order.cargo_volume_m3 }} m³</p>
 
-<a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+                    <h5>📍 Route</h5>
+                    <p><strong>Origin:</strong> {{ order.origin|default:"Not specified" }}</p>
+                    <p><strong>Destination:</strong> {{ order.destination|default:"Not specified" }}</p>
+                    <p><strong>Pickup:</strong> {{ order.pickup_datetime|date:"M d, Y, h:i A" }}</p>
+                    <p><strong>Delivery:</strong> {{ order.delivery_datetime|date:"M d, Y, h:i A" }}</p>
+
+                    <h5>👤 Client</h5>
+                    <p>{{ order.client.name }}{% if order.client.phone %} | {{ order.client.phone }}{% endif %}</p>
+
+                    <h5>🚚 Assignment</h5>
+                    <p><strong>Driver:</strong> {% if order.driver %}{{ order.driver.full_name }}{% else %}<span
+                            class="text-muted">Not assigned</span>{% endif %}</p>
+                    <p><strong>Vehicle:</strong> {% if order.vehicle %}{{ order.vehicle }}{% else %}<span
+                            class="text-muted">Not assigned</span>{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

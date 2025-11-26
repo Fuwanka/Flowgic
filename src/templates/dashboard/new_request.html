@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Shipment Request</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title">Create New Shipment Request</div>
+                    <div class="modal-subtitle">Fill in the details below to create a new shipment request.</div>
+                </div>
+                <a href="{% url 'dashboard' %}" class="close-btn">×</a>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Cargo Description</label>
+                    <input type="text" class="form-input" placeholder="e.g., Medical Supplies - Temperature Controlled">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Origin</label>
+                        <input type="text" class="form-input" placeholder="e.g., Los Angeles, CA">
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Destination</label>
+                        <input type="text" class="form-input" placeholder="e.g., San Francisco, CA">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <label class="form-label">Assigned Driver</label>
+                        <select class="form-input">
+                            <option value="">Select a driver</option>
+                            <option value="mike">Mike Davis</option>
+                            <option value="emily">Emily Chen</option>
+                            <option value="james">James Wilson</option>
+                            <option value="robert">Robert Martinez</option>
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <label class="form-label">Initial Status</label>
+                        <select class="form-input">
+                            <option value="new">new</option>
+                            <option value="in-transit">In Transit</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="button" class="btn btn-primary">Create Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,15 +1,56 @@
-{% extends "accounts/base.html" %}
-{% block title %}Водитель{% endblock %}
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Driver Dashboard{% endblock %}
+
 {% block content %}
-<h2>Добро пожаловать, {{ user.full_name }}</h2>
-<h3>Ваши назначенные заявки:</h3>
-<ul class="list-group">
-    {% for order in requests %}
-    <li class="list-group-item">
-        {{ order.cargo_type }} — {{ order.get_status_display }}
-    </li>
-    {% empty %}
-    <li class="list-group-item">Нет назначенных заявок</li>
-    {% endfor %}
-</ul>
+<style>
+    .order-unread {
+        background-color: #fff3cd !important;
+        border-left: 4px solid #ffc107;
+    }
+</style>
+
+<h1 class="mb-3">My Assigned Orders</h1>
+
+<div class="mb-3">
+    <span class="badge bg-warning">🔔 {{ unread_count }} New</span>
+    <span class="badge bg-secondary">Total: {{ requests|length }}</span>
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cargo</th>
+            <th>Route</th>
+            <th>Pickup Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in requests %}
+        <tr class="{% if not order.is_viewed_by_driver %}order-unread{% endif %}">
+            <td>
+                {% if not order.is_viewed_by_driver %}<span class="badge bg-warning">NEW</span>{% endif %}
+                <a href="{% url 'request_detail' order.id %}">{{ order.id|slice:":8" }}</a>
+            </td>
+            <td>{{ order.cargo_type }}</td>
+            <td>{{ order.origin|default:"—" }} → {{ order.destination|default:"—" }}</td>
+            <td>{{ order.pickup_datetime|date:"M d, h:i A" }}</td>
+            <td><span
+                    class="badge bg-{% if order.status == 'created' %}secondary{% elif order.status == 'in_transit' %}warning{% elif order.status == 'completed' %}success{% else %}info{% endif %}">{{
+                    order.get_status_display }}</span></td>
+            <td>
+                <a href="{% url 'request_detail' order.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-outline-warning">Update Status</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center text-muted">No orders assigned to you</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
