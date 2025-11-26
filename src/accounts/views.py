@@ -30,13 +30,14 @@ def register_view(request):
             return redirect('register')
 
         # Создаём пользователя
-        user = User.objects.create(
+        user = User(
             full_name=full_name,
             email=email,
-            password=make_password(password),  # хэшируем пароль
             company=company_obj,
             role=role
-        )
+            )
+        user.set_password(password)   # ← правильный способ
+        user.save()
 
         # Автоматически авторизуем пользователя после регистрации
         login(request, user)
@@ -51,17 +52,17 @@ def custom_login_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Аутентификация пользователя
-        user = authenticate(request, email=email, password=password)
+        # так как в модели User указано USERNAME_FIELD = 'email'
+        user = authenticate(request, username=email, password=password)
 
         if user is not None:
-            login(request, user)
-            messages.success(request, f'Добро пожаловать, {user.full_name}!')
-            return redirect('home')  # или куда нужно после логина
+            login(request, user)   # авторизуем пользователя
+            return redirect('home')
         else:
             messages.error(request, 'Неверный email или пароль')
             return redirect('login')
 
+    # если GET-запрос — просто отрисовываем страницу входа
     return render(request, 'accounts/login_register.html', {'tab': 'login'})
 
 @login_required
@@ -134,8 +135,9 @@ def password_reset_request_view(request):
         send_mail(
             subject='Сброс пароля',
             message=f'Ваш код для сброса пароля: {code}',
-            from_email=None,  # возьмёт DEFAULT_FROM_EMAIL
+            from_email='snitch_pc@mail.ru',  # ← совпадает с EMAIL_HOST_USER
             recipient_list=[user.email],
+            fail_silently=False,
         )
 
         messages.success(request, 'Код отправлен на вашу почту')

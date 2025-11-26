@@ -7,6 +7,12 @@ from datetime import timedelta
 
 
 class User(AbstractUser):
+    
+    USERNAME_FIELD = 'email'        
+    REQUIRED_FIELDS = ['username']
+
+    username = None
+
     class Role(models.TextChoices):
         Dispatcher = 'dispatcher', 'Диспетчер'
         Manager = 'manager', 'руководитель'
@@ -92,3 +98,4 @@ class PasswordResetCode(models.Model):
 
     def is_valid(self):
         return timezone.now() - self.created_at < timedelta(minutes=10)  # код живёт 10 минут
+
