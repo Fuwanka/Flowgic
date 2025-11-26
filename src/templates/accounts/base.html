@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,36 +9,48 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
-<header class="header">
-    <div class="logo">
-        <span>🚚</span>
-        <span>FlowGic</span>
-        {% if user.is_authenticated %}
-        <span style="font-size:12px; color:#666;">{{ user.company.name }}</span>
-        {% endif %}
-    </div>
-    <div class="user-panel">
-        {% if user.is_authenticated %}
-        <div class="user-info">
-            <div class="name">{{ user.full_name }}</div>
-            <div class="email">{{ user.email }}</div>
+    <header class="header">
+        <div class="logo">
+            <span>🚚</span>
+            <span>FlowGic</span>
+            {% if user.is_authenticated %}
+            <span style="font-size:12px; color:#666;">{{ user.company.name }}</span>
+            {% endif %}
         </div>
-        <div class="user-role">{{ user.role|title }}</div>
-        <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-light ms-2">Logout</a>
-        {% else %}
-        <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light ms-2">Login</a>
-        <a href="{% url 'register' %}" class="btn btn-sm btn-outline-light ms-2">Register</a>
-        {% endif %}
-    </div>
-</header>
+        <div class="user-panel">
+            {% if user.is_authenticated %}
+            <!-- Кнопка для вызова collapsible меню -->
+            <button class="btn btn-sm btn-primary ms-2" type="button" data-bs-toggle="collapse"
+                data-bs-target="#actionsMenu" aria-expanded="false" aria-controls="actionsMenu">
+                Действие
+            </button>
 
-<main class="container mt-4">
-    {% block content %}{% endblock %}
-</main>
+            <!-- Меню действий -->
+            <div class="collapse mt-2" id="actionsMenu">
+                <div class="card card-body">
+                    <a href="{% url 'password_change' %}" class="btn btn-warning mb-2">Сменить пароль</a>
+                    <a href="{% url 'delete_account' %}" class="btn btn-danger mb-2">Удалить аккаунт</a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">Выйти</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light ms-2">Войти</a>
+            <a href="{% url 'register' %}" class="btn btn-sm btn-outline-light ms-2">Регистрация</a>
+            {% endif %}
+        </div>
+    </header>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-{% block scripts %}{% endblock %}
+    <main class="container mt-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
 </body>
-</html>
 
+</html>

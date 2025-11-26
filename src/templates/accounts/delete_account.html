@@ -1,0 +1,11 @@
+{% extends "accounts/base.html" %}
+{% block title %}Удаление аккаунта{% endblock %}
+{% block content %}
+<h2>Удаление аккаунта</h2>
+<p>Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Удалить аккаунт</button>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

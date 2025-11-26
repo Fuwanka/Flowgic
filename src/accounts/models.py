@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import dispatcher
+import uuid
+from django.utils import timezone
+from datetime import timedelta
 
 
 class User(AbstractUser):
@@ -81,3 +84,11 @@ class User(AbstractUser):
     def __str__(self):
         name = self.full_name or self.get_full_name() or self.username
         return f"{name} ({self.get_role_display()})"
+    
+class PasswordResetCode(models.Model):
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self):
+        return timezone.now() - self.created_at < timedelta(minutes=10)  # код живёт 10 минут

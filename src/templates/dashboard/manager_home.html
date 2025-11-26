@@ -1,0 +1,15 @@
+{% extends "accounts/base.html" %}
+{% block title %}Менеджер{% endblock %}
+{% block content %}
+<h2>Добро пожаловать, {{ user.full_name }}</h2>
+<h3>Заявки вашей компании:</h3>
+<ul class="list-group">
+    {% for order in requests %}
+    <li class="list-group-item">
+        {{ order.cargo_type }} — {{ order.get_status_display }}
+    </li>
+    {% empty %}
+    <li class="list-group-item">Нет заявок</li>
+    {% endfor %}
+</ul>
+{% endblock %}

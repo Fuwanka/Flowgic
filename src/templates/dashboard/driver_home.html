@@ -1,0 +1,15 @@
+{% extends "accounts/base.html" %}
+{% block title %}Водитель{% endblock %}
+{% block content %}
+<h2>Добро пожаловать, {{ user.full_name }}</h2>
+<h3>Ваши назначенные заявки:</h3>
+<ul class="list-group">
+    {% for order in requests %}
+    <li class="list-group-item">
+        {{ order.cargo_type }} — {{ order.get_status_display }}
+    </li>
+    {% empty %}
+    <li class="list-group-item">Нет назначенных заявок</li>
+    {% endfor %}
+</ul>
+{% endblock %}

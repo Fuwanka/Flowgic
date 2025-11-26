@@ -6,6 +6,10 @@ from logistics.models import Company  # Импортируем Company из logi
 from .models import User
 from django.contrib.auth.decorators import login_required
 from logistics.models import Order
+import random
+from django.core.mail import send_mail
+from django.contrib.auth import update_session_auth_hash
+from .models import PasswordResetCode
 
 User = get_user_model()
 
@@ -103,3 +107,72 @@ def home_view(request):
         template_name = 'dashboard/home.html'
 
     return render(request, template_name, context)
+
+@login_required
+def delete_account_view(request):
+    if request.method == 'POST':
+        user = request.user
+        user.delete()
+        messages.success(request, 'Ваш аккаунт был удалён.')
+        return redirect('login')
+    return render(request, 'accounts/delete_account.html')
+
+def password_reset_request_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, 'Пользователь с таким email не найден')
+            return redirect('password_reset_request')
+
+        # генерируем код
+        code = str(random.randint(100000, 999999))
+        PasswordResetCode.objects.create(user=user, code=code)
+
+        # отправляем письмо
+        send_mail(
+            subject='Сброс пароля',
+            message=f'Ваш код для сброса пароля: {code}',
+            from_email=None,  # возьмёт DEFAULT_FROM_EMAIL
+            recipient_list=[user.email],
+        )
+
+        messages.success(request, 'Код отправлен на вашу почту')
+        return redirect('password_reset_confirm')
+
+    return render(request, 'accounts/password_reset_request.html')
+
+
+def password_reset_confirm_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        code = request.POST.get('code')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+
+        if new_password1 != new_password2:
+            messages.error(request, 'Пароли не совпадают')
+            return redirect('password_reset_confirm')
+
+        try:
+            user = User.objects.get(email=email)
+            reset_code = PasswordResetCode.objects.filter(user=user, code=code).latest('created_at')
+        except (User.DoesNotExist, PasswordResetCode.DoesNotExist):
+            messages.error(request, 'Неверный код или email')
+            return redirect('password_reset_confirm')
+
+        if not reset_code.is_valid():
+            messages.error(request, 'Код истёк')
+            return redirect('password_reset_request')
+
+        # меняем пароль
+        user.set_password(new_password1)
+        user.save()
+        update_session_auth_hash(request, user)  # чтобы сразу авторизовать
+
+        messages.success(request, 'Пароль успешно изменён')
+        login(request, user)
+        return redirect('home')
+
+    return render(request, 'accounts/password_reset_confirm.html')

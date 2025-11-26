@@ -16,10 +16,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('accounts.urls')),  # сначала подключаем все маршруты из accounts
+
+    # все маршруты аккаунтов доступны в корне
+    path('', include('accounts.urls')),
+
+    # маршруты логистики
     path('logistics/', include('logistics.urls')),
-    path("accounts/", include("accounts.urls")),
+
+    # смена пароля
+    path('password_change/', auth_views.PasswordChangeView.as_view(
+        template_name='accounts/password_change.html',
+        success_url='/password_change_done/'
+    ), name='password_change'),
+
+    path('password_change_done/', auth_views.PasswordChangeDoneView.as_view(
+        template_name='accounts/password_change_done.html'
+    ), name='password_change_done'),
 ]
