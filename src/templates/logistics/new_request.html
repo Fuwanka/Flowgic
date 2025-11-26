@@ -38,132 +38,88 @@
                             <label for="{{ form.cargo_type.id_for_label }}" class="form-label">
                                 {{ form.cargo_type.label }} <span class="text-danger">*</span>
                             </label>
+                            </label>
                             {{ form.cargo_type }}
                             {% if form.cargo_type.errors %}
                             <div class="text-danger small">{{ form.cargo_type.errors }}</div>
                             {% endif %}
                         </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.origin.id_for_label }}" class="form-label">
+                            {{ form.origin.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.origin }}
+                        {% if form.origin.errors %}
+                        <div class="text-danger small">{{ form.origin.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.destination.id_for_label }}" class="form-label">
+                            {{ form.destination.label }}
+                        </label>
+                        {{ form.destination }}
+                        {% if form.destination.errors %}
+                        <div class="text-danger small">{{ form.destination.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
 
-                        <!-- Cargo Weight and Volume -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.cargo_mass_kg.id_for_label }}" class="form-label">
-                                    {{ form.cargo_mass_kg.label }} <span class="text-danger">*</span>
-                                </label>
-                                {{ form.cargo_mass_kg }}
-                                {% if form.cargo_mass_kg.errors %}
-                                <div class="text-danger small">{{ form.cargo_mass_kg.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.cargo_volume_m3.id_for_label }}" class="form-label">
-                                    {{ form.cargo_volume_m3.label }} <span class="text-danger">*</span>
-                                </label>
-                                {{ form.cargo_volume_m3 }}
-                                {% if form.cargo_volume_m3.errors %}
-                                <div class="text-danger small">{{ form.cargo_volume_m3.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
+                <!-- Pickup and Delivery Times -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.pickup_datetime.id_for_label }}" class="form-label">
+                            {{ form.pickup_datetime.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.pickup_datetime }}
+                        {% if form.pickup_datetime.errors %}
+                        <div class="text-danger small">{{ form.pickup_datetime.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.delivery_datetime.id_for_label }}" class="form-label">
+                            {{ form.delivery_datetime.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.delivery_datetime }}
+                        {% if form.delivery_datetime.errors %}
+                        <div class="text-danger small">{{ form.delivery_datetime.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
 
-                        <!-- Origin and Destination -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.origin.id_for_label }}" class="form-label">
-                                    {{ form.origin.label }}
-                                </label>
-                                {{ form.origin }}
-                                {% if form.origin.errors %}
-                                <div class="text-danger small">{{ form.origin.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.destination.id_for_label }}" class="form-label">
-                                    {{ form.destination.label }}
-                                </label>
-                                {{ form.destination }}
-                                {% if form.destination.errors %}
-                                <div class="text-danger small">{{ form.destination.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
+                <!-- Driver and Vehicle -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.driver.id_for_label }}" class="form-label">
+                            {{ form.driver.label }}
+                        </label>
+                        {{ form.driver }}
+                        {% if form.driver.errors %}
+                        <div class="text-danger small">{{ form.driver.errors }}</div>
+                        {% endif %}
+                        <small class="text-muted">Leave empty to assign later</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.vehicle.id_for_label }}" class="form-label">
+                            {{ form.vehicle.label }}
+                        </label>
+                        {{ form.vehicle }}
+                        {% if form.vehicle.errors %}
+                        <div class="text-danger small">{{ form.vehicle.errors }}</div>
+                        {% endif %}
+                        <small class="text-muted">Leave empty to assign later</small>
+                    </div>
+                </div>
 
-                        <!-- Pickup and Delivery Times -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.pickup_datetime.id_for_label }}" class="form-label">
-                                    {{ form.pickup_datetime.label }} <span class="text-danger">*</span>
-                                </label>
-                                {{ form.pickup_datetime }}
-                                {% if form.pickup_datetime.errors %}
-                                <div class="text-danger small">{{ form.pickup_datetime.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.delivery_datetime.id_for_label }}" class="form-label">
-                                    {{ form.delivery_datetime.label }} <span class="text-danger">*</span>
-                                </label>
-                                {{ form.delivery_datetime }}
-                                {% if form.delivery_datetime.errors %}
-                                <div class="text-danger small">{{ form.delivery_datetime.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Driver and Vehicle -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.driver.id_for_label }}" class="form-label">
-                                    {{ form.driver.label }}
-                                </label>
-                                {{ form.driver }}
-                                {% if form.driver.errors %}
-                                <div class="text-danger small">{{ form.driver.errors }}</div>
-                                {% endif %}
-                                <small class="text-muted">Leave empty to assign later</small>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.vehicle.id_for_label }}" class="form-label">
-                                    {{ form.vehicle.label }}
-                                </label>
-                                {{ form.vehicle }}
-                                {% if form.vehicle.errors %}
-                                <div class="text-danger small">{{ form.vehicle.errors }}</div>
-                                {% endif %}
-                                <small class="text-muted">Leave empty to assign later</small>
-                            </div>
-                        </div>
-
-                        <!-- Status and Payment Terms -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.status.id_for_label }}" class="form-label">
-                                    {{ form.status.label }} <span class="text-danger">*</span>
-                                </label>
-                                {{ form.status }}
-                                {% if form.status.errors %}
-                                <div class="text-danger small">{{ form.status.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.payment_terms.id_for_label }}" class="form-label">
-                                    {{ form.payment_terms.label }}
-                                </label>
-                                {{ form.payment_terms }}
-                                {% if form.payment_terms.errors %}
-                                <div class="text-danger small">{{ form.payment_terms.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2 mt-4">
-                            <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Request</button>
-                        </div>
-                    </form>
+                <!-- Status and Payment Terms -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.status.id_for_label }}" class="form-label">
+                            </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}

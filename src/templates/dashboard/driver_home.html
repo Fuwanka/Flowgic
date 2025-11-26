@@ -35,12 +35,14 @@
                 {% if not order.is_viewed_by_driver %}<span class="badge bg-warning">NEW</span>{% endif %}
                 <a href="{% url 'request_detail' order.id %}">{{ order.id|slice:":8" }}</a>
             </td>
-            <td>{{ order.cargo_type }}</td>
+            <td>
+                {{ order.cargo_type }}
+                <br>
+                <small class="text-muted">{{ order.cargo_mass_kg }} kg</small>
+            </td>
             <td>{{ order.origin|default:"—" }} → {{ order.destination|default:"—" }}</td>
             <td>{{ order.pickup_datetime|date:"M d, h:i A" }}</td>
-            <td><span
-                    class="badge bg-{% if order.status == 'created' %}secondary{% elif order.status == 'in_transit' %}warning{% elif order.status == 'completed' %}success{% else %}info{% endif %}">{{
-                    order.get_status_display }}</span></td>
+            <td><span class="badge bg-{{ order.status|lower }}">{{ order.get_status_display }}</span></td>
             <td>
                 <a href="{% url 'request_detail' order.id %}" class="btn btn-sm btn-outline-primary">View</a>
                 <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-outline-warning">Update Status</a>

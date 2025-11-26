@@ -19,32 +19,19 @@
                     <div class="mb-3">
                         <span
                             class="badge bg-{% if order.status == 'created' %}secondary{% elif order.status == 'in_transit' %}warning{% elif order.status == 'completed' %}success{% elif order.status == 'cancelled' %}danger{% else %}info{% endif %} fs-6">
-                            {{ order.get_status_display }}
-                        </span>
+
+                            <h5>👤 Client</h5>
+                            <p>{{ order.client.name }}{% if order.client.phone %} | {{ order.client.phone }}{% endif %}
+                            </p>
+
+                            <h5>🚚 Assignment</h5>
+                            <p><strong>Driver:</strong> {% if order.driver %}{{ order.driver.full_name }}{% else %}<span
+                                    class="text-muted">Not assigned</span>{% endif %}</p>
+                            <p><strong>Vehicle:</strong> {% if order.vehicle %}{{ order.vehicle }}{% else %}<span
+                                    class="text-muted">Not assigned</span>{% endif %}</p>
                     </div>
-
-                    <h5>📦 Cargo</h5>
-                    <p><strong>Type:</strong> {{ order.cargo_type }}</p>
-                    <p><strong>Weight:</strong> {{ order.cargo_mass_kg }} kg | <strong>Volume:</strong> {{
-                        order.cargo_volume_m3 }} m³</p>
-
-                    <h5>📍 Route</h5>
-                    <p><strong>Origin:</strong> {{ order.origin|default:"Not specified" }}</p>
-                    <p><strong>Destination:</strong> {{ order.destination|default:"Not specified" }}</p>
-                    <p><strong>Pickup:</strong> {{ order.pickup_datetime|date:"M d, Y, h:i A" }}</p>
-                    <p><strong>Delivery:</strong> {{ order.delivery_datetime|date:"M d, Y, h:i A" }}</p>
-
-                    <h5>👤 Client</h5>
-                    <p>{{ order.client.name }}{% if order.client.phone %} | {{ order.client.phone }}{% endif %}</p>
-
-                    <h5>🚚 Assignment</h5>
-                    <p><strong>Driver:</strong> {% if order.driver %}{{ order.driver.full_name }}{% else %}<span
-                            class="text-muted">Not assigned</span>{% endif %}</p>
-                    <p><strong>Vehicle:</strong> {% if order.vehicle %}{{ order.vehicle }}{% else %}<span
-                            class="text-muted">Not assigned</span>{% endif %}</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}

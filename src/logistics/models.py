@@ -100,12 +100,6 @@ class Vehicle(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name='Грузоподъёмность (кг)'
     )
-    capacity_m3 = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal('0.00'))],
-        verbose_name='Объём кузова (м³)'
-    )
     last_maintenance = models.DateField(blank=True, null=True, verbose_name='Дата последнего ТО')
     status = models.CharField(
         max_length=20,
@@ -184,12 +178,6 @@ class Order(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name='Масса груза (кг)'
     )
-    cargo_volume_m3 = models.DecimalField(
-        max_digits=6,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal('0.00'))],
-        verbose_name='Объём груза (м³)'
-    )
     # Поля для маршрута
     origin = models.CharField(
         max_length=255,
@@ -205,12 +193,13 @@ class Order(models.Model):
         verbose_name='Пункт назначения',
         help_text='Адрес или название точки назначения'
     )
-    payment_terms = models.CharField(
-        max_length=100,
+    agreed_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
         blank=True,
         null=True,
-        verbose_name='Условия оплаты',
-        help_text='Например: "100% предоплата", "наличные при получении"'
+        verbose_name='Договоренная стоимость',
+        help_text='Стоимость перевозки'
     )
     pickup_datetime = models.DateTimeField(verbose_name='Плановое время забора')
     delivery_datetime = models.DateTimeField(verbose_name='Плановое время доставки')

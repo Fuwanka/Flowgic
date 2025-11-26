@@ -1,15 +1,64 @@
-{% extends "base.html" %}
-{% block title %}Диспетчер{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
-<h2>Добро пожаловать, {{ user.full_name }}</h2>
-<h3>Ваши заявки:</h3>
-<ul class="list-group">
-    {% for order in requests %}
-    <li class="list-group-item">
-        {{ order.cargo_type }} — {{ order.get_status_display }}
-    </li>
-    {% empty %}
-    <li class="list-group-item">Нет заявок</li>
-    {% endfor %}
-</ul>
+<h1 class="mb-3">Dashboard</h1>
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="filters">
+        <button class="btn btn-outline-primary filter-btn active">All</button>
+        <button class="btn btn-outline-secondary filter-btn">New</button>
+        <button class="btn btn-outline-warning filter-btn">In Transit</button>
+        <button class="btn btn-outline-success filter-btn">Completed</button>
+        <button class="btn btn-outline-danger filter-btn">Cancelled</button>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'create_client' %}" class="btn btn-success">👤 New Client</a>
+        <a href="{% url 'create_vehicle' %}" class="btn btn-info text-white">🚛 New Vehicle</a>
+        <a href="{% url 'new_request' %}" class="btn btn-primary">➕ New Request</a>
+    </div>
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cargo</th>
+            <th>Route</th>
+            <th>Driver</th>
+            <th>Vehicle</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for req in requests %}
+        <tr>
+            <td><a href="{% url 'request_detail' req.id %}">{{ req.id|slice:":8" }}</a></td>
+            <td>{{ req.cargo_type }}</td>
+            <td>{{ req.origin }} → {{ req.destination }}</td>
+            <td>{% if req.driver %}{{ req.driver.full_name }}{% else %}—{% endif %}</td>
+            <td>{% if req.vehicle %}{{ req.vehicle.reg_number }}{% else %}—{% endif %}</td>
+            <td><span class="badge bg-{{ req.status|lower }}">{{ req.get_status_display }}</span></td>
+            <td><a href="{% url 'request_detail' req.id %}" class="btn btn-sm btn-outline-primary">View</a></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center">No requests found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            // TODO: добавить фильтрацию по статусу через AJAX
+        });
+    });
+</script>
 {% endblock %}

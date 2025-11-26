@@ -73,7 +73,7 @@ def home_view(request):
         # Все заявки, которые созданы диспетчером или для компании
         requests = Order.objects.filter(created_by=user).order_by('-created_at')
         context['requests'] = requests
-        template_name = 'accounts/dashboard.html'
+        template_name = 'dashboard/dispatcher_home.html'
 
     elif user.role == 'manager':
         # Все заявки для компании менеджера
@@ -191,3 +191,28 @@ def create_client_view(request):
         form = ClientForm()
     
     return render(request, 'logistics/new_client.html', {'form': form})
+
+
+@login_required
+def create_vehicle_view(request):
+    """View for creating new vehicles - accessible by dispatchers"""
+    from logistics.forms import VehicleForm
+    from logistics.models import Vehicle
+    
+    # Only dispatchers can create vehicles
+    if request.user.role != 'dispatcher':
+        messages.error(request, 'Only dispatchers can create vehicles')
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = VehicleForm(request.POST)
+        if form.is_valid():
+            vehicle = form.save(commit=False)
+            vehicle.company = request.user.company
+            vehicle.save()
+            messages.success(request, f'Vehicle "{vehicle.reg_number}" created successfully!')
+            return redirect('home')
+    else:
+        form = VehicleForm()
+    
+    return render(request, 'logistics/new_vehicle.html', {'form': form})

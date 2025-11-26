@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Смена пароля{% endblock %}
+{% block title %}Новый транспорт{% endblock %}
 
 {% block content %}
 <div class="row">
-    <div class="col-md-6 offset-md-3">
-        <h2 class="mb-4">Смена пароля</h2>
+    <div class="col-md-8 offset-md-2">
+        <h2 class="mb-4">Добавление нового транспорта</h2>
         <form method="post" class="card card-body">
             {% csrf_token %}
             {% for field in form %}
@@ -22,8 +22,10 @@
                 {% endif %}
             </div>
             {% endfor %}
-            <button type="submit" class="btn btn-primary">Сменить пароль</button>
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary">Отмена</a>
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary">Отмена</a>
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </div>
         </form>
     </div>
 </div>
