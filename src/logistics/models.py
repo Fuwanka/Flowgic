@@ -241,6 +241,11 @@ class Order(models.Model):
         """Alias for cargo_type for template compatibility"""
         return self.cargo_type
 
+    @property
+    def order_number(self):
+        """Returns a short, user-friendly order number"""
+        return str(self.id).split('-')[0].upper()
+
     def __str__(self):
         return f"Заказ #{self.id} — {self.cargo_type}"
 
@@ -257,6 +262,7 @@ class OrderEvent(models.Model):
         DELIVERED = 'delivered', 'Доставлен'
         DOCUMENT_SIGNED = 'document_signed', 'Документ подписан'
         STATUS_CHANGED = 'status_changed', 'Изменение статуса'
+        PAYMENT_UPDATED = 'payment_updated', 'Обновление оплаты'
         LOCATION_UPDATE = 'location_update', 'Обновление местоположения'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

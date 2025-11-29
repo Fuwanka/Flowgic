@@ -121,7 +121,7 @@ class OrderEditForm(forms.ModelForm):
     """Form for dispatchers to edit order driver and status"""
     
     class Meta:
-        model = Order
+        model = Order 
         fields = ['driver', 'vehicle', 'status']
         widgets = {
             'driver': forms.Select(attrs={'class': 'form-input'}),

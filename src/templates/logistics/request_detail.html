@@ -1,37 +1,335 @@
-{% extends 'base.html' %}
-{% block title %}Request #{{ order.id }}{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3>Request #{{ order.id }}</h3>
-                    <div class="d-flex gap-2">
-                        {% if user.role == 'dispatcher' or user.role == 'driver' and order.driver == user %}
-                        <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-warning">✏️ Edit</a>
-                        {% endif %}
-                        <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary">Back</a>
+<head>
+    <meta charset="UTF-8">
+    <title>Request {{ order.id }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/request_detail.css' %}">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <span>Request #{{ order.id|stringformat:"s"|slice:":8" }}...</span>
+                <span class="status-badge status-{{ order.status }}" id="order-status-badge">{{ order.get_status_display
+                    }}</span>
+
+                {% if user.role == 'dispatcher' or user.role == 'manager' %}
+                <!-- Quick Status Change -->
+                <div style="margin-left: 20px; display: flex; align-items: center; gap: 10px;">
+                    <select id="status-select"
+                        style="padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                        <option value="">Изменить статус...</option>
+                        {% for choice in order.Status.choices %}
+                        <option value="{{ choice.0 }}" {% if order.status==choice.0 %}disabled{% endif %}>{{ choice.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div id="status-message" style="font-size: 0.85rem; display: none;"></div>
+                </div>
+                {% endif %}
+            </div>
+            <div>
+                <span class="text-muted" style="font-size: 0.9rem; margin-right: 15px;">
+                    Created {{ order.created_at|date:"M d, H:i" }} by {{
+                    order.created_by.get_full_name|default:order.created_by.username }}
+                </span>
+                <a href="{% url 'home' %}" class="close-btn">Close</a>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Column 1: Client & Cargo -->
+            <div class="dashboard-column">
+                <div class="info-card">
+                    <div class="card-title">🏢 Client Details</div>
+                    <div class="info-row">
+                        <span class="info-label">Company</span>
+                        <span class="info-value">{{ order.client.company.name }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Contact</span>
+                        <span class="info-value">{{ order.client.name }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Phone</span>
+                        <span class="info-value">{{ order.client.phone|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">{{ order.client.email|default:"-" }}</span>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <span
-                            class="badge bg-{% if order.status == 'created' %}secondary{% elif order.status == 'in_transit' %}warning{% elif order.status == 'completed' %}success{% elif order.status == 'cancelled' %}danger{% else %}info{% endif %} fs-6">
 
-                            <h5>👤 Client</h5>
-                            <p>{{ order.client.name }}{% if order.client.phone %} | {{ order.client.phone }}{% endif %}
-                            </p>
+                <div class="info-card">
+                    <div class="card-title">📦 Cargo</div>
+                    <div class="info-row">
+                        <span class="info-label">Type</span>
+                        <span class="info-value">{{ order.cargo_type }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Mass</span>
+                        <span class="info-value">{{ order.cargo_mass_kg }} kg</span>
+                    </div>
+                </div>
 
-                            <h5>🚚 Assignment</h5>
-                            <p><strong>Driver:</strong> {% if order.driver %}{{ order.driver.full_name }}{% else %}<span
-                                    class="text-muted">Not assigned</span>{% endif %}</p>
-                            <p><strong>Vehicle:</strong> {% if order.vehicle %}{{ order.vehicle }}{% else %}<span
-                                    class="text-muted">Not assigned</span>{% endif %}</p>
+                {% if user.role == 'dispatcher' or user.role == 'manager' or user.role == 'driver' %}
+                <div class="info-card">
+                    <div class="card-title">💰 Financials</div>
+                    {% if user.role == 'dispatcher' or user.role == 'manager' %}
+                    <div class="info-row">
+                        <span class="info-label">Agreed Price</span>
+                        <span class="info-value">{{ order.agreed_price|default:"-" }}</span>
+                    </div>
+                    {% if order.financial %}
+                    <div class="info-row">
+                        <span class="info-label">Client Cost</span>
+                        <span class="info-value">{{ order.financial.client_cost|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Profit</span>
+                        <span class="info-value text-success">{{ order.financial.profit|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Payment Status</span>
+                        <span class="info-value">
+                            <span class="payment-badge payment-{{ order.financial.payment_status }}"
+                                id="payment-status-badge">{{ order.financial.get_payment_status_display }}</span>
+                        </span>
+                    </div>
+
+                    <!-- Payment Controls (Dispatcher/Manager Only) -->
+                    <div class="payment-controls"
+                        style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;">
+                        <form id="payment-form" style="display: flex; flex-direction: column; gap: 10px;">
+                            {% csrf_token %}
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="fully-paid" name="fully_paid" style="cursor: pointer;">
+                                <label for="fully-paid" style="margin: 0; cursor: pointer; font-size: 0.9rem;">Полностью
+                                    оплачено</label>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                <label for="partial-amount" style="font-size: 0.85rem; color: #666;">Частичная
+                                    оплата:</label>
+                                <input type="number" id="partial-amount" name="partial_amount"
+                                    placeholder="Введите сумму"
+                                    value="{% if order.financial.payment_plan.partial_amount %}{{ order.financial.payment_plan.partial_amount }}{% endif %}"
+                                    style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;"
+                                    step="0.01" min="0">
+                            </div>
+                            <button type="submit" class="btn-update-payment"
+                                style="padding: 8px 12px; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+                                Обновить
+                            </button>
+                            <div id="payment-message" style="font-size: 0.85rem; display: none;"></div>
+                        </form>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+
+                    {% if order.financial.driver_cost %}
+                    <div class="info-row">
+                        <span class="info-label">Driver Payout</span>
+                        <span class="info-value">{{ order.financial.driver_cost }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Column 2: Route & Resources -->
+            <div class="dashboard-column">
+                <div class="info-card">
+                    <div class="card-title">📍 Route</div>
+                    <div class="info-row">
+                        <span class="info-label">Origin</span>
+                        <span class="info-value">{{ order.origin }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Pickup</span>
+                        <span class="info-value">{{ order.pickup_datetime|date:"M d, H:i" }}</span>
+                    </div>
+                    <hr class="divider">
+                    <div class="info-row">
+                        <span class="info-label">Destination</span>
+                        <span class="info-value">{{ order.destination }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Delivery</span>
+                        <span class="info-value">{{ order.delivery_datetime|date:"M d, H:i" }}</span>
+                    </div>
+                    {% if order.distance_km %}
+                    <div class="info-row" style="margin-top: 10px;">
+                        <span class="info-label">Distance</span>
+                        <span class="info-value">{{ order.distance_km }} km</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="info-card">
+                    <div class="card-title">🚚 Resources</div>
+                    <div class="info-row">
+                        <span class="info-label">Driver</span>
+                        <span class="info-value">
+                            {% if order.driver %}{{ order.driver.get_full_name|default:order.driver.username }}
+                            {% else %}<span class="text-muted">Unassigned</span>{% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Vehicle</span>
+                        <span class="info-value">
+                            {% if order.vehicle %}{{ order.vehicle.reg_number }}
+                            {% else %}<span class="text-muted">Unassigned</span>{% endif %}
+                        </span>
                     </div>
                 </div>
             </div>
+
+            <!-- Column 3: History & Documents -->
+            <div class="dashboard-column">
+                <div class="info-card" style="flex: 1; display: flex; flex-direction: column;">
+                    <div class="card-title">🕒 History</div>
+                    <div class="history-list" id="history-list">
+                        {% for event in order.events.all %}
+                        <div class="history-item">
+                            <span class="history-icon">●</span>
+                            <div class="history-content">
+                                <div><strong>{{ event.get_event_type_display }}</strong></div>
+                                {% if event.event_data %}
+                                <div style="font-size: 0.8rem; color: #666;">
+                                    {% if event.event_data.action == 'marked_as_paid' %}
+                                    Заказ помечен как полностью оплаченный<br>
+                                    Пользователь: {{ event.event_data.user }}
+                                    {% elif event.event_data.action == 'partial_payment' %}
+                                    Частичная оплата: <strong>{{ event.event_data.amount }} ₽</strong><br>
+                                    Пользователь: {{ event.event_data.user }}
+                                    {% elif event.event_data.old_status %}
+                                    Статус изменён: {{ event.event_data.old_status }} → {{ event.event_data.new_status
+                                    }}<br>
+                                    Пользователь: {{ event.event_data.user }}
+                                    {% else %}
+                                    {{ event.event_data }}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                <div class="history-time">{{ event.created_at|date:"M d, H:i" }}</div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-muted" style="font-style: italic; padding: 10px;">No events yet.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if order.documents.exists %}
+                <div class="info-card">
+                    <div class="card-title">📄 Documents</div>
+                    {% for doc in order.documents.all %}
+                    <a href="{{ doc.file_url|default:'#' }}" target="_blank" class="document-link">
+                        {{ doc.get_type_display }} №{{ doc.number }}
+                        <span style="float: right; font-size: 0.8rem; color: #666;">{{ doc.get_status_display }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
-    {% endblock %}
+
+    <script>
+        // Status change dropdown handler
+        document.getElementById('status-select')?.addEventListener('change', async function () {
+            const newStatus = this.value;
+            const messageEl = document.getElementById('status-message');
+            const badge = document.getElementById('order-status-badge');
+            if (!newStatus) return;
+
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            formData.append('status', newStatus);
+
+            try {
+                const response = await fetch('{% url "update_order_status" order.id %}', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (data.success) {
+                    badge.className = 'status-badge status-' + data.status;
+                    badge.textContent = data.status_display;
+                    messageEl.textContent = '✓ Обновлено';
+                    messageEl.style.color = '#388e3c';
+                    messageEl.style.display = 'block';
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    messageEl.textContent = '✗ ' + data.error;
+                    messageEl.style.color = '#c62828';
+                    messageEl.style.display = 'block';
+                }
+            } catch (error) {
+                messageEl.textContent = '✗ Ошибка сервера';
+                messageEl.style.color = '#c62828';
+                messageEl.style.display = 'block';
+            }
+            this.value = '';
+            setTimeout(() => messageEl.style.display = 'none', 3000);
+        });
+
+        // Payment form AJAX submission
+        document.getElementById('payment-form')?.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const fullyPaid = document.getElementById('fully-paid').checked;
+            const partialAmount = document.getElementById('partial-amount').value.trim();
+            const messageEl = document.getElementById('payment-message');
+            const badge = document.getElementById('payment-status-badge');
+
+            if (!fullyPaid && !partialAmount) {
+                messageEl.textContent = 'Выберите вариант оплаты';
+                messageEl.style.color = '#c62828';
+                messageEl.style.display = 'block';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            formData.append('fully_paid', fullyPaid);
+            if (partialAmount) formData.append('partial_amount', partialAmount);
+
+            try {
+                const response = await fetch('{% url "update_payment_status" order.id %}', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (data.success) {
+                    badge.className = 'payment-badge payment-' + data.payment_status;
+                    badge.textContent = data.payment_status_display;
+                    messageEl.textContent = 'Статус оплаты обновлен!';
+                    messageEl.style.color = '#388e3c';
+                    messageEl.style.display = 'block';
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    messageEl.textContent = 'Ошибка: ' + data.error;
+                    messageEl.style.color = '#c62828';
+                    messageEl.style.display = 'block';
+                }
+            } catch (error) {
+                messageEl.textContent = 'Ошибка сервера';
+                messageEl.style.color = '#c62828';
+                messageEl.style.display = 'block';
+            }
+        });
+
+        // Uncheck fully paid when entering partial amount
+        document.getElementById('partial-amount')?.addEventListener('input', function () {
+            if (this.value) document.getElementById('fully-paid').checked = false;
+        });
+
+        // Clear partial amount when checking fully paid
+        document.getElementById('fully-paid')?.addEventListener('change', function () {
+            if (this.checked) document.getElementById('partial-amount').value = '';
+        });
+    </script>
+</body>
+
+</html>

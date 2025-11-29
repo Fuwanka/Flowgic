@@ -22,29 +22,42 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>Order #</th>
             <th>Cargo</th>
             <th>Route</th>
             <th>Driver</th>
             <th>Vehicle</th>
             <th>Status</th>
+            <th>Payment</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for req in requests %}
         <tr>
-            <td><a href="{% url 'request_detail' req.id %}">{{ req.id|slice:":8" }}</a></td>
+            <td><a href="{% url 'request_detail' req.id %}">{{ req.order_number }}</a></td>
             <td>{{ req.cargo_type }}</td>
             <td>{{ req.origin }} → {{ req.destination }}</td>
             <td>{% if req.driver %}{{ req.driver.full_name }}{% else %}—{% endif %}</td>
             <td>{% if req.vehicle %}{{ req.vehicle.reg_number }}{% else %}—{% endif %}</td>
             <td><span class="badge bg-{{ req.status|lower }}">{{ req.get_status_display }}</span></td>
+            <td>
+                {% if req.financial %}
+                <span class="badge 
+                    {% if req.financial.payment_status == 'paid' %}bg-success
+                    {% elif req.financial.payment_status == 'partially_paid' %}bg-warning
+                    {% else %}bg-danger{% endif %}">
+                    {{ req.financial.get_payment_status_display }}
+                </span>
+                {% else %}
+                <span class="badge bg-secondary">—</span>
+                {% endif %}
+            </td>
             <td><a href="{% url 'request_detail' req.id %}" class="btn btn-sm btn-outline-primary">View</a></td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="7" class="text-center">No requests found.</td>
+            <td colspan="8" class="text-center">No requests found.</td>
         </tr>
         {% endfor %}
     </tbody>

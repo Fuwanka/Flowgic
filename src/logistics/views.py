@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
 from accounts.decorators import role_required
 from .models import Order
 
@@ -33,6 +34,8 @@ def new_request(request):
             order.save()
             messages.success(request, f'Order #{order.id} created successfully!')
             return redirect('request_detail', order_id=order.id)
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = OrderForm(user=request.user)
     
@@ -85,3 +88,134 @@ def edit_order(request, order_id):
     }
     return render(request, 'logistics/edit_order.html', context)
 
+
+@login_required
+def update_payment_status(request, order_id):
+    """Update payment status for an order (dispatcher/manager only)"""
+    from django.http import JsonResponse
+    from decimal import Decimal
+    from .models import OrderEvent, Financial
+    
+    # Check permissions
+    if request.user.role not in ['dispatcher', 'manager']:
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
+    
+    order = get_object_or_404(Order, id=order_id)
+    
+    try:
+        fully_paid = request.POST.get('fully_paid') == 'true'
+        partial_amount = request.POST.get('partial_amount', '').strip()
+        
+        # Get or create Financial record
+        financial, created = Financial.objects.get_or_create(
+            order=order,
+            defaults={
+                'client_cost': order.agreed_price or Decimal('0.00'),
+                'driver_cost': Decimal('0.00'),
+                'profit': Decimal('0.00'),
+            }
+        )
+        
+        old_status = financial.payment_status
+        event_data = {}
+        
+        if fully_paid:
+            # Mark as fully paid
+            financial.payment_status = 'paid'
+            event_data = {'action': 'marked_as_paid', 'user': request.user.username}
+        elif partial_amount:
+            # Update partial payment
+            try:
+                amount = Decimal(partial_amount)
+                if amount <= 0:
+                    return JsonResponse({'success': False, 'error': 'Amount must be positive'}, status=400)
+                
+                financial.payment_status = 'partially_paid'
+                # Store partial amount in payment_plan as the current partial payment
+                financial.payment_plan = {
+                    'partial_amount': str(amount),
+                    'updated_by': request.user.username,
+                    'updated_at': str(timezone.now())
+                }
+                event_data = {'action': 'partial_payment', 'amount': str(amount), 'user': request.user.username}
+            except (ValueError, TypeError):
+                return JsonResponse({'success': False, 'error': 'Invalid amount'}, status=400)
+        else:
+            return JsonResponse({'success': False, 'error': 'No payment data provided'}, status=400)
+        
+        financial.save()
+        
+        # Log payment update event if status changed
+        if old_status != financial.payment_status:
+            OrderEvent.objects.create(
+                order=order,
+                event_type='payment_updated',
+                event_data=event_data
+            )
+        
+        return JsonResponse({
+            'success': True,
+            'payment_status': financial.payment_status,
+            'payment_status_display': financial.get_payment_status_display()
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+@login_required
+def update_order_status(request, order_id):
+    """Update order status (dispatcher/manager only)"""
+    from django.http import JsonResponse
+    from .models import OrderEvent
+    
+    # Check permissions
+    if request.user.role not in ['dispatcher', 'manager']:
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
+    
+    order = get_object_or_404(Order, id=order_id)
+    
+    try:
+        new_status = request.POST.get('status', '').strip()
+        
+        if not new_status:
+            return JsonResponse({'success': False, 'error': 'Status is required'}, status=400)
+        
+        # Validate status
+        valid_statuses = [choice[0] for choice in Order.Status.choices]
+        if new_status not in valid_statuses:
+            return JsonResponse({'success': False, 'error': 'Invalid status'}, status=400)
+        
+        old_status = order.status
+        
+        if old_status != new_status:
+            order.status = new_status
+            order.save()
+            
+            # Log status change event
+            OrderEvent.objects.create(
+                order=order,
+                event_type='status_changed',
+                event_data={
+                    'old_status': old_status,
+                    'new_status': new_status,
+                    'user': request.user.username
+                }
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'status': order.status,
+                'status_display': order.get_status_display()
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'Status unchanged'}, status=400)
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
