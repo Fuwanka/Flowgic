@@ -14,17 +14,17 @@
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <span>Request #{{ order.id|stringformat:"s"|slice:":8" }}...</span>
-                <span class="status-badge status-{{ order.status }}" id="order-status-badge">{{ order.get_status_display
-                    }}</span>
+                <span class="status-badge status-{{ order.status }}" id="order-status-badge">{{ order.get_status_display }}</span>
 
                 {% if user.role == 'dispatcher' or user.role == 'manager' %}
                 <!-- Quick Status Change -->
                 <div style="margin-left: 20px; display: flex; align-items: center; gap: 10px;">
+                    {% csrf_token %}
                     <select id="status-select"
                         style="padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
                         <option value="">Изменить статус...</option>
-                        {% for choice in order.Status.choices %}
-                        <option value="{{ choice.0 }}" {% if order.status==choice.0 %}disabled{% endif %}>{{ choice.1 }}
+                        {% for choice in status_choices %}
+                        <option value="{{ choice.0 }}" {% if order.status == choice.0 %}selected{% endif %}>{{ choice.1 }}
                         </option>
                         {% endfor %}
                     </select>
@@ -34,8 +34,7 @@
             </div>
             <div>
                 <span class="text-muted" style="font-size: 0.9rem; margin-right: 15px;">
-                    Created {{ order.created_at|date:"M d, H:i" }} by {{
-                    order.created_by.get_full_name|default:order.created_by.username }}
+                    Created {{ order.created_at|date:"M d, H:i" }} by {% if order.created_by %}{{ order.created_by.full_name|default:order.created_by.get_full_name|default:order.created_by.email }}{% else %}Unknown{% endif %}
                 </span>
                 <a href="{% url 'home' %}" class="close-btn">Close</a>
             </div>
@@ -207,9 +206,16 @@
                                     Частичная оплата: <strong>{{ event.event_data.amount }} ₽</strong><br>
                                     Пользователь: {{ event.event_data.user }}
                                     {% elif event.event_data.old_status %}
-                                    Статус изменён: {{ event.event_data.old_status }} → {{ event.event_data.new_status
-                                    }}<br>
-                                    Пользователь: {{ event.event_data.user }}
+                                    Статус изменён: 
+                                    {% for status_key, status_label in status_choices %}
+                                        {% if status_key == event.event_data.old_status %}{{ status_label }}{% endif %}
+                                    {% endfor %}
+                                     → 
+                                    {% for status_key, status_label in status_choices %}
+                                        {% if status_key == event.event_data.new_status %}{{ status_label }}{% endif %}
+                                    {% endfor %}
+                                    <br>
+                                    Пользователь: {{ event.order.created_by.full_name|default:order.created_by.get_full_name }}
                                     {% else %}
                                     {{ event.event_data }}
                                     {% endif %}
@@ -245,10 +251,24 @@
             const newStatus = this.value;
             const messageEl = document.getElementById('status-message');
             const badge = document.getElementById('order-status-badge');
-            if (!newStatus) return;
+            const selectEl = this;
+            
+            if (!newStatus) {
+                // Reset to current status if empty option selected
+                selectEl.value = '{{ order.status }}';
+                return;
+            }
 
             const formData = new FormData();
-            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (!csrfToken) {
+                messageEl.textContent = '✗ Ошибка: CSRF токен не найден';
+                messageEl.style.color = '#c62828';
+                messageEl.style.display = 'block';
+                selectEl.value = '{{ order.status }}';
+                return;
+            }
+            formData.append('csrfmiddlewaretoken', csrfToken.value);
             formData.append('status', newStatus);
 
             try {
@@ -261,19 +281,25 @@
                     messageEl.textContent = '✓ Обновлено';
                     messageEl.style.color = '#388e3c';
                     messageEl.style.display = 'block';
+                    // Update select to show new status
+                    selectEl.value = data.status;
                     setTimeout(() => location.reload(), 1000);
                 } else {
                     messageEl.textContent = '✗ ' + data.error;
                     messageEl.style.color = '#c62828';
                     messageEl.style.display = 'block';
+                    // Reset to current status on error
+                    selectEl.value = '{{ order.status }}';
+                    setTimeout(() => messageEl.style.display = 'none', 3000);
                 }
             } catch (error) {
                 messageEl.textContent = '✗ Ошибка сервера';
                 messageEl.style.color = '#c62828';
                 messageEl.style.display = 'block';
+                // Reset to current status on error
+                selectEl.value = '{{ order.status }}';
+                setTimeout(() => messageEl.style.display = 'none', 3000);
             }
-            this.value = '';
-            setTimeout(() => messageEl.style.display = 'none', 3000);
         });
 
         // Payment form AJAX submission

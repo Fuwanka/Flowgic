@@ -53,7 +53,15 @@ def request_detail(request, order_id):
             order.is_viewed_by_driver = True
             order.save()
     
-    return render(request, 'logistics/request_detail.html', {'order': order})
+    # Create a dictionary for quick status lookup
+    status_dict = dict(Order.Status.choices)
+    
+    return render(request, 'logistics/request_detail.html', {
+        'order': order,
+        'status_choices': Order.Status.choices,
+        'status_dict': status_dict,
+        'user': request.user
+    })
 
 
 @login_required
