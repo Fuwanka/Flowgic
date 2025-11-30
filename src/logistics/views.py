@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.utils import timezone
 from accounts.decorators import role_required
 from .models import Order
+from decimal import Decimal
+from .models import Financial
 
 
 @role_required(['dispatcher'])
@@ -47,6 +49,15 @@ def request_detail(request, order_id):
     """View for displaying order details"""
     order = get_object_or_404(Order, id=order_id)
     
+    if request.user.role in ['dispatcher', 'manager'] and order.agreed_price is not None:
+        Financial.objects.get_or_create(
+            order=order,
+            defaults={
+                'client_cost': order.agreed_price,
+            'driver_cost': Decimal('0.00'),
+            'third_party_cost': Decimal('0.00'),
+        }
+    )
     # Mark as viewed if driver opens their assigned order
     if request.user.role == 'driver' and order.driver == request.user:
         if not order.is_viewed_by_driver:

@@ -99,7 +99,15 @@
                                 id="payment-status-badge">{{ order.financial.get_payment_status_display }}</span>
                         </span>
                     </div>
-
+                    {% else %}
+                    <!-- Если Financial ещё нет -->
+                    <div class="info-row">
+                        <span class="info-label">Payment Status</span>
+                        <span class="info-value">
+                            <span class="payment-badge payment-unpaid" id="payment-status-badge">Не оплачен</span>
+                        </span>
+                    </div>
+                    {% endif %}
                     <!-- Payment Controls (Dispatcher/Manager Only) -->
                     <div class="payment-controls"
                         style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;">
@@ -126,7 +134,6 @@
                             <div id="payment-message" style="font-size: 0.85rem; display: none;"></div>
                         </form>
                     </div>
-                    {% endif %}
                     {% endif %}
 
                     {% if order.financial.driver_cost %}
@@ -201,10 +208,10 @@
                                 <div style="font-size: 0.8rem; color: #666;">
                                     {% if event.event_data.action == 'marked_as_paid' %}
                                     Заказ помечен как полностью оплаченный<br>
-                                    Пользователь: {{ event.event_data.user }}
+                                    Пользователь: {{  event.order.created_by.full_name|default:order.created_by.get_full_name }}
                                     {% elif event.event_data.action == 'partial_payment' %}
                                     Частичная оплата: <strong>{{ event.event_data.amount }} ₽</strong><br>
-                                    Пользователь: {{ event.event_data.user }}
+                                    Пользователь: {{  event.order.created_by.full_name|default:order.created_by.get_full_name }}
                                     {% elif event.event_data.old_status %}
                                     Статус изменён: 
                                     {% for status_key, status_label in status_choices %}
