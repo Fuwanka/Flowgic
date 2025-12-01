@@ -409,12 +409,6 @@ class Financial(models.Model):
         default=PaymentStatus.UNPAID,
         verbose_name='Статус оплаты'
     )
-    payment_plan = models.JSONField(
-        blank=True,
-        null=True,
-        verbose_name='График оплат',
-        help_text='Массив объектов с датой, суммой и статусом оплаты'
-    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     fuel_expenses = models.DecimalField(
@@ -432,19 +426,18 @@ class Financial(models.Model):
     def save(self, *args, **kwargs):
         """Автоматически вычисляем прибыль при сохранении"""
         # --- Расчёт топлива ---
-        AVERAGE_FUEL_CONSUMPTION_L_PER_100KM = Decimal('30.0')  # 30 литров на 100 км
-        DIESEL_PRICE_PER_LITER = Decimal('82.0') # Цена бензина за литр
-
-        if self.order.distance_km and self.order.distance_km > 0:
-            distance = self.order.distance_km
-            fuel_needed_liters = (distance / Decimal('100')) * AVERAGE_FUEL_CONSUMPTION_L_PER_100KM
-            self.fuel_expenses = fuel_needed_liters * DIESEL_PRICE_PER_LITER
-        else:
-            self.fuel_expenses = Decimal('0.00')
+        if self.fuel_expenses is None or self.fuel_expenses == Decimal('0.00'):
+            if self.order.distance_km and self.order.distance_km > 0:
+                AVERAGE_FUEL_CONSUMPTION_L_PER_100KM = Decimal('30.0')
+                DIESEL_PRICE_PER_LITER = Decimal('82.0')
+                fuel_liters = (self.order.distance_km / 100) * AVERAGE_FUEL_CONSUMPTION_L_PER_100KM
+                self.fuel_expenses = fuel_liters * DIESEL_PRICE_PER_LITER
+            else:
+                self.fuel_expenses = Decimal('0.00')
 
         # --- Расчёт прибыли ---
         third_party = self.third_party_cost or Decimal('0.00')
-        self.profit = self.client_cost - self.driver_cost - third_party
+        self.profit = self.client_cost - self.driver_cost - third_party - self.fuel_expenses
         super().save(*args, **kwargs)
 
     def __str__(self):

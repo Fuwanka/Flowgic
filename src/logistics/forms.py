@@ -117,8 +117,8 @@ class OrderForm(forms.ModelForm):
             self.fields['client'].queryset = Client.objects.filter(company=user.company)
 
 
+"""
 class OrderEditForm(forms.ModelForm):
-    """Form for dispatchers to edit order driver and status"""
     
     class Meta:
         model = Order 
@@ -140,7 +140,7 @@ class OrderEditForm(forms.ModelForm):
         self.fields['driver'].queryset = User.objects.filter(role='driver')
         self.fields['driver'].required = False
         self.fields['vehicle'].required = False
-
+"""
 
 class DriverOrderStatusForm(forms.ModelForm):
     """Form for drivers to update order status"""
