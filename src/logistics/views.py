@@ -53,11 +53,11 @@ def request_detail(request, order_id):
         Financial.objects.get_or_create(
             order=order,
             defaults={
-                'client_cost': order.agreed_price,
-            'driver_cost': Decimal('0.00'),
-            'third_party_cost': Decimal('0.00'),
-        }
-    )
+                'client_cost': order.agreed_price or Decimal('0.00'),
+                'driver_cost': Decimal('0.00'),
+                'third_party_cost': Decimal('0.00'),
+            }
+        )
     # Mark as viewed if driver opens their assigned order
     if request.user.role == 'driver' and order.driver == request.user:
         if not order.is_viewed_by_driver:

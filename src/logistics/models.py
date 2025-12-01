@@ -417,6 +417,12 @@ class Financial(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
+    fuel_expenses = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        verbose_name='Расходы на топливо'
+    )
 
     class Meta:
         db_table = 'financials'
@@ -425,6 +431,18 @@ class Financial(models.Model):
 
     def save(self, *args, **kwargs):
         """Автоматически вычисляем прибыль при сохранении"""
+        # --- Расчёт топлива ---
+        AVERAGE_FUEL_CONSUMPTION_L_PER_100KM = Decimal('30.0')  # 30 литров на 100 км
+        DIESEL_PRICE_PER_LITER = Decimal('82.0') # Цена бензина за литр
+
+        if self.order.distance_km and self.order.distance_km > 0:
+            distance = self.order.distance_km
+            fuel_needed_liters = (distance / Decimal('100')) * AVERAGE_FUEL_CONSUMPTION_L_PER_100KM
+            self.fuel_expenses = fuel_needed_liters * DIESEL_PRICE_PER_LITER
+        else:
+            self.fuel_expenses = Decimal('0.00')
+
+        # --- Расчёт прибыли ---
         third_party = self.third_party_cost or Decimal('0.00')
         self.profit = self.client_cost - self.driver_cost - third_party
         super().save(*args, **kwargs)
