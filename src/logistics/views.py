@@ -1,9 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.utils import timezone
 from accounts.decorators import role_required
 from .models import Order
+from decimal import Decimal
+from .models import Financial
 
 
 @role_required(['dispatcher'])
@@ -47,6 +50,17 @@ def request_detail(request, order_id):
     """View for displaying order details"""
     order = get_object_or_404(Order, id=order_id)
     
+    if request.user.role in ['dispatcher', 'manager'] and order.agreed_price is not None:
+        Financial.objects.get_or_create(
+            order=order,
+            defaults={
+                'client_cost': order.agreed_price or Decimal('0.00'),
+                'driver_cost': Decimal('0.00'),
+                'fuel_expenses': Decimal('0.00'),
+                'third_party_cost': Decimal('0.00'),
+            }
+        )
+
     # Mark as viewed if driver opens their assigned order
     if request.user.role == 'driver' and order.driver == request.user:
         if not order.is_viewed_by_driver:
@@ -227,3 +241,42 @@ def update_order_status(request, order_id):
         
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@login_required
+@role_required(['dispatcher', 'manager'])
+@require_POST
+def update_financials(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    
+    # Обязательно создаём Financial, если его нет
+    financial, created = Financial.objects.get_or_create(
+        order=order,
+        defaults={
+            'client_cost': order.agreed_price or Decimal('0.00'),
+            'driver_cost': Decimal('0.00'),
+            'fuel_expenses': Decimal('0.00'),
+            'third_party_cost': Decimal('0.00'),
+        }
+    )
+
+    try:
+        agreed_price = Decimal(request.POST.get('agreed_price', '0'))
+        fuel_expenses = Decimal(request.POST.get('fuel_expenses', '0'))
+        driver_cost = Decimal(request.POST.get('driver_cost', '0'))
+
+        # Обновляем заказ
+        order.agreed_price = agreed_price
+        order.save(update_fields=['agreed_price'])
+
+        # Обновляем финансовую запись
+        financial.client_cost = agreed_price
+        financial.fuel_expenses = fuel_expenses
+        financial.driver_cost = driver_cost
+        financial.save()  # Прибыль пересчитается автоматически
+
+        return JsonResponse({
+            'success': True,
+            'profit': str(financial.profit)
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
