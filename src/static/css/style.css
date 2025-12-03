@@ -489,3 +489,16 @@ header .logout-btn {
 .close-btn:hover {
     color: #e74c3c;
 }
+
+.dropdown-item {
+    display: block;
+    padding: 10px 12px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: #f0f4f8;
+}
