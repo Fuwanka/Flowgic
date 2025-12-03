@@ -1,0 +1,21 @@
+<nav class="dashboard-sidebar">
+    <div style="font-weight:600; color:#333; margin-bottom:12px;">Навигация</div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                href="{% url 'home' %}">🏠 Главная</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.path|slice:':16' == '/logistics/dashboard' or request.resolver_match.url_name == 'dashboard_vehicles' %}active{% endif %}"
+                href="{% url 'dashboard_vehicles' %}">🚛 Транспорт компании</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard_clients' %}active{% endif %}"
+                href="{% url 'dashboard_clients' %}">👤 Наши клиенты</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard_drivers' %}active{% endif %}"
+                href="{% url 'dashboard_drivers' %}">🧑‍✈️ Водители</a>
+        </li>
+    </ul>
+</nav>

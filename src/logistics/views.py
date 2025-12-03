@@ -1,12 +1,16 @@
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.utils import timezone
 from accounts.decorators import role_required
-from .models import Order
+from .models import Order, Vehicle, Company, Client
 from decimal import Decimal
 from .models import Financial
+from accounts.models import User
+from django.shortcuts import get_object_or_404, render
+import datetime
 
 
 @role_required(['dispatcher'])
@@ -280,3 +284,128 @@ def update_financials(request, order_id):
         })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    
+@login_required
+def dashboard_vehicles(request):
+    """Список транспорта компании с краткой статистикой и действиями."""
+    if not request.user.company:
+        messages.error(request, 'У вас не указана компания.')
+        return redirect('home')
+    vehicles = Vehicle.objects.filter(company=request.user.company).order_by('reg_number')
+    return render(request, 'logistics/vehicles_list.html', {'vehicles': vehicles})
+
+@login_required
+def vehicle_detail(request, vehicle_id):
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+
+    # связанные заказы (если есть)
+    orders = vehicle.orders.all() if hasattr(vehicle, 'orders') else []
+
+    # --- Заменяем здесь: получаем реальные записи ТО из модели Maintenance ---
+    # ------------------------------------------------------------------------
+
+    # подготовка status_choices (если используется)
+    status_choices = []
+    try:
+        choices_iter = vehicle.Status.choices
+    except Exception:
+        choices_iter = getattr(Vehicle, 'Status', getattr(Vehicle, 'STATUS_CHOICES', []))
+    for item in choices_iter:
+        try:
+            key, label = item
+        except Exception:
+            continue
+        status_choices.append((key, label, key == vehicle.status))
+
+    return render(request, 'logistics/vehicle_detail.html', {
+        'vehicle': vehicle,
+        'orders': orders,
+        'status_choices': status_choices,
+    })
+
+@login_required
+@role_required(['dispatcher', 'manager'])
+@require_POST
+def vehicle_update_status(request, vehicle_id):
+    """Обновление статуса ТС (доступно диспетчеру/менеджеру)."""
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    new_status = request.POST.get('status', '').strip()
+    valid_statuses = [choice[0] for choice in Vehicle.Status.choices]
+    if new_status not in valid_statuses:
+        return JsonResponse({'success': False, 'error': 'Invalid status'}, status=400)
+    vehicle.status = new_status
+    vehicle.save(update_fields=['status'])
+    return JsonResponse({'success': True, 'status': vehicle.status, 'status_display': vehicle.get_status_display()})
+
+@login_required
+@role_required(['dispatcher', 'manager'])
+@require_POST
+def vehicle_plan_maintenance(request, vehicle_id):
+    """Планирование ТО (минимальная версия: обновить дату last_maintenance и комментарий в истории)."""
+    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    date_str = request.POST.get('date', '').strip()
+    note = request.POST.get('note', '').strip()
+    if not date_str:
+        return JsonResponse({'success': False, 'error': 'Date is required'}, status=400)
+    try:
+        # Формат: YYYY-MM-DD
+        from datetime import datetime
+        dt = datetime.strptime(date_str, '%Y-%m-%d').date()
+        vehicle.last_maintenance = dt
+        vehicle.save(update_fields=['last_maintenance'])
+        return JsonResponse({'success': True, 'last_maintenance': str(vehicle.last_maintenance), 'note': note})
+    except ValueError:
+        return JsonResponse({'success': False, 'error': 'Invalid date format (YYYY-MM-DD)'}, status=400)
+    
+
+
+@login_required
+def dashboard_clients(request):
+    """Список клиентов компании."""
+    if not request.user.company:
+        messages.error(request, 'У вас не указана компания.')
+        return redirect('home')
+    clients = Client.objects.filter(company=request.user.company).order_by('name')
+    return render(request, 'logistics/clients_list.html', {'clients': clients})
+
+@login_required
+def client_detail(request, client_id):
+    """Карточка клиента: данные, история взаимодействий (по заказам)."""
+    client = get_object_or_404(Client, id_client=client_id)
+    orders = client.orders.all().order_by('-created_at')
+    return render(request, 'logistics/client_detail.html', {'client': client, 'orders': orders})
+
+@login_required
+@role_required(['dispatcher', 'manager'])
+def client_edit(request, client_id):
+    """Редактирование клиента (имя/телефон/email)."""
+    client = get_object_or_404(Client, id_client=client_id)
+    from accounts.forms import ClientForm
+    if request.method == 'POST':
+        form = ClientForm(request.POST, instance=client)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Клиент обновлён')
+            return redirect('client_detail', client_id=client.id_client)
+    else:
+        form = ClientForm(instance=client)
+    return render(request, 'logistics/client_edit.html', {'form': form, 'client': client})
+   
+
+
+@login_required
+def dashboard_drivers(request):
+    """Список водителей компании."""
+    if not request.user.company:
+        messages.error(request, 'У вас не указана компания.')
+        return redirect('home')
+    drivers = User.objects.filter(role='driver', company=request.user.company).order_by('full_name')
+    return render(request, 'logistics/drivers_list.html', {'drivers': drivers})
+
+@login_required
+def driver_detail(request, user_id):
+    """Карточка водителя: данные, историй заказов."""
+    driver = get_object_or_404(User, id=user_id, role='driver')
+    orders = Order.objects.filter(driver=driver).order_by('-created_at')
+    return render(request, 'logistics/driver_detail.html', {'driver': driver, 'orders': orders})
+

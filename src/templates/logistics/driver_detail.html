@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Водитель {{ driver.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid dashboard-fluid">
+    <div class="dashboard-wrapper">
+        {% include 'dashboard/_sidebar.html' %}
+        <div class="dashboard-content">
+            {% block dashboard_content %}
+            <h2 class="mb-3">Водитель: {{ driver.full_name|default:driver.get_full_name|default:driver.email }}</h2>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card card-body mb-3">
+                        <h5>Профиль</h5>
+                        <p><strong>Email:</strong> {{ driver.email }}</p>
+                        <p><strong>Телефон:</strong> {{ driver.phone|default:"—" }}</p>
+                        <p><strong>Статус:</strong> {{ driver.get_status_display }}</p>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card card-body">
+                        <h5>История заказов</h5>
+                        <ul class="list-group">
+                            {% for o in orders %}
+                            <li class="list-group-item">
+                                <a href="{% url 'request_detail' o.id %}">Заказ {{ o.order_number }}</a> — {{
+                                o.get_status_display }}
+                                <br><small class="text-muted">{{ o.origin|default:"—" }} → {{ o.destination|default:"—"
+                                    }}</small>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item text-muted">Заказов нет</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

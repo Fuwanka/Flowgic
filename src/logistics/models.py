@@ -442,3 +442,4 @@ class Financial(models.Model):
 
     def __str__(self):
         return f"Финансы заказа #{self.order.id}"
+    

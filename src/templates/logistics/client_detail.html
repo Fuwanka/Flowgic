@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Клиент {{ client.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid dashboard-fluid">
+    <div class="dashboard-wrapper">
+        {% include 'dashboard/_sidebar.html' %}
+        <div class="dashboard-content">
+            {% block dashboard_content %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Клиент: {{ client.name }}</h2>
+                {% if user.role == 'dispatcher' or user.role == 'manager' %}
+                <a href="{% url 'client_edit' client.id_client %}" class="btn btn-sm btn-warning">Редактировать</a>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card card-body mb-3">
+                        <h5>Контакты</h5>
+                        <p><strong>Компания:</strong> {{ client.company.name }}</p>
+                        <p><strong>Телефон:</strong> {{ client.phone|default:"—" }}</p>
+                        <p><strong>Email:</strong> {{ client.email|default:"—" }}</p>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card card-body mb-3">
+                        <h5>История взаимодействий (заказы)</h5>
+                        <ul class="list-group">
+                            {% for o in orders %}
+                            <li class="list-group-item">
+                                <a href="{% url 'request_detail' o.id %}">Заказ {{ o.order_number }}</a> — {{
+                                o.get_status_display }}
+                                <br><small class="text-muted">{{ o.origin|default:"—" }} → {{ o.destination|default:"—"
+                                    }}</small>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item text-muted">Заказов нет</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,49 +1,60 @@
 {% extends "base.html" %}
 {% block title %}Менеджер{% endblock %}
+
 {% block content %}
-<h1 class="mb-3">Добро пожаловать, {{ user.full_name }}</h1>
+<div class="container-fluid dashboard-fluid">
+    <div class="dashboard-wrapper">
+        {% include 'dashboard/_sidebar.html' %}
+        <div class="dashboard-content">
+            {% block dashboard_content %}
+            <h1 class="mb-3">Добро пожаловать, {{ user.full_name }}</h1>
 
-<h3>Заявки вашей компании:</h3>
+            <h3>Заявки вашей компании:</h3>
 
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Order #</th>
-            <th>Cargo</th>
-            <th>Route</th>
-            <th>Status</th>
-            <th>Payment</th>
-            <th>Price</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for order in requests %}
-        <tr>
-            <td><a href="{% url 'request_detail' order.id %}">{{ order.order_number }}</a></td>
-            <td>{{ order.cargo_type }}</td>
-            <td>{{ order.origin }} → {{ order.destination }}</td>
-            <td><span class="badge bg-{{ order.status|lower }}">{{ order.get_status_display }}</span></td>
-            <td>
-                {% if order.financial %}
-                <span class="badge 
-                    {% if order.financial.payment_status == 'paid' %}bg-success
-                    {% elif order.financial.payment_status == 'partially_paid' %}bg-warning text-dark
-                    {% else %}bg-danger{% endif %}">
-                    {{ order.financial.get_payment_status_display }}
-                </span>
-                {% else %}
-                <span class="badge bg-secondary">—</span>
-                {% endif %}
-            </td>
-            <td>{{ order.agreed_price|default:"—" }}</td>
-            <td><a href="{% url 'request_detail' order.id %}" class="btn btn-sm btn-outline-primary">View</a></td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7" class="text-center text-muted">Нет заявок</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Cargo</th>
+                        <th>Route</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in requests %}
+                    <tr>
+                        <td><a href="{% url 'request_detail' order.id %}">{{ order.order_number }}</a></td>
+                        <td>{{ order.cargo_type }}</td>
+                        <td>{{ order.origin }} → {{ order.destination }}</td>
+                        <td><span class="badge bg-{{ order.status|lower }}">{{ order.get_status_display }}</span></td>
+                        <td>
+                            {% if order.financial %}
+                            <span class="badge
+                              {% if order.financial.payment_status == 'paid' %}bg-success
+                              {% elif order.financial.payment_status == 'partially_paid' %}bg-warning text-dark
+                              {% else %}bg-danger{% endif %}">
+                                {{ order.financial.get_payment_status_display }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">—</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ order.agreed_price|default:"—" }}</td>
+                        <td><a href="{% url 'request_detail' order.id %}"
+                                class="btn btn-sm btn-outline-primary">View</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Нет заявок</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endblock %}
+        </div>
+    </div>
+</div>
 {% endblock %}

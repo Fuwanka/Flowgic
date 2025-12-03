@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}ТС {{ vehicle.reg_number }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid dashboard-fluid">
+    <div class="dashboard-wrapper">
+        {% include 'dashboard/_sidebar.html' %}
+        <div class="dashboard-content">
+            {% block dashboard_content %}
+            <h2 class="mb-3">ТС: {{ vehicle.reg_number }}</h2>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card card-body mb-3">
+                        <h5>Параметры</h5>
+                        <p><strong>Тип:</strong> {{ vehicle.type }}</p>
+                        <p><strong>Модель:</strong> {{ vehicle.model|default:"—" }}</p>
+                        <p><strong>Грузоподъёмность:</strong> {{ vehicle.capacity_kg }} кг</p>
+                        <p><strong>Статус:</strong> <span class="badge bg-{{ vehicle.status }}">{{
+                                vehicle.get_status_display }}</span></p>
+                        <p><strong>Последнее ТО:</strong> {{ vehicle.last_maintenance|default:"—" }}</p>
+                    </div>
+
+                    {% if user.role == 'dispatcher' or user.role == 'manager' %}
+                    <div class="card card-body mb-3">
+                        <h5>Обновить статус</h5>
+                        <form id="vehicle-status-form">
+                            {% csrf_token %}
+                            <select id="new-status" class="form-select mb-2">
+                                {% for key, label, selected in status_choices %}
+                                <option value="{{ key }}" {% if selected %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-primary btn-sm" type="submit">Сохранить</button>
+                            <div id="vehicle-status-msg" class="mt-2" style="display:none;"></div>
+                        </form>
+                    </div>
+
+                    <div class="card card-body">
+                        <h5>Планирование ТО</h5>
+                        <form id="vehicle-maintenance-form">
+                            {% csrf_token %}
+                            <div class="mb-2">
+                                <label class="form-label">Дата (YYYY-MM-DD)</label>
+                                <input type="date" id="maintenance-date" class="form-control" />
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Комментарий</label>
+                                <input type="text" id="maintenance-note" class="form-control"
+                                    placeholder="Описание работ" />
+                            </div>
+                            <button class="btn btn-success btn-sm" type="submit">Запланировать</button>
+                            <div id="vehicle-maintenance-msg" class="mt-2" style="display:none;"></div>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card card-body mb-3">
+                    <h5>История ТО</h5>
+                    <ul class="list-group">
+                        {% for item in maintenance_history %}
+                        <li class="list-group-item">
+                            <strong>{{ item.date }}</strong>
+                            {% if item.note %} — {{ item.note }}{% endif %}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-muted">Нет записей ТО</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="card card-body">
+                    <h5>Связанные заказы</h5>
+                    <ul class="list-group">
+                        {% for o in orders %}
+                        <li class="list-group-item">
+                            <a href="{% url 'request_detail' o.id %}">Заказ {{ o.order_number }}</a>
+                            — {{ o.get_status_display }} — {{ o.origin|default:"—" }} → {{ o.destination|default:"—" }}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-muted">Нет заказов</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            // Update status
+            document.getElementById('vehicle-status-form')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const msg = document.getElementById('vehicle-status-msg');
+                const formData = new FormData();
+                formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+                formData.append('status', document.getElementById('new-status').value);
+
+                const resp = await fetch('{% url "vehicle_update_status" vehicle.id %}', { method: 'POST', body: formData });
+                const data = await resp.json();
+                if (data.success) {
+                    msg.textContent = '✓ Статус обновлён';
+                    msg.style.color = '#388e3c';
+                    msg.style.display = 'block';
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    msg.textContent = '✗ ' + (data.error || 'Ошибка');
+                    msg.style.color = '#c62828';
+                    msg.style.display = 'block';
+                }
+            });
+
+            // Plan maintenance
+            document.getElementById('vehicle-maintenance-form')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const msg = document.getElementById('vehicle-maintenance-msg');
+                const formData = new FormData();
+                formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+                formData.append('date', document.getElementById('maintenance-date').value);
+                formData.append('note', document.getElementById('maintenance-note').value);
+
+                const resp = await fetch('{% url "vehicle_plan_maintenance" vehicle.id %}', { method: 'POST', body: formData });
+                const data = await resp.json();
+                if (data.success) {
+                    msg.textContent = '✓ ТО запланировано';
+                    msg.style.color = '#388e3c';
+                    msg.style.display = 'block';
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    msg.textContent = '✗ ' + (data.error || 'Ошибка');
+                    msg.style.color = '#c62828';
+                    msg.style.display = 'block';
+                }
+            });
+        </script>
+        {% endblock %}
+    </div>
+</div>
+</div>
+{% endblock %}
