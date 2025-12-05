@@ -8,6 +8,9 @@ from .models import Order
 from decimal import Decimal
 from .models import Financial
 
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
 
 @role_required(['dispatcher'])
 def dispatcher_dashboard(request):
@@ -80,40 +83,35 @@ def request_detail(request, order_id):
 
 @login_required
 def edit_order(request, order_id):
-    """Dispatcher edits driver/vehicle/status, driver edits ONLY status."""
-
+    """View for editing order - dispatchers can edit driver/status, drivers can edit status only"""
     order = get_object_or_404(Order, id=order_id)
-    role = request.user.role
-
-    # Determine form class
-    if role == 'dispatcher':
+    
+    # Determine which form to use based on role
+    if request.user.role == 'dispatcher':
         from .forms import OrderEditForm
         FormClass = OrderEditForm
-
-    elif role == 'driver' and order.driver == request.user:
+    elif request.user.role == 'driver' and order.driver == request.user:
         from .forms import DriverOrderStatusForm
         FormClass = DriverOrderStatusForm
-
     else:
-        messages.error(request, 'У вас нет прав для редактирования этого заказа.')
+        messages.error(request, 'You do not have permission to edit this order')
         return redirect('request_detail', order_id=order.id)
-
-    # process form
+    
     if request.method == 'POST':
         form = FormClass(request.POST, instance=order)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Данные заказа обновлены.')
+            messages.success(request, 'Order updated successfully!')
             return redirect('request_detail', order_id=order.id)
     else:
         form = FormClass(instance=order)
-
-    return render(request, 'logistics/edit_order.html', {
+    
+    context = {
         'form': form,
         'order': order,
-        'is_driver': (role == 'driver'),
-    })
-
+        'is_driver': request.user.role == 'driver',
+    }
+    return render(request, 'logistics/edit_order.html', context)
 
 
 @login_required
@@ -285,3 +283,24 @@ def update_financials(request, order_id):
         })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+def calendar_view(request):
+    orders = Order.objects.all()
+    
+    events = []
+    for order in orders:
+        events.append({
+            'title': f"Заказ {order.order_number}: {order.client.name or 'Клиент'}",
+            'start': order.pickup_datetime.isoformat(),
+            'end': order.delivery_datetime.isoformat(),
+            'color': "#37d842",
+            'textColor': 'white',
+            'extendedProps': {
+                'cargo': order.cargo_type,
+                'status': order.get_status_display()
+            }
+        })
+    
+    events_json = json.dumps(events, cls=DjangoJSONEncoder, ensure_ascii=False)
+    
+    return render(request, 'logistics/calendar.html', {'events_json': events_json})

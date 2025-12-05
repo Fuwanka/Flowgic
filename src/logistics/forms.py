@@ -5,8 +5,8 @@ from logistics.models import Vehicle
 
 
 class OrderEditForm(forms.ModelForm):
-    """Form for dispatchers to edit order driver, vehicle and status"""
-
+    """Form for dispatchers to edit order driver and status"""
+    
     class Meta:
         model = Order
         fields = ['driver', 'vehicle', 'status']
@@ -16,21 +16,14 @@ class OrderEditForm(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-input'}),
         }
         labels = {
-            'driver': 'Назначенный водитель',
-            'vehicle': 'Назначенный транспорт',
-            'status': 'Статус',
+            'driver': 'Assigned Driver',
+            'vehicle': 'Assigned Vehicle',
+            'status': 'Order Status',
         }
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # фильтр: только водители
-        self.fields['driver'].queryset = User.objects.filter(role='driver')
-        self.fields['driver'].required = False
-
-        # транспорт тоже необязательный
-        self.fields['vehicle'].required = False
-
+        # Filter drivers
 
 
 class OrderForm(forms.ModelForm):
@@ -150,7 +143,8 @@ class OrderEditForm(forms.ModelForm):
 """
 
 class DriverOrderStatusForm(forms.ModelForm):
-
+    """Form for drivers to update order status"""
+    
     class Meta:
         model = Order
         fields = ['status']
@@ -158,20 +152,8 @@ class DriverOrderStatusForm(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
         labels = {
-            'status': 'Статус заказа',
+            'status': 'Order Status',
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # доступные водителю статусы
-        allowed = ['on_the_way', 'delivering', 'completed']
-
-        self.fields['status'].choices = [
-            (value, label) for value, label in self.fields['status'].choices
-            if value in allowed
-        ]
-
 
 
 class VehicleForm(forms.ModelForm):
