@@ -80,35 +80,40 @@ def request_detail(request, order_id):
 
 @login_required
 def edit_order(request, order_id):
-    """View for editing order - dispatchers can edit driver/status, drivers can edit status only"""
+    """Dispatcher edits driver/vehicle/status, driver edits ONLY status."""
+
     order = get_object_or_404(Order, id=order_id)
-    
-    # Determine which form to use based on role
-    if request.user.role == 'dispatcher':
+    role = request.user.role
+
+    # Determine form class
+    if role == 'dispatcher':
         from .forms import OrderEditForm
         FormClass = OrderEditForm
-    elif request.user.role == 'driver' and order.driver == request.user:
+
+    elif role == 'driver' and order.driver == request.user:
         from .forms import DriverOrderStatusForm
         FormClass = DriverOrderStatusForm
+
     else:
-        messages.error(request, 'You do not have permission to edit this order')
+        messages.error(request, 'У вас нет прав для редактирования этого заказа.')
         return redirect('request_detail', order_id=order.id)
-    
+
+    # process form
     if request.method == 'POST':
         form = FormClass(request.POST, instance=order)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Order updated successfully!')
+            messages.success(request, 'Данные заказа обновлены.')
             return redirect('request_detail', order_id=order.id)
     else:
         form = FormClass(instance=order)
-    
-    context = {
+
+    return render(request, 'logistics/edit_order.html', {
         'form': form,
         'order': order,
-        'is_driver': request.user.role == 'driver',
-    }
-    return render(request, 'logistics/edit_order.html', context)
+        'is_driver': (role == 'driver'),
+    })
+
 
 
 @login_required

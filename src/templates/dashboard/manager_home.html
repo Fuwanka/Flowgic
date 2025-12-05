@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Менеджер{% endblock %}
+{% block title %}Руководитель{% endblock %}
 {% block content %}
 <h1 class="mb-3">Добро пожаловать, {{ user.full_name }}</h1>
 
@@ -8,13 +8,13 @@
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Order #</th>
-            <th>Cargo</th>
-            <th>Route</th>
-            <th>Status</th>
-            <th>Payment</th>
-            <th>Price</th>
-            <th>Actions</th>
+            <th>№ заказа</th>
+            <th>Груз</th>
+            <th>Маршрут</th>
+            <th>Статус</th>
+            <th>Оплата</th>
+            <th>Стоимость</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -37,7 +37,11 @@
                 {% endif %}
             </td>
             <td>{{ order.agreed_price|default:"—" }}</td>
-            <td><a href="{% url 'request_detail' order.id %}" class="btn btn-sm btn-outline-primary">View</a></td>
+            <td>
+                <a href="{% url 'request_detail' order.id %}" class="btn btn-sm btn-outline-primary">
+                    Открыть
+                </a>
+            </td>
         </tr>
         {% empty %}
         <tr>
