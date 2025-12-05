@@ -28,4 +28,7 @@ urlpatterns += [
 urlpatterns += [
     path('dashboard/drivers/', views.dashboard_drivers, name='dashboard_drivers'),
     path('dashboard/drivers/<int:user_id>/', views.driver_detail, name='driver_detail'),
+
+    path('calendar/', views.calendar_view, name='calendar'),
+
 ]

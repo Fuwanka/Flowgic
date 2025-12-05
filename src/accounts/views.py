@@ -66,31 +66,80 @@ def custom_login_view(request):
 @login_required
 def home_view(request):
     user = request.user
-    context = {'user': user}
+    
+    # === НОВОЕ: Подготовка данных для календаря ===
+    from logistics.models import Order
+    import json
+    from django.core.serializers.json import DjangoJSONEncoder
+
+    # Берём все заказы, к которым у пользователя есть доступ
+    if user.role == 'dispatcher':
+        orders_qs = Order.objects.filter(created_by=user)
+    elif user.role == 'manager':
+        orders_qs = Order.objects.filter(client__company=user.company)
+    elif user.role == 'driver':
+        orders_qs = Order.objects.filter(driver=user)
+    else:
+        orders_qs = Order.objects.none()
+
+    # Формируем события для календаря
+    orders_for_calendar = orders_qs.filter(
+        pickup_datetime__isnull=False,
+        delivery_datetime__isnull=False
+    )
+    
+    events = []
+    for order in orders_for_calendar:
+        events.append({
+            "title": f"Заказ {order.order_number}: {order.client.name or 'Клиент'}",
+            "start": order.pickup_datetime.isoformat(),
+            "end": order.delivery_datetime.isoformat(),
+            "color": "#3788d8",
+            "textColor": "white",
+            "extendedProps": {
+                "cargo": order.cargo_type,
+                "status": order.get_status_display()
+            }
+        })
+    
+    events_json = json.dumps(events, cls=DjangoJSONEncoder, ensure_ascii=False)
+    # === КОНЕЦ НОВОГО ===
 
     # Формируем заявки для дашборда в зависимости от роли
     if user.role == 'dispatcher':
-        # Все заявки, которые созданы диспетчером или для компании
         requests = Order.objects.filter(created_by=user).order_by('-created_at')
-        context['requests'] = requests
+        context = {
+            'user': user,
+            'requests': requests,
+            'events_json': events_json  # ← добавляем
+        }
         template_name = 'dashboard/dispatcher_home.html'
 
     elif user.role == 'manager':
-        # Все заявки для компании менеджера
         requests = Order.objects.filter(client__company=user.company).order_by('-created_at')
-        context['requests'] = requests
+        context = {
+            'user': user,
+            'requests': requests,
+            'events_json': events_json  # ← добавляем
+        }
         template_name = 'dashboard/manager_home.html'
 
     elif user.role == 'driver':
-        # Только заявки, назначенные водителю
         requests = Order.objects.filter(driver=user).order_by('is_viewed_by_driver', '-created_at')
         unread_count = requests.filter(is_viewed_by_driver=False).count()
-        context['requests'] = requests
-        context['unread_count'] = unread_count
+        context = {
+            'user': user,
+            'requests': requests,
+            'unread_count': unread_count,
+            'events_json': events_json  # ← добавляем
+        }
         template_name = 'dashboard/driver_home.html'
 
     else:
-        # Для остальных пользователей простой шаблон
+        context = {
+            'user': user,
+            'events_json': events_json  # ← добавляем
+        }
         template_name = 'dashboard/home.html'
 
     return render(request, template_name, context)

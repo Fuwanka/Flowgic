@@ -12,6 +12,9 @@ from accounts.models import User
 from django.shortcuts import get_object_or_404, render
 import datetime
 
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
 
 @role_required(['dispatcher'])
 def dispatcher_dashboard(request):
@@ -409,3 +412,24 @@ def driver_detail(request, user_id):
     orders = Order.objects.filter(driver=driver).order_by('-created_at')
     return render(request, 'logistics/driver_detail.html', {'driver': driver, 'orders': orders})
 
+
+def calendar_view(request):
+    orders = Order.objects.all()
+    
+    events = []
+    for order in orders:
+        events.append({
+            'title': f"Заказ {order.order_number}: {order.client.name or 'Клиент'}",
+            'start': order.pickup_datetime.isoformat(),
+            'end': order.delivery_datetime.isoformat(),
+            'color': "#37d842",
+            'textColor': 'white',
+            'extendedProps': {
+                'cargo': order.cargo_type,
+                'status': order.get_status_display()
+            }
+        })
+    
+    events_json = json.dumps(events, cls=DjangoJSONEncoder, ensure_ascii=False)
+    
+    return render(request, 'logistics/calendar.html', {'events_json': events_json})

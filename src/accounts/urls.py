@@ -2,11 +2,12 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 from django.shortcuts import redirect
+from django.shortcuts import render
 
 urlpatterns = [
     path('login/', views.custom_login_view, name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/login/'), name='logout'),  # ← исправлено
-    path('', lambda request: redirect('home')),  # ← теперь отдельно
+    path('', lambda request: render(request, 'landing.html'), name='landing'),
     path('home/', views.home_view, name='home'),
     path('delete_account/', views.delete_account_view, name='delete_account'),
     path('password_reset/', views.password_reset_request_view, name='password_reset_request'),

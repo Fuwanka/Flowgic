@@ -7,40 +7,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}FlowGic{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS (без integrity) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <header class="header">
+    <header>
         <div class="logo">
-            <span>🚚</span>
+            <img src="{% static 'img/logo.png' %}" alt="FlowGic">
             <span>FlowGic</span>
+
             {% if user.is_authenticated and user.company %}
             <span style="font-size:12px; color:#666; margin-left:8px;">{{ user.company.name }}</span>
+
             {% endif %}
         </div>
+
         <div class="user-panel">
             {% if user.is_authenticated %}
-            <!-- Кнопка для вызова collapsible меню -->
-            <button class="btn btn-sm btn-primary ms-2" type="button" data-bs-toggle="collapse"
-                data-bs-target="#actionsMenu" aria-expanded="false" aria-controls="actionsMenu">
-                Действие
-            </button>
+            <div class="user-info">
+                <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="email">{{ user.email }}</div>
+                <div class="user-role">
+                    {{ user.role_display }}
+                </div>
+            </div>
 
-            <!-- Меню действий -->
-            <div class="collapse mt-2" id="actionsMenu">
-                <div class="card card-body">
-                    <a href="{% url 'password_change' %}" class="btn btn-warning mb-2">Сменить пароль</a>
-                    <a href="{% url 'delete_account' %}" class="btn btn-danger mb-2">Удалить аккаунт</a>
+            <div class="dropdown">
+                <button class="logout-btn" onclick="toggleMenu()">Меню ▾</button>
+
+                <div class="dropdown-menu" id="menu" style="
+                    display:none;
+                    position:absolute;
+                    right:40px;
+                    top:70px;
+                    background:white;
+                    border:1px solid #ddd;
+                    border-radius:8px;
+                    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+                    padding:10px;
+                    min-width:180px;
+                ">
+                    <a href="{% url 'password_change' %}" class="dropdown-item">Сменить пароль</a>
+                    <a href="{% url 'delete_account' %}" class="dropdown-item">Удалить аккаунт</a>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-secondary">Выйти</button>
+                        <button class="dropdown-item" style="color:#c62828;">Выйти</button>
                     </form>
                 </div>
             </div>
             {% else %}
-            <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light ms-2">Войти</a>
-            <a href="{% url 'register' %}" class="btn btn-sm btn-outline-light ms-2">Регистрация</a>
+            <a href="{% url 'login' %}" class="btn btn-secondary">Войти</a>
+            <a href="{% url 'register' %}" class="btn btn-primary">Регистрация</a>
             {% endif %}
         </div>
     </header>
@@ -61,7 +80,21 @@
         {% block content %}{% endblock %}
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById("menu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        }
+        document.addEventListener("click", (e) => {
+            const menu = document.getElementById("menu");
+            if (!e.target.closest('.dropdown')) {
+                if (menu) menu.style.display = "none";
+            }
+        });
+    </script>
+
+    <!-- Bootstrap JS (без integrity) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 

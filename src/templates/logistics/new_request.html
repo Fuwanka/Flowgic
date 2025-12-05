@@ -78,7 +78,7 @@
                         </div>
 
                         <!-- Pickup and Delivery Times -->
-                        <div class="row">
+                        <div class="row mb-4">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.pickup_datetime.id_for_label }}" class="form-label">
                                     {{ form.pickup_datetime.label }} <span class="text-danger">*</span>
@@ -96,6 +96,14 @@
                                 {% if form.delivery_datetime.errors %}
                                 <div class="text-danger small">{{ form.delivery_datetime.errors }}</div>
                                 {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Визуализация диапазона дат -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="mb-3">📆 Визуализация маршрута</h5>
+                                <div id="order-calendar" style="background:white; padding:15px; border-radius:8px; box-shadow:0 1px 5px rgba(0,0,0,0.1);"></div>
                             </div>
                         </div>
 
@@ -151,6 +159,86 @@
                         </div>
                     </form>
                 </div>
+                <!-- FullCalendar -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pickupInput = document.getElementById('{{ form.pickup_datetime.id_for_label }}');
+    const deliveryInput = document.getElementById('{{ form.delivery_datetime.id_for_label }}');
+    const calendarEl = document.getElementById('order-calendar');
+
+    if (!pickupInput || !deliveryInput || !calendarEl) return;
+
+    let pickupDate = null;
+    let deliveryDate = null;
+
+    // Инициализация календаря
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'ru',
+        initialView: 'dayGridMonth',
+        firstDay: 1,
+        height: 300,
+        events: []
+    });
+    calendar.render();
+
+    // Обновление при ручном изменении полей
+    function updateFromInputs() {
+        const pickupVal = pickupInput.value ? pickupInput.value.split('T')[0] : null;
+        const deliveryVal = deliveryInput.value ? deliveryInput.value.split('T')[0] : null;
+        pickupDate = pickupVal;
+        deliveryDate = deliveryVal;
+        renderEvents();
+    }
+
+    pickupInput.addEventListener('change', updateFromInputs);
+    deliveryInput.addEventListener('change', updateFromInputs);
+
+    function renderEvents() {
+        const events = [];
+        if (pickupDate) {
+            events.push({
+                title: 'Погрузка',
+                start: pickupDate,
+                color: '#28a745',
+                textColor: 'white'
+            });
+        }
+        if (deliveryDate) {
+            events.push({
+                title: 'Доставка',
+                start: deliveryDate,
+                color: '#ffc107',
+                textColor: 'black'
+            });
+        }
+        // Закрашиваем промежуточные дни (только если даты разные и в правильном порядке)
+        if (pickupDate && deliveryDate && pickupDate !== deliveryDate) {
+            const start = new Date(pickupDate);
+            const end = new Date(deliveryDate);
+            if (start < end) {
+                const current = new Date(start);
+                current.setDate(current.getDate() + 1); // пропускаем день погрузки
+                while (current < end) {
+                    events.push({
+                        start: current.toISOString().split('T')[0],
+                        color: '#d0e8f9',
+                        display: 'background'
+                    });
+                    current.setDate(current.getDate() + 1);
+                }
+            }
+        }
+        calendar.removeAllEvents();
+        calendar.addEventSource(events);
+    }
+
+    // Инициализация при загрузке (если форма уже содержит данные)
+    updateFromInputs();
+});
+</script>
             </div>
         </div>
     </div>
