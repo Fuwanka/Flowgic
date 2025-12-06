@@ -24,11 +24,14 @@
                         <h5>История заказов</h5>
                         <ul class="list-group">
                             {% for o in orders %}
-                            <li class="list-group-item">
-                                <a href="{% url 'request_detail' o.id %}">Заказ {{ o.order_number }}</a> — {{
-                                o.get_status_display }}
-                                <br><small class="text-muted">{{ o.origin|default:"—" }} → {{ o.destination|default:"—"
-                                    }}</small>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{% url 'request_detail' o.id %}">Заказ {{ o.order_number }}</a>
+
+                                <br>
+                                <div class="small text-muted mt-1">
+                                    {{ o.origin|default:"—" }} &rarr; {{ o.destination|default:"—" }}
+                                </div>
+                                <span class="status-badge status-{{ o.status }}">{{ o.get_status_display }}</span>
                             </li>
                             {% empty %}
                             <li class="list-group-item text-muted">Заказов нет</li>

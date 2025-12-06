@@ -155,7 +155,7 @@ class DriverOrderStatusForm(forms.ModelForm):
             'status': 'Order Status',
         }
 
-
+ 
 class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle

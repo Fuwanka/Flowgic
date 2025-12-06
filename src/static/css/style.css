@@ -214,24 +214,44 @@ header .logout-btn {
     display: inline-block;
 }
 
-.status-in-transit {
+.status-created {
     background: #e3f2fd;
     color: #1976d2;
 }
 
-.status-completed {
-    background: #e8f5e9;
-    color: #2e7d32;
+.status-assigned {
+    background: #fff3e0;
+    color: #f57c00;
 }
 
-.status-new {
-    background: #fff3e0;
-    color: #ef6c00;
+.status-loading {
+    background: #fff9c4;
+    color: #f9a825;
+}
+
+.status-in_transit {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.status-delivered {
+    background: #e0f2f1;
+    color: #00897b;
+}
+
+.status-completed {
+    background: #e0f2f1;
+    color: #00695c;
 }
 
 .status-cancelled {
     background: #ffebee;
     color: #c62828;
+}
+
+.status-delayed {
+    background: #fce4ec;
+    color: #c2185b;
 }
 
 .actions a {
