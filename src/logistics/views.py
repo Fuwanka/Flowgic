@@ -5,12 +5,14 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.utils import timezone
 from accounts.decorators import role_required
-from .models import Order, Vehicle, Company, Client
+from .models import Order, Vehicle, Company, Client, Financial
 from decimal import Decimal
-from .models import Financial
 from accounts.models import User
 from django.shortcuts import get_object_or_404, render
 import datetime
+from django.utils.timezone import now
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncMonth
 
 from django.core.serializers.json import DjangoJSONEncoder
 import json
@@ -433,3 +435,51 @@ def calendar_view(request):
     events_json = json.dumps(events, cls=DjangoJSONEncoder, ensure_ascii=False)
     
     return render(request, 'logistics/calendar.html', {'events_json': events_json})
+
+@login_required
+@role_required(['manager'])
+def manager_dashboard(request):
+    company = request.user.company
+    if not company:
+        messages.error(request, "У вас не указана компания.")
+        return redirect('home')
+
+    # --- Заказы компании ---
+    orders = Order.objects.filter(created_by__company=company).select_related('driver', 'vehicle', 'client', 'financial').order_by('-created_at')
+
+    # --- Статистика по водителям ---
+    drivers = User.objects.filter(role='driver', company=company)
+    driver_stats = []
+    for driver in drivers:
+        assigned_count = orders.filter(driver=driver, status__in=[
+            Order.Status.ASSIGNED, Order.Status.LOADING, Order.Status.IN_TRANSIT
+        ]).count()
+        driver_stats.append({
+            'driver': driver,
+            'assigned_count': assigned_count
+        })
+
+    # --- Генерация событий для календаря ---
+    events = []
+    for order in orders:
+        if order.pickup_datetime and order.delivery_datetime:
+            events.append({
+                'title': f"Заказ {order.order_number}: {order.client.name if order.client else 'Клиент'}",
+                'start': order.pickup_datetime.isoformat(),
+                'end': order.delivery_datetime.isoformat(),
+                'color': "#37d842",
+                'textColor': "white",
+                'extendedProps': {
+                    'cargo': order.cargo_type,
+                    'status': order.get_status_display()
+                }
+            })
+    events_json = json.dumps(events, cls=DjangoJSONEncoder, ensure_ascii=False)
+
+    context = {
+        'orders': orders,
+        'driver_stats': driver_stats,
+        'events_json': events_json,
+    }
+
+    return render(request, 'logistics/manager_dashboard.html', context)

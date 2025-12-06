@@ -30,5 +30,6 @@ urlpatterns += [
     path('dashboard/drivers/<int:user_id>/', views.driver_detail, name='driver_detail'),
 
     path('calendar/', views.calendar_view, name='calendar'),
+    path('dashboard/manager/', views.manager_dashboard, name='manager_dashboard'),
 
 ]
