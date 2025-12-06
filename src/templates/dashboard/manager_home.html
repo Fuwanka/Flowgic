@@ -1,60 +1,129 @@
-{% extends "base.html" %}
-{% block title %}Менеджер{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Панель диспетчера{% endblock %}
 
 {% block content %}
 <div class="container-fluid dashboard-fluid">
-    <div class="dashboard-wrapper">
-        {% include 'dashboard/_sidebar.html' %}
-        <div class="dashboard-content">
-            {% block dashboard_content %}
-            <h1 class="mb-3">Добро пожаловать, {{ user.full_name }}</h1>
+  <div class="dashboard-wrapper">
+    {% include 'dashboard/_sidebar.html' %}
+    <div class="dashboard-content">
+      {% block dashboard_content %}
+      <h1 class="mb-3">Панель диспетчера</h1>
 
-            <h3>Заявки вашей компании:</h3>
+      <script>
+        console.log('events_json:', '{{ events_json|safe }}');
+      </script>
 
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Order #</th>
-                        <th>Cargo</th>
-                        <th>Route</th>
-                        <th>Status</th>
-                        <th>Payment</th>
-                        <th>Price</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in requests %}
-                    <tr>
-                        <td><a href="{% url 'request_detail' order.id %}">{{ order.order_number }}</a></td>
-                        <td>{{ order.cargo_type }}</td>
-                        <td>{{ order.origin }} → {{ order.destination }}</td>
-                        <td><span class="badge bg-{{ order.status|lower }}">{{ order.get_status_display }}</span></td>
-                        <td>
-                            {% if order.financial %}
-                            <span class="badge
-                              {% if order.financial.payment_status == 'paid' %}bg-success
-                              {% elif order.financial.payment_status == 'partially_paid' %}bg-warning text-dark
-                              {% else %}bg-danger{% endif %}">
-                                {{ order.financial.get_payment_status_display }}
-                            </span>
-                            {% else %}
-                            <span class="badge bg-secondary">—</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ order.agreed_price|default:"—" }}</td>
-                        <td><a href="{% url 'request_detail' order.id %}"
-                                class="btn btn-sm btn-outline-primary">View</a></td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center text-muted">Нет заявок</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% endblock %}
+      <div class="d-flex justify-content-between mb-3">
+        <div class="filters">
+          <button class="btn btn-outline-primary filter-btn active">Все</button>
+          <button class="btn btn-outline-secondary filter-btn">Новые</button>
+          <button class="btn btn-outline-warning filter-btn">В пути</button>
+          <button class="btn btn-outline-success filter-btn">Завершённые</button>
+          <button class="btn btn-outline-danger filter-btn">Отменённые</button>
         </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'create_client' %}" class="btn btn-success">👤 Новый клиент</a>
+          <a href="{% url 'create_vehicle' %}" class="btn btn-info text-white">🚛 Новое ТС</a>
+          <a href="{% url 'new_request' %}" class="btn btn-primary">➕ Новая заявка</a>
+          <button type="button" class="btn btn-outline-primary" id="openCalendarBtn">📅 Календарь</button>
+        </div>
+      </div>
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>№ заказа</th>
+            <th>Груз</th>
+            <th>Маршрут</th>
+            <th>Водитель</th>
+            <th>Транспорт</th>
+            <th>Статус</th>
+            <th>Оплата</th>
+            <th>Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in requests %}
+          <tr>
+            <td><a href="{% url 'request_detail' req.id %}">{{ req.order_number }}</a></td>
+            <td>{{ req.cargo_type }}</td>
+            <td>{{ req.origin }} → {{ req.destination }}</td>
+            <td>{% if req.driver %}{{ req.driver.full_name }}{% else %}—{% endif %}</td>
+            <td>{% if req.vehicle %}{{ req.vehicle.reg_number }}{% else %}—{% endif %}</td>
+            <td><span class="badge bg-{{ req.status|lower }}">{{ req.get_status_display }}</span></td>
+            <td>
+              {% if req.financial %}
+              <span class="badge
+                      {% if req.financial.payment_status == 'paid' %}bg-success
+                      {% elif req.financial.payment_status == 'partially_paid' %}bg-warning
+                      {% else %}bg-danger{% endif %}">
+                {{ req.financial.get_payment_status_display }}
+              </span>
+              {% else %}
+              <span class="badge bg-secondary">—</span>
+              {% endif %}
+            </td>
+            <td><a href="{% url 'request_detail' req.id %}" class="btn btn-sm btn-outline-primary">Открыть</a></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center">Заявки отсутствуют.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endblock %}
     </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<div class="modal fade" id="calendarModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">📅 Календарь заказов</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="dashboard-calendar" style="height: 600px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarEl = document.getElementById('dashboard-calendar');
+  if (calendarEl) {
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      locale: 'ru',
+      initialView: 'dayGridMonth',
+      firstDay: 1,
+      height: 'auto',
+      events: {{ events_json|safe }},
+      eventClick: function(info) {
+        alert(
+          `Заказ: ${info.event.title}\n` +
+          `Груз: ${info.event.extendedProps.cargo}\n` +
+          `Статус: ${info.event.extendedProps.status}`
+        );
+      }
+    });
+    calendar.render();
+  }
+
+  const btn = document.getElementById('openCalendarBtn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const modal = new bootstrap.Modal(document.getElementById('calendarModal'));
+      modal.show();
+    });
+  }
+});
+</script>
 {% endblock %}

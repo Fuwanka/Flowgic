@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Панель диспетчера{% endblock %}
 
 {% block content %}
 <div class="container-fluid dashboard-fluid">
@@ -7,26 +7,25 @@
     {% include 'dashboard/_sidebar.html' %}
     <div class="dashboard-content">
       {% block dashboard_content %}
-      <h1 class="mb-3">Dashboard</h1>
+      <h1 class="mb-3">Панель диспетчера</h1>
 
-      <!-- ОТЛАДКА: проверяем, есть ли events_json -->
+      <!-- ОТЛАДКА -->
       <script>
         console.log('events_json:', '{{ events_json|safe }}');
       </script>
 
       <div class="d-flex justify-content-between mb-3">
         <div class="filters">
-          <button class="btn btn-outline-primary filter-btn active">All</button>
-          <button class="btn btn-outline-secondary filter-btn">New</button>
-          <button class="btn btn-outline-warning filter-btn">In Transit</button>
-          <button class="btn btn-outline-success filter-btn">Completed</button>
-          <button class="btn btn-outline-danger filter-btn">Cancelled</button>
+          <button class="btn btn-outline-primary filter-btn active">Все</button>
+          <button class="btn btn-outline-secondary filter-btn">Новые</button>
+          <button class="btn btn-outline-warning filter-btn">В пути</button>
+          <button class="btn btn-outline-success filter-btn">Завершённые</button>
+          <button class="btn btn-outline-danger filter-btn">Отменённые</button>
         </div>
         <div class="d-flex gap-2">
-          <a href="{% url 'create_client' %}" class="btn btn-success">👤 New Client</a>
-          <a href="{% url 'create_vehicle' %}" class="btn btn-info text-white">🚛 New Vehicle</a>
-          <a href="{% url 'new_request' %}" class="btn btn-primary">➕ New Request</a>
-          <!-- КНОПКА КАЛЕНДАРЯ -->
+          <a href="{% url 'create_client' %}" class="btn btn-success">👤 Новый клиент</a>
+          <a href="{% url 'create_vehicle' %}" class="btn btn-info text-white">🚛 Новое ТС</a>
+          <a href="{% url 'new_request' %}" class="btn btn-primary">➕ Новый заказ</a>
           <button type="button" class="btn btn-outline-primary" id="openCalendarBtn">📅 Календарь</button>
         </div>
       </div>
@@ -34,14 +33,14 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>Order #</th>
-            <th>Cargo</th>
-            <th>Route</th>
-            <th>Driver</th>
-            <th>Vehicle</th>
-            <th>Status</th>
-            <th>Payment</th>
-            <th>Actions</th>
+            <th>№ заказа</th>
+            <th>Груз</th>
+            <th>Маршрут</th>
+            <th>Водитель</th>
+            <th>Транспорт</th>
+            <th>Статус</th>
+            <th>Оплата</th>
+            <th>Действия</th>
           </tr>
         </thead>
         <tbody>
@@ -65,11 +64,11 @@
               <span class="badge bg-secondary">—</span>
               {% endif %}
             </td>
-            <td><a href="{% url 'request_detail' req.id %}" class="btn btn-sm btn-outline-primary">View</a></td>
+            <td><a href="{% url 'request_detail' req.id %}" class="btn btn-sm btn-outline-primary">Открыть</a></td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="8" class="text-center">No requests found.</td>
+            <td colspan="8" class="text-center">Заказы не найдены.</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -81,13 +80,12 @@
 {% endblock %}
 
 {% block scripts %}
-<!-- Модальное окно -->
 <div class="modal fade" id="calendarModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">📅 Календарь заказов</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <div id="dashboard-calendar" style="height: 600px;"></div>
@@ -96,7 +94,6 @@
   </div>
 </div>
 
-<!-- FullCalendar -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
@@ -110,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
       firstDay: 1,
       height: 'auto',
       events: {{ events_json|safe }},
-      eventClick: function(info) {
+      eventClick(info) {
         alert(
           `Заказ: ${info.event.title}\n` +
           `Груз: ${info.event.extendedProps.cargo}\n` +

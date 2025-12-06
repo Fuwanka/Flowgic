@@ -1,64 +1,58 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 
 <head>
     <meta charset="UTF-8">
-    <title>Request {{ order.id }}</title>
+    <title>Заказ {{ order.id }}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/request_detail.css' %}">
 </head>
 
 <body>
     <div class="dashboard-container">
-        <div class="dashboard-header">
-            <div class="dashboard-title">
-                <span>Request #{{ order.id|stringformat:"s"|slice:":8" }}...</span>
-                <span class="status-badge status-{{ order.status }}" id="order-status-badge">{{ order.get_status_display
-                    }}</span>
+        <!-- Верхняя шапка заказа -->
+        <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div class="dashboard-title" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span>Заказ #{% if order.id|stringformat:"s"|length > 8 %}{{ order.id|stringformat:"s"|slice:":8" }}...{% else %}{{ order.id }}{% endif %}</span>
+                <span class="status-badge status-{{ order.status }}" id="order-status-badge">{{ order.get_status_display }}</span>
 
-                {% if user.role == 'dispatcher' or user.role == 'manager' %}
-                <!-- Quick Status Change -->
-                <div style="margin-left: 20px; display: flex; align-items: center; gap: 10px;">
+                {% if user.role in 'dispatcher manager' %}
+                <div style="display:flex; align-items:center; gap:10px;">
                     {% csrf_token %}
-                    <select id="status-select"
-                        style="padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">
+                    <select id="status-select" style="padding:5px 10px; border:1px solid #ddd; border-radius:4px; font-size:0.85rem; cursor:pointer;">
                         <option value="">Изменить статус...</option>
                         {% for choice in status_choices %}
-                        <option value="{{ choice.0 }}" {% if order.status is choice.0 %}selected{% endif %}>{{ choice.1
-                            }}
-                        </option>
+                        <option value="{{ choice.0 }}" {% if order.status == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
                         {% endfor %}
                     </select>
-                    <div id="status-message" style="font-size: 0.85rem; display: none;"></div>
+                    <div id="status-message" style="font-size:0.85rem; display:none;"></div>
                 </div>
                 {% endif %}
             </div>
-            <div>
-                <span class="text-muted" style="font-size: 0.9rem; margin-right: 15px;">
-                    Created {{ order.created_at|date:"M d, H:i" }} by {% if order.created_by %}{{
-                    order.created_by.full_name|default:order.created_by.get_full_name|default:order.created_by.email
-                    }}{% else %}Unknown{% endif %}
+            <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+                <span class="text-muted" style="font-size:0.9rem;">
+                    Создан {{ order.created_at|date:"d M, H:i" }} {% if order.created_by %} пользователем {{ order.created_by.full_name|default:order.created_by.get_full_name|default:order.created_by.email }}{% else %}Неизвестно{% endif %}
                 </span>
-                <a href="{% url 'home' %}" class="close-btn">Close</a>
+                <a href="{% url 'home' %}" class="close-btn">Закрыть</a>
             </div>
         </div>
 
         <div class="dashboard-content">
-            <!-- Column 1: Client & Cargo -->
+            <!-- Колонка 1: Клиент и Груз -->
             <div class="dashboard-column">
                 <div class="info-card">
-                    <div class="card-title">🏢 Client Details</div>
+                    <div class="card-title">🏢 Данные клиента</div>
                     <div class="info-row">
-                        <span class="info-label">Company</span>
+                        <span class="info-label">Компания</span>
                         <span class="info-value">{{ order.client.company.name }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Contact</span>
+                        <span class="info-label">Контакт</span>
                         <span class="info-value">{{ order.client.name }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Phone</span>
+                        <span class="info-label">Телефон</span>
                         <span class="info-value">{{ order.client.phone|default:"-" }}</span>
                     </div>
                     <div class="info-row">
@@ -68,70 +62,42 @@
                 </div>
 
                 <div class="info-card">
-                    <div class="card-title">📦 Cargo</div>
+                    <div class="card-title">📦 Груз</div>
                     <div class="info-row">
-                        <span class="info-label">Type</span>
+                        <span class="info-label">Тип</span>
                         <span class="info-value">{{ order.cargo_type }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Mass</span>
-                        <span class="info-value">{{ order.cargo_mass_kg }} kg</span>
+                        <span class="info-label">Масса</span>
+                        <span class="info-value">{{ order.cargo_mass_kg }} кг</span>
                     </div>
                 </div>
 
-                <!-- Financials -->
                 <div class="info-card">
-                    <div class="card-title">💰 Financials - правильный</div>
-
-                    {% if user.role == 'dispatcher' or user.role == 'manager' %}
-                    <!-- Financial Edit Form -->
-                    <form id="financial-form"
-                        style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                    <div class="card-title">💰 Финансы</div>
+                    {% if user.role in 'dispatcher manager' %}
+                    <form id="financial-form" style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
                         {% csrf_token %}
-
-                        <!-- Договорённая стоимость (из Order) -->
                         <div class="info-row">
                             <label for="id_agreed_price" class="info-label">Договорённая стоимость:</label>
-                            <input type="number" step="0.01" min="0" id="id_agreed_price"
-                                value="{% if order.agreed_price %}{{ order.agreed_price }}{% else %}0.00{% endif %}"
-                                style="width: 120px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            <input type="number" step="0.01" min="0" id="id_agreed_price" value="{% if order.agreed_price %}{{ order.agreed_price }}{% else %}0.00{% endif %}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
                         </div>
-
-                        <!-- Расходы на топливо -->
                         <div class="info-row">
                             <label for="id_fuel_expenses" class="info-label">Расходы на топливо:</label>
-                            <input type="number" step="0.01" min="0" id="id_fuel_expenses"
-                                value="{{ order.financial.fuel_expenses|floatformat:2 }}"
-                                style="width: 120px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            <input type="number" step="0.01" min="0" id="id_fuel_expenses" value="{{ order.financial.fuel_expenses|floatformat:2 }}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
                         </div>
-
-                        <!-- Оплата водителю -->
                         <div class="info-row">
                             <label for="id_driver_cost" class="info-label">Оплата водителю:</label>
-                            <input type="number" step="0.01" min="0" id="id_driver_cost"
-                                value="{{ order.financial.driver_cost|floatformat:2 }}"
-                                style="width: 120px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            <input type="number" step="0.01" min="0" id="id_driver_cost" value="{{ order.financial.driver_cost|floatformat:2 }}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
                         </div>
-
-                        <!-- Прибыль (только для просмотра) -->
                         <div class="info-row">
                             <label class="info-label">Прибыль:</label>
-                            <span id="profit-display" class="info-value text-success"
-                                style="font-weight: bold; margin-left: 8px;">
-                                {{ order.financial.profit|floatformat:2 }}
-                            </span>
+                            <span id="profit-display" class="info-value text-success" style="font-weight:bold; margin-left:8px;">{{ order.financial.profit|floatformat:2 }}</span>
                         </div>
-
-                        <button type="submit" class="btn-update-payment"
-                            style="padding: 8px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
-                            Сохранить финансы
-                        </button>
-                        <div id="financial-message" style="font-size: 0.85rem; display: none;"></div>
+                        <button type="submit" class="btn-update-payment" style="padding:8px 12px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.9rem;">Сохранить финансы</button>
+                        <div id="financial-message" style="font-size:0.85rem; display:none;"></div>
                     </form>
-
-
                     {% else %}
-                    <!-- Для водителя — только просмотр -->
                     <div class="info-row">
                         <span class="info-label">Договорённая стоимость</span>
                         <span class="info-value">{{ order.agreed_price|default:"-" }}</span>
@@ -150,234 +116,109 @@
                     </div>
                     {% endif %}
                 </div>
+            </div>
 
-                <!-- Column 2: Route & Resources -->
-                <div class="dashboard-column">
-                    <div class="info-card">
-                        <div class="card-title">📍 Route</div>
-                        <div class="info-row">
-                            <span class="info-label">Origin</span>
-                            <span class="info-value">{{ order.origin }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Pickup</span>
-                            <span class="info-value">{{ order.pickup_datetime|date:"M d, H:i" }}</span>
-                        </div>
-                        <hr class="divider">
-                        <div class="info-row">
-                            <span class="info-label">Destination</span>
-                            <span class="info-value">{{ order.destination }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Delivery</span>
-                            <span class="info-value">{{ order.delivery_datetime|date:"M d, H:i" }}</span>
-                        </div>
-                        {% if order.distance_km %}
-                        <div class="info-row" style="margin-top: 10px;">
-                            <span class="info-label">Distance</span>
-                            <span class="info-value">{{ order.distance_km }} km</span>
-                        </div>
-                        {% endif %}
+            <!-- Колонка 2: Маршрут и ресурсы -->
+            <div class="dashboard-column">
+                <div class="info-card">
+                    <div class="card-title">📍 Маршрут</div>
+                    <div class="info-row">
+                        <span class="info-label">Откуда</span>
+                        <span class="info-value">{{ order.origin }}</span>
                     </div>
-
-                    <div class="info-card">
-                        <div class="card-title">🚚 Resources</div>
-                        <div class="info-row">
-                            <span class="info-label">Driver</span>
-                            <span class="info-value">
-                                {% if order.driver %}{{ order.driver.get_full_name|default:order.driver.username }}
-                                {% else %}<span class="text-muted">Unassigned</span>{% endif %}
-                            </span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Vehicle</span>
-                            <span class="info-value">
-                                {% if order.vehicle %}{{ order.vehicle.reg_number }}
-                                {% else %}<span class="text-muted">Unassigned</span>{% endif %}
-                            </span>
-                        </div>
+                    <div class="info-row">
+                        <span class="info-label">Дата погрузки</span>
+                        <span class="info-value">{{ order.pickup_datetime|date:"d M, H:i" }}</span>
                     </div>
-                </div>
-
-                <!-- Column 3: History & Documents -->
-                <div class="dashboard-column">
-                    <div class="info-card" style="flex: 1; display: flex; flex-direction: column;">
-                        <div class="card-title">🕒 History</div>
-                        <div class="history-list" id="history-list">
-                            {% for event in order.events.all %}
-                            <div class="history-item">
-                                <span class="history-icon">●</span>
-                                <div class="history-content">
-                                    <div><strong>{{ event.get_event_type_display }}</strong></div>
-                                    {% if event.event_data %}
-                                    <div style="font-size: 0.8rem; color: #666;">
-                                        {% if event.event_data.action == 'marked_as_paid' %}
-                                        Заказ помечен как полностью оплаченный<br>
-                                        Пользователь: {{
-                                        event.order.created_by.full_name|default:order.created_by.get_full_name }}
-                                        {% elif event.event_data.action == 'partial_payment' %}
-                                        Частичная оплата: <strong>{{ event.event_data.amount }} ₽</strong><br>
-                                        Пользователь: {{
-                                        event.order.created_by.full_name|default:order.created_by.get_full_name }}
-                                        {% elif event.event_data.old_status %}
-                                        Статус изменён:
-                                        {% for status_key, status_label in status_choices %}
-                                        {% if status_key == event.event_data.old_status %}{{ status_label }}{% endif %}
-                                        {% endfor %}
-                                        →
-                                        {% for status_key, status_label in status_choices %}
-                                        {% if status_key == event.event_data.new_status %}{{ status_label }}{% endif %}
-                                        {% endfor %}
-                                        <br>
-                                        Пользователь: {{
-                                        event.order.created_by.full_name|default:order.created_by.get_full_name }}
-                                        {% else %}
-                                        {{ event.event_data }}
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
-                                    <div class="history-time">{{ event.created_at|date:"M d, H:i" }}</div>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <div class="text-muted" style="font-style: italic; padding: 10px;">No events yet.</div>
-                            {% endfor %}
-                        </div>
+                    <hr class="divider">
+                    <div class="info-row">
+                        <span class="info-label">Куда</span>
+                        <span class="info-value">{{ order.destination }}</span>
                     </div>
-
-                    {% if order.documents.exists %}
-                    <div class="info-card">
-                        <div class="card-title">📄 Documents</div>
-                        {% for doc in order.documents.all %}
-                        <a href="{{ doc.file_url|default:'#' }}" target="_blank" class="document-link">
-                            {{ doc.get_type_display }} №{{ doc.number }}
-                            <span style="float: right; font-size: 0.8rem; color: #666;">{{ doc.get_status_display
-                                }}</span>
-                        </a>
-                        {% endfor %}
+                    <div class="info-row">
+                        <span class="info-label">Дата доставки</span>
+                        <span class="info-value">{{ order.delivery_datetime|date:"d M, H:i" }}</span>
+                    </div>
+                    {% if order.distance_km %}
+                    <div class="info-row" style="margin-top:10px;">
+                        <span class="info-label">Расстояние</span>
+                        <span class="info-value">{{ order.distance_km }} км</span>
                     </div>
                     {% endif %}
                 </div>
+
+                <div class="info-card">
+                    <div class="card-title">🚚 Ресурсы</div>
+                    <div class="info-row">
+                        <span class="info-label">Водитель</span>
+                        <span class="info-value">{% if order.driver %}{{ order.driver.get_full_name|default:order.driver.username }}{% else %}<span class="text-muted">Не назначен</span>{% endif %}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Транспорт</span>
+                        <span class="info-value">{% if order.vehicle %}{{ order.vehicle.reg_number }}{% else %}<span class="text-muted">Не назначен</span>{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Колонка 3: История и документы -->
+            <div class="dashboard-column">
+                <div class="info-card" style="flex:1; display:flex; flex-direction:column;">
+                    <div class="card-title">🕒 История</div>
+                    <div class="history-list" id="history-list">
+                        {% for event in order.events.all %}
+                        <div class="history-item">
+                            <span class="history-icon">●</span>
+                            <div class="history-content">
+                                <div><strong>{{ event.get_event_type_display }}</strong></div>
+                                {% if event.event_data %}
+                                <div style="font-size:0.8rem; color:#666;">
+                                    {% if event.event_data.action == 'marked_as_paid' %}
+                                    Заказ помечен как полностью оплаченный<br>
+                                    Пользователь: {{ event.order.created_by.full_name|default:order.created_by.get_full_name }}
+                                    {% elif event.event_data.action == 'partial_payment' %}
+                                    Частичная оплата: <strong>{{ event.event_data.amount }} ₽</strong><br>
+                                    Пользователь: {{ event.order.created_by.full_name|default:order.created_by.get_full_name }}
+                                    {% elif event.event_data.old_status %}
+                                    Статус изменён:
+                                    {% for status_key, status_label in status_choices %}
+                                    {% if status_key == event.event_data.old_status %}{{ status_label }}{% endif %}
+                                    {% endfor %}
+                                    →
+                                    {% for status_key, status_label in status_choices %}
+                                    {% if status_key == event.event_data.new_status %}{{ status_label }}{% endif %}
+                                    {% endfor %}
+                                    <br>
+                                    Пользователь: {{ event.order.created_by.full_name|default:order.created_by.get_full_name }}
+                                    {% else %}
+                                    {{ event.event_data }}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                <div class="history-time">{{ event.created_at|date:"d M, H:i" }}</div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-muted" style="font-style:italic; padding:10px;">Событий пока нет.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if order.documents.exists %}
+                <div class="info-card">
+                    <div class="card-title">📄 Документы</div>
+                    {% for doc in order.documents.all %}
+                    <a href="{{ doc.file_url|default:'#' }}" target="_blank" class="document-link">
+                        {{ doc.get_type_display }} №{{ doc.number }}
+                        <span style="float:right; font-size:0.8rem; color:#666;">{{ doc.get_status_display }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
         </div>
+    </div>
 
-        <script>
-            // Status change dropdown handler
-            document.getElementById('status-select')?.addEventListener('change', async function () {
-                const newStatus = this.value;
-                const messageEl = document.getElementById('status-message');
-                const badge = document.getElementById('order-status-badge');
-                const selectEl = this;
-
-                if (!newStatus) {
-                    // Reset to current status if empty option selected
-                    selectEl.value = '{{ order.status }}';
-                    return;
-                }
-
-                const formData = new FormData();
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
-                if (!csrfToken) {
-                    messageEl.textContent = '✗ Ошибка: CSRF токен не найден';
-                    messageEl.style.color = '#c62828';
-                    messageEl.style.display = 'block';
-                    selectEl.value = '{{ order.status }}';
-                    return;
-                }
-                formData.append('csrfmiddlewaretoken', csrfToken.value);
-                formData.append('status', newStatus);
-
-                try {
-                    const response = await fetch('{% url "update_order_status" order.id %}', { method: 'POST', body: formData });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        badge.className = 'status-badge status-' + data.status;
-                        badge.textContent = data.status_display;
-                        messageEl.textContent = '✓ Обновлено';
-                        messageEl.style.color = '#388e3c';
-                        messageEl.style.display = 'block';
-                        // Update select to show new status
-                        selectEl.value = data.status;
-                        setTimeout(() => location.reload(), 1000);
-                    } else {
-                        messageEl.textContent = '✗ ' + data.error;
-                        messageEl.style.color = '#c62828';
-                        messageEl.style.display = 'block';
-                        // Reset to current status on error
-                        selectEl.value = '{{ order.status }}';
-                        setTimeout(() => messageEl.style.display = 'none', 3000);
-                    }
-                } catch (error) {
-                    messageEl.textContent = '✗ Ошибка сервера';
-                    messageEl.style.color = '#c62828';
-                    messageEl.style.display = 'block';
-                    // Reset to current status on error
-                    selectEl.value = '{{ order.status }}';
-                    setTimeout(() => messageEl.style.display = 'none', 3000);
-                }
-            });
-
-            // Financial form AJAX submission
-            document.getElementById('financial-form')?.addEventListener('submit', async function (e) {
-                e.preventDefault();
-
-                const agreedPrice = document.getElementById('id_agreed_price').value;
-                const fuelExpenses = document.getElementById('id_fuel_expenses').value;
-                const driverCost = document.getElementById('id_driver_cost').value;
-                const msgEl = document.getElementById('financial-message');
-
-                if (!agreedPrice || parseFloat(agreedPrice) <= 0) {
-                    msgEl.textContent = 'Укажите корректную договорённую стоимость';
-                    msgEl.style.color = '#c62828';
-                    msgEl.style.display = 'block';
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
-                formData.append('agreed_price', agreedPrice);
-                formData.append('fuel_expenses', fuelExpenses || '0.00');
-                formData.append('driver_cost', driverCost || '0.00');
-
-                try {
-                    const response = await fetch('{% url "update_financials" order.id %}', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        // Обновляем отображение прибыли
-                        document.getElementById('profit-display').textContent = data.profit;
-                        msgEl.textContent = '✓ Финансы обновлены';
-                        msgEl.style.color = '#388e3c';
-                        msgEl.style.display = 'block';
-                        setTimeout(() => msgEl.style.display = 'none', 3000);
-                    } else {
-                        msgEl.textContent = '✗ ' + data.error;
-                        msgEl.style.color = '#c62828';
-                        msgEl.style.display = 'block';
-                    }
-                } catch (error) {
-                    msgEl.textContent = '✗ Ошибка сети';
-                    msgEl.style.color = '#c62828';
-                    msgEl.style.display = 'block';
-                }
-            });
-
-            // Динамический пересчёт прибыли при вводе (опционально)
-            ['id_agreed_price', 'id_fuel_expenses', 'id_driver_cost'].forEach(id => {
-                document.getElementById(id)?.addEventListener('input', () => {
-                    const ap = parseFloat(document.getElementById('id_agreed_price').value) || 0;
-                    const fe = parseFloat(document.getElementById('id_fuel_expenses').value) || 0;
-                    const dc = parseFloat(document.getElementById('id_driver_cost').value) || 0;
-                    const tp = 0; // или получать из скрытого поля, если нужно
-                    const profit = ap - fe - dc - tp;
-                    document.getElementById('profit-display').textContent = profit.toFixed(2);
-                });
-            });
-        </script>
+    <!-- JS скрипты для статуса и финансов оставляем без изменений -->
+    <script src="{% static 'js/request_detail.js' %}"></script>
 </body>
-
 </html>

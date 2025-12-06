@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Edit Order #{{ order.id }}{% endblock %}
+{% block title %}Редактирование заказа №{{ order.id }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -7,36 +7,36 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3>Edit Order #{{ order.id }}</h3>
-                    <a href="{% url 'request_detail' order.id %}" class="btn btn-sm btn-outline-secondary">Cancel</a>
+                    <h3>Редактирование заказа №{{ order.id }}</h3>
+                    <a href="{% url 'request_detail' order.id %}" class="btn btn-sm btn-outline-secondary">Отмена</a>
                 </div>
                 <div class="card-body">
                     {% if is_driver %}
                     <div class="alert alert-info mb-4">
-                        <strong>Driver Mode:</strong> You can update the order status.
+                        <strong>Режим водителя:</strong> Вы можете обновить статус заказа.
                     </div>
                     {% else %}
                     <div class="alert alert-info mb-4">
-                        <strong>Dispatcher Mode:</strong> You can reassign the driver/vehicle and update status.
+                        <strong>Режим диспетчера:</strong> Вы можете переназначить водителя/транспорт и обновить статус.
                     </div>
                     {% endif %}
 
-                    <!-- Order Info (Read-only) -->
+                    <!-- Информация о заказе (только для чтения) -->
                     <div class="mb-4 p-3" style="background-color: #f8f9fa; border-radius: 5px;">
-                        <h5 class="mb-3">Order Information</h5>
+                        <h5 class="mb-3">Информация о заказе</h5>
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>Cargo:</strong> {{ order.cargo_type }}</p>
-                                <p><strong>Origin:</strong> {{ order.origin|default:"Not specified" }}</p>
+                                <p><strong>Груз:</strong> {{ order.cargo_type }}</p>
+                                <p><strong>Откуда:</strong> {{ order.origin|default:"Не указано" }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Client:</strong> {{ order.client.name }}</p>
-                                <p><strong>Destination:</strong> {{ order.destination|default:"Not specified" }}</p>
+                                <p><strong>Клиент:</strong> {{ order.client.name }}</p>
+                                <p><strong>Куда:</strong> {{ order.destination|default:"Не указано" }}</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Edit Form -->
+                    <!-- Форма редактирования -->
                     <form method="post">
                         {% csrf_token %}
 
@@ -47,7 +47,7 @@
                         {% endif %}
 
                         {% if not is_driver %}
-                        <!-- Driver Selection (Dispatcher only) -->
+                        <!-- Выбор водителя (только для диспетчера) -->
                         <div class="mb-3">
                             <label for="{{ form.driver.id_for_label }}" class="form-label">
                                 {{ form.driver.label }}
@@ -56,10 +56,10 @@
                             {% if form.driver.errors %}
                             <div class="text-danger small">{{ form.driver.errors }}</div>
                             {% endif %}
-                            <small class="text-muted">Leave empty to unassign</small>
+                            <small class="text-muted">Оставьте пустым, чтобы снять назначение</small>
                         </div>
 
-                        <!-- Vehicle Selection (Dispatcher only) -->
+                        <!-- Выбор транспорта (только для диспетчера) -->
                         <div class="mb-3">
                             <label for="{{ form.vehicle.id_for_label }}" class="form-label">
                                 {{ form.vehicle.label }}
@@ -68,11 +68,11 @@
                             {% if form.vehicle.errors %}
                             <div class="text-danger small">{{ form.vehicle.errors }}</div>
                             {% endif %}
-                            <small class="text-muted">Leave empty to unassign</small>
+                            <small class="text-muted">Оставьте пустым, чтобы снять назначение</small>
                         </div>
                         {% endif %}
 
-                        <!-- Status Selection -->
+                        <!-- Выбор статуса -->
                         <div class="mb-3">
                             <label for="{{ form.status.id_for_label }}" class="form-label">
                                 {{ form.status.label }} <span class="text-danger">*</span>
@@ -84,8 +84,8 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-4">
-                            <a href="{% url 'request_detail' order.id %}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a href="{% url 'request_detail' order.id %}" class="btn btn-secondary">Отмена</a>
+                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
                         </div>
                     </form>
                 </div>

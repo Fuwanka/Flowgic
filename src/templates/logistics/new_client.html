@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Create New Client{% endblock %}
+{% block title %}Создать нового клиента{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -7,11 +7,11 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3>Create New Client</h3>
-                    <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary">Cancel</a>
+                    <h3>Создать нового клиента</h3>
+                    <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary">Отмена</a>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-4">Add a new client to your company's client list.</p>
+                    <p class="text-muted mb-4">Добавьте нового клиента в список вашей компании.</p>
 
                     <form method="post">
                         {% csrf_token %}
@@ -22,7 +22,7 @@
                         </div>
                         {% endif %}
 
-                        <!-- Client Name -->
+                        <!-- Название клиента -->
                         <div class="mb-3">
                             <label for="{{ form.name.id_for_label }}" class="form-label">
                                 {{ form.name.label }} <span class="text-danger">*</span>
@@ -31,10 +31,10 @@
                             {% if form.name.errors %}
                             <div class="text-danger small">{{ form.name.errors }}</div>
                             {% endif %}
-                            <small class="text-muted">Company or individual name</small>
+                            <small class="text-muted">Название компании или физического лица</small>
                         </div>
 
-                        <!-- Phone -->
+                        <!-- Телефон -->
                         <div class="mb-3">
                             <label for="{{ form.phone.id_for_label }}" class="form-label">
                                 {{ form.phone.label }}
@@ -57,8 +57,8 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-4">
-                            <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Client</button>
+                            <a href="{% url 'home' %}" class="btn btn-secondary">Отмена</a>
+                            <button type="submit" class="btn btn-primary">Создать клиента</button>
                         </div>
                     </form>
                 </div>

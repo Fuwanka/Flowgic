@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Create New Request{% endblock %}
+{% block title %}Создать новую заявку{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -7,11 +7,11 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3>Create New Shipment Request</h3>
-                    <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary">Cancel</a>
+                    <h3>Создать новую заявку на перевозку</h3>
+                    <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary">Отмена</a>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-4">Fill in the details below to create a new shipment request.</p>
+                    <p class="text-muted mb-4">Заполните данные ниже, чтобы создать новую заявку на перевозку.</p>
 
                     <form method="post">
                         {% csrf_token %}
@@ -22,7 +22,7 @@
                         </div>
                         {% endif %}
 
-                        <!-- Client Selection -->
+                        <!-- Выбор клиента -->
                         <div class="mb-3">
                             <label for="{{ form.client.id_for_label }}" class="form-label">
                                 {{ form.client.label }} <span class="text-danger">*</span>
@@ -33,7 +33,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Cargo Description -->
+                        <!-- Тип груза -->
                         <div class="mb-3">
                             <label for="{{ form.cargo_type.id_for_label }}" class="form-label">
                                 {{ form.cargo_type.label }} <span class="text-danger">*</span>
@@ -44,7 +44,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Cargo Weight -->
+                        <!-- Масса груза -->
                         <div class="mb-3">
                             <label for="{{ form.cargo_mass_kg.id_for_label }}" class="form-label">
                                 {{ form.cargo_mass_kg.label }} <span class="text-danger">*</span>
@@ -55,7 +55,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Origin and Destination -->
+                        <!-- Пункт отправления и назначения -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.origin.id_for_label }}" class="form-label">
@@ -77,7 +77,7 @@
                             </div>
                         </div>
 
-                        <!-- Pickup and Delivery Times -->
+                        <!-- Дата и время забора и доставки -->
                         <div class="row mb-4">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.pickup_datetime.id_for_label }}" class="form-label">
@@ -99,7 +99,7 @@
                             </div>
                         </div>
 
-                        <!-- Визуализация диапазона дат -->
+                        <!-- Визуализация маршрута -->
                         <div class="row mb-4">
                             <div class="col-12">
                                 <h5 class="mb-3">📆 Визуализация маршрута</h5>
@@ -107,7 +107,7 @@
                             </div>
                         </div>
 
-                        <!-- Driver and Vehicle -->
+                        <!-- Водитель и транспорт -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.driver.id_for_label }}" class="form-label">
@@ -117,7 +117,7 @@
                                 {% if form.driver.errors %}
                                 <div class="text-danger small">{{ form.driver.errors }}</div>
                                 {% endif %}
-                                <small class="text-muted">Leave empty to assign later</small>
+                                <small class="text-muted">Оставьте пустым, чтобы назначить позже</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.vehicle.id_for_label }}" class="form-label">
@@ -127,11 +127,11 @@
                                 {% if form.vehicle.errors %}
                                 <div class="text-danger small">{{ form.vehicle.errors }}</div>
                                 {% endif %}
-                                <small class="text-muted">Leave empty to assign later</small>
+                                <small class="text-muted">Оставьте пустым, чтобы назначить позже</small>
                             </div>
                         </div>
 
-                        <!-- Status and Agreed Price -->
+                        <!-- Статус и согласованная цена -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.status.id_for_label }}" class="form-label">
@@ -154,91 +154,74 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-4">
-                            <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Save Request</button>
+                            <a href="{% url 'home' %}" class="btn btn-secondary">Отмена</a>
+                            <button type="submit" class="btn btn-primary">Сохранить заявку</button>
                         </div>
                     </form>
                 </div>
+
                 <!-- FullCalendar -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+                <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css' rel='stylesheet' />
+                <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const pickupInput = document.getElementById('{{ form.pickup_datetime.id_for_label }}');
-    const deliveryInput = document.getElementById('{{ form.delivery_datetime.id_for_label }}');
-    const calendarEl = document.getElementById('order-calendar');
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const pickupInput = document.getElementById('{{ form.pickup_datetime.id_for_label }}');
+                    const deliveryInput = document.getElementById('{{ form.delivery_datetime.id_for_label }}');
+                    const calendarEl = document.getElementById('order-calendar');
 
-    if (!pickupInput || !deliveryInput || !calendarEl) return;
+                    if (!pickupInput || !deliveryInput || !calendarEl) return;
 
-    let pickupDate = null;
-    let deliveryDate = null;
+                    let pickupDate = null;
+                    let deliveryDate = null;
 
-    // Инициализация календаря
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        locale: 'ru',
-        initialView: 'dayGridMonth',
-        firstDay: 1,
-        height: 300,
-        events: []
-    });
-    calendar.render();
-
-    // Обновление при ручном изменении полей
-    function updateFromInputs() {
-        const pickupVal = pickupInput.value ? pickupInput.value.split('T')[0] : null;
-        const deliveryVal = deliveryInput.value ? deliveryInput.value.split('T')[0] : null;
-        pickupDate = pickupVal;
-        deliveryDate = deliveryVal;
-        renderEvents();
-    }
-
-    pickupInput.addEventListener('change', updateFromInputs);
-    deliveryInput.addEventListener('change', updateFromInputs);
-
-    function renderEvents() {
-        const events = [];
-        if (pickupDate) {
-            events.push({
-                title: 'Погрузка',
-                start: pickupDate,
-                color: '#28a745',
-                textColor: 'white'
-            });
-        }
-        if (deliveryDate) {
-            events.push({
-                title: 'Доставка',
-                start: deliveryDate,
-                color: '#ffc107',
-                textColor: 'black'
-            });
-        }
-        // Закрашиваем промежуточные дни (только если даты разные и в правильном порядке)
-        if (pickupDate && deliveryDate && pickupDate !== deliveryDate) {
-            const start = new Date(pickupDate);
-            const end = new Date(deliveryDate);
-            if (start < end) {
-                const current = new Date(start);
-                current.setDate(current.getDate() + 1); // пропускаем день погрузки
-                while (current < end) {
-                    events.push({
-                        start: current.toISOString().split('T')[0],
-                        color: '#d0e8f9',
-                        display: 'background'
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        locale: 'ru',
+                        initialView: 'dayGridMonth',
+                        firstDay: 1,
+                        height: 300,
+                        events: []
                     });
-                    current.setDate(current.getDate() + 1);
-                }
-            }
-        }
-        calendar.removeAllEvents();
-        calendar.addEventSource(events);
-    }
+                    calendar.render();
 
-    // Инициализация при загрузке (если форма уже содержит данные)
-    updateFromInputs();
-});
-</script>
+                    function updateFromInputs() {
+                        const pickupVal = pickupInput.value ? pickupInput.value.split('T')[0] : null;
+                        const deliveryVal = deliveryInput.value ? deliveryInput.value.split('T')[0] : null;
+                        pickupDate = pickupVal;
+                        deliveryDate = deliveryVal;
+                        renderEvents();
+                    }
+
+                    pickupInput.addEventListener('change', updateFromInputs);
+                    deliveryInput.addEventListener('change', updateFromInputs);
+
+                    function renderEvents() {
+                        const events = [];
+                        if (pickupDate) {
+                            events.push({ title: 'Погрузка', start: pickupDate, color: '#28a745', textColor: 'white' });
+                        }
+                        if (deliveryDate) {
+                            events.push({ title: 'Доставка', start: deliveryDate, color: '#ffc107', textColor: 'black' });
+                        }
+                        if (pickupDate && deliveryDate && pickupDate !== deliveryDate) {
+                            const start = new Date(pickupDate);
+                            const end = new Date(deliveryDate);
+                            if (start < end) {
+                                const current = new Date(start);
+                                current.setDate(current.getDate() + 1);
+                                while (current < end) {
+                                    events.push({ start: current.toISOString().split('T')[0], color: '#d0e8f9', display: 'background' });
+                                    current.setDate(current.getDate() + 1);
+                                }
+                            }
+                        }
+                        calendar.removeAllEvents();
+                        calendar.addEventSource(events);
+                    }
+
+                    updateFromInputs();
+                });
+                </script>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Driver Dashboard{% endblock %}
+{% block title %}Панель водителя{% endblock %}
 
 {% block content %}
 <div class="container-fluid dashboard-fluid">
@@ -15,49 +15,51 @@
                 }
             </style>
 
-            <h1 class="mb-3">My Assigned Orders</h1>
+            <h1 class="mb-3">Мои назначенные заказы</h1>
 
             <div class="mb-3">
-                <span class="badge bg-warning">🔔 {{ unread_count }} New</span>
-                <span class="badge bg-secondary">Total: {{ requests|length }}</span>
+                <span class="badge bg-warning">🔔 {{ unread_count }} новых</span>
+                <span class="badge bg-secondary">Всего: {{ requests|length }}</span>
             </div>
 
             <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Cargo</th>
-                        <th>Route</th>
-                        <th>Pickup Time</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Груз</th>
+                        <th>Маршрут</th>
+                        <th>Время подачи</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in requests %}
                     <tr class="{% if not order.is_viewed_by_driver %}order-unread{% endif %}">
                         <td>
-                            {% if not order.is_viewed_by_driver %}<span class="badge bg-warning">NEW</span>{% endif %}
+                            {% if not order.is_viewed_by_driver %}
+                                <span class="badge bg-warning">НОВОЕ</span>
+                            {% endif %}
                             <a href="{% url 'request_detail' order.id %}">{{ order.id|slice:":8" }}</a>
                         </td>
                         <td>
                             {{ order.cargo_type }}
                             <br>
-                            <small class="text-muted">{{ order.cargo_mass_kg }} kg</small>
+                            <small class="text-muted">{{ order.cargo_mass_kg }} кг</small>
                         </td>
                         <td>{{ order.origin|default:"—" }} → {{ order.destination|default:"—" }}</td>
-                        <td>{{ order.pickup_datetime|date:"M d, h:i A" }}</td>
+                        <td>{{ order.pickup_datetime|date:"d.m.Y, H:i" }}</td>
                         <td><span class="badge bg-{{ order.status|lower }}">{{ order.get_status_display }}</span></td>
                         <td>
                             <a href="{% url 'request_detail' order.id %}"
-                                class="btn btn-sm btn-outline-primary">View</a>
-                            <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-outline-warning">Update
-                                Status</a>
+                               class="btn btn-sm btn-outline-primary">Открыть</a>
+                            <a href="{% url 'edit_order' order.id %}"
+                               class="btn btn-sm btn-outline-warning">Обновить статус</a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted">No orders assigned to you</td>
+                        <td colspan="6" class="text-center text-muted">У вас пока нет назначенных заказов</td>
                     </tr>
                     {% endfor %}
                 </tbody>
