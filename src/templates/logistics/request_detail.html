@@ -80,8 +80,10 @@
                         {% csrf_token %}
                         <div class="info-row">
                             <span class="info-label">Договорённая стоимость:</span>
-                            <span class="info-value">{{ order.financial.client_cost|default:"0.00" }}</span>
-                        </div>
+                            <input type="text" id="id_client_cost" name="client_cost"
+           value="{{ order.financial.client_cost|floatformat:2 }}"
+           style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
+        </div>
                         <div class="info-row">
                             <label for="id_fuel_expenses" class="info-label">Расходы на топливо:</label>
                             <input type="text" id="id_fuel_expenses" value="{{ order.financial.fuel_expenses|floatformat:2 }}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
@@ -150,8 +152,8 @@
                 <div class="info-card">
                     <div class="card-title">🚚 Ресурсы</div>
                     <div class="info-row">
-                        <span class="info-label">Водитель</span>
-                        <span class="info-value">{% if order.driver %}{{ order.driver.get_full_name|default:order.driver.username }}{% else %}<span class="text-muted">Не назначен</span>{% endif %}</span>
+                        <span class="info-label">Водител</span>
+                        <span class="info-value">{% if order.driver %}{{ order.driver.full_name }}{% else %}<span class="text-muted">Не назначен</span>{% endif %}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Транспорт</span>

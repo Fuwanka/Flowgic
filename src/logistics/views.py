@@ -57,7 +57,7 @@ def new_request(request):
 @login_required
 def request_detail(request, order_id):
     """View for displaying order details"""
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(Order.objects.select_related('driver', 'vehicle', 'client__company', 'created_by', 'financial'), id=order_id)
 
     # Always create Financial if not exists
     Financial.objects.get_or_create(
@@ -509,4 +509,4 @@ def manager_dashboard(request):
         'events_json': events_json,
     }
 
-    return render(request, 'logistics/manager_dashboard.html', context)
+    return render(request, 'dashboard/manager_home.html', context)

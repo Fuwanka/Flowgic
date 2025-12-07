@@ -151,9 +151,8 @@
         initialView: 'dayGridMonth',
         firstDay: 1,
         height: 'auto',
-        events: {{ events_json| safe }
-  },
-    eventClick(info) {
+        events: {{ events_json|safe }},
+        eventClick(info) {
     alert(
             `Заказ: ${info.event.title
   }\n` +
