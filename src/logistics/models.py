@@ -426,7 +426,7 @@ class Financial(models.Model):
     def save(self, *args, **kwargs):
         """Автоматически вычисляем прибыль при сохранении"""
         # --- Расчёт топлива ---
-        if self.fuel_expenses is None or self.fuel_expenses == Decimal('0.00'):
+        if self.fuel_expenses is None:
             if self.order.distance_km and self.order.distance_km > 0:
                 AVERAGE_FUEL_CONSUMPTION_L_PER_100KM = Decimal('30.0')
                 DIESEL_PRICE_PER_LITER = Decimal('82.0')
@@ -436,8 +436,7 @@ class Financial(models.Model):
                 self.fuel_expenses = Decimal('0.00')
 
         # --- Расчёт прибыли ---
-        third_party = self.third_party_cost or Decimal('0.00')
-        self.profit = self.client_cost - self.driver_cost - third_party - self.fuel_expenses
+        self.profit = self.client_cost - self.fuel_expenses - self.driver_cost
         super().save(*args, **kwargs)
 
     def __str__(self):

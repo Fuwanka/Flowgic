@@ -58,17 +58,17 @@ def new_request(request):
 def request_detail(request, order_id):
     """View for displaying order details"""
     order = get_object_or_404(Order, id=order_id)
-    
-    if request.user.role in ['dispatcher', 'manager'] and order.agreed_price is not None:
-        Financial.objects.get_or_create(
-            order=order,
-            defaults={
-                'client_cost': order.agreed_price or Decimal('0.00'),
-                'driver_cost': Decimal('0.00'),
-                'fuel_expenses': Decimal('0.00'),
-                'third_party_cost': Decimal('0.00'),
-            }
-        )
+
+    # Always create Financial if not exists
+    Financial.objects.get_or_create(
+        order=order,
+        defaults={
+            'client_cost': order.agreed_price or Decimal('0.00'),
+            'driver_cost': Decimal('0.00'),
+            'fuel_expenses': Decimal('0.00'),
+            'third_party_cost': Decimal('0.00'),
+        }
+    )
 
     # Mark as viewed if driver opens their assigned order
     if request.user.role == 'driver' and order.driver == request.user:
@@ -255,8 +255,10 @@ def update_order_status(request, order_id):
 @role_required(['dispatcher', 'manager'])
 @require_POST
 def update_financials(request, order_id):
+    from .models import OrderEvent
+
     order = get_object_or_404(Order, id=order_id)
-    
+
     # Обязательно создаём Financial, если его нет
     financial, created = Financial.objects.get_or_create(
         order=order,
@@ -269,19 +271,44 @@ def update_financials(request, order_id):
     )
 
     try:
-        agreed_price = Decimal(request.POST.get('agreed_price', '0'))
         fuel_expenses = Decimal(request.POST.get('fuel_expenses', '0'))
         driver_cost = Decimal(request.POST.get('driver_cost', '0'))
 
-        # Обновляем заказ
-        order.agreed_price = agreed_price
-        order.save(update_fields=['agreed_price'])
+        # Сохраняем старые значения для логирования
+        old_fuel_expenses = financial.fuel_expenses
+        old_driver_cost = financial.driver_cost
+        old_profit = financial.profit
+        client_cost = Decimal(request.POST.get('client_cost', str(financial.client_cost)))
+        financial.client_cost = client_cost
 
-        # Обновляем финансовую запись
-        financial.client_cost = agreed_price
+        """
+        order.refresh_from_db()  # на случай кэша
+        agreed_price = order.agreed_price or Decimal('0.00')
+        if financial.client_cost != agreed_price:
+            financial.client_cost = agreed_price
+        """
+        
+        # Обновляем финансовую запись (client_cost уже установлен как agreed_price)
         financial.fuel_expenses = fuel_expenses
         financial.driver_cost = driver_cost
         financial.save()  # Прибыль пересчитается автоматически
+
+        # Логируем изменения в истории заказа
+        if old_fuel_expenses != fuel_expenses or old_driver_cost != driver_cost:
+            event_data = {
+                'old_fuel_expenses': str(old_fuel_expenses),
+                'new_fuel_expenses': str(fuel_expenses),
+                'old_driver_cost': str(old_driver_cost),
+                'new_driver_cost': str(driver_cost),
+                'old_profit': str(old_profit),
+                'new_profit': str(financial.profit),
+                'user': request.user.username
+            }
+            OrderEvent.objects.create(
+                order=order,
+                event_type='financials_updated',
+                event_data=event_data
+            )
 
         return JsonResponse({
             'success': True,
@@ -289,7 +316,7 @@ def update_financials(request, order_id):
         })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
-    
+
 @login_required
 def dashboard_vehicles(request):
     """Список транспорта компании с краткой статистикой и действиями."""

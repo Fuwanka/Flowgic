@@ -79,16 +79,16 @@
                     <form id="financial-form" style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
                         {% csrf_token %}
                         <div class="info-row">
-                            <label for="id_agreed_price" class="info-label">Договорённая стоимость:</label>
-                            <input type="number" step="0.01" min="0" id="id_agreed_price" value="{% if order.agreed_price %}{{ order.agreed_price }}{% else %}0.00{% endif %}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
+                            <span class="info-label">Договорённая стоимость:</span>
+                            <span class="info-value">{{ order.financial.client_cost|default:"0.00" }}</span>
                         </div>
                         <div class="info-row">
                             <label for="id_fuel_expenses" class="info-label">Расходы на топливо:</label>
-                            <input type="number" step="0.01" min="0" id="id_fuel_expenses" value="{{ order.financial.fuel_expenses|floatformat:2 }}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
+                            <input type="text" id="id_fuel_expenses" value="{{ order.financial.fuel_expenses|floatformat:2 }}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
                         </div>
                         <div class="info-row">
                             <label for="id_driver_cost" class="info-label">Оплата водителю:</label>
-                            <input type="number" step="0.01" min="0" id="id_driver_cost" value="{{ order.financial.driver_cost|floatformat:2 }}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
+                            <input type="text" id="id_driver_cost" value="{{ order.financial.driver_cost|floatformat:2 }}" style="width:120px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;">
                         </div>
                         <div class="info-row">
                             <label class="info-label">Прибыль:</label>
@@ -100,7 +100,7 @@
                     {% else %}
                     <div class="info-row">
                         <span class="info-label">Договорённая стоимость</span>
-                        <span class="info-value">{{ order.agreed_price|default:"-" }}</span>
+                        <span class="info-value">{{ order.financial.client_cost|default:"-" }}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Расходы на топливо</span>
@@ -189,6 +189,12 @@
                                     {% endfor %}
                                     <br>
                                     Пользователь: {{ event.order.created_by.full_name|default:order.created_by.get_full_name }}
+                                    {% elif event.event_data.old_fuel_expenses %}
+                                    Финансы обновлены:<br>
+                                    Расходы на топливо: {{ event.event_data.old_fuel_expenses }} → {{ event.event_data.new_fuel_expenses }}<br>
+                                    Оплата водителю: {{ event.event_data.old_driver_cost }} → {{ event.event_data.new_driver_cost }}<br>
+                                    Прибыль: {{ event.event_data.old_profit }} → {{ event.event_data.new_profit }}<br>
+                                    Пользователь: {{ event.event_data.user }}
                                     {% else %}
                                     {{ event.event_data }}
                                     {% endif %}
