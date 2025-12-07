@@ -27,7 +27,7 @@
         <div class="user-panel">
             {% if user.is_authenticated %}
             <div class="user-info">
-                <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="name">{{ user.full_name|default:user.username }}</div>
                 <div class="email">{{ user.email }}</div>
                 <div class="user-role">
                     {{ user.role_display }}
@@ -64,7 +64,7 @@
         </div>
     </header>
 
-    <main class="container mt-4">
+    <main class="{% block main_class %}container mt-4{% endblock %}">
         {% if messages %}
         <div class="messages mb-4">
             {% for message in messages %}

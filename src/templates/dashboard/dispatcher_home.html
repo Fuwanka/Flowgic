@@ -1,39 +1,42 @@
 {% extends 'base.html' %}
+
+{% block main_class %}p-0{% endblock %}
+
 {% block extra_styles %}
 <style>
-    /* ========= КРАСИВЫЕ СТАТУСЫ ========= */
+  /* ========= КРАСИВЫЕ СТАТУСЫ ========= */
 
-    .status-badge {
-        padding: 6px 10px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-block;
-    }
+  .status-badge {
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+  }
 
-    .status-new {
-        background: #0d6efd22;
-        color: #0d6efd;
-        border: 1px solid #0d6efd55;
-    }
+  .status-new {
+    background: #0d6efd22;
+    color: #0d6efd;
+    border: 1px solid #0d6efd55;
+  }
 
-    .status-in_progress {
-        background: #ffc10722;
-        color: #b58100;
-        border: 1px solid #ffc10755;
-    }
+  .status-in_progress {
+    background: #ffc10722;
+    color: #b58100;
+    border: 1px solid #ffc10755;
+  }
 
-    .status-completed {
-        background: #19875422;
-        color: #0f5132;
-        border: 1px solid #19875466;
-    }
+  .status-completed {
+    background: #19875422;
+    color: #0f5132;
+    border: 1px solid #19875466;
+  }
 
-    .status-cancelled {
-        background: #dc354522;
-        color: #842029;
-        border: 1px solid #dc354566;
-    }
+  .status-cancelled {
+    background: #dc354522;
+    color: #842029;
+    border: 1px solid #dc354566;
+  }
 </style>
 {% endblock %}
 
@@ -90,9 +93,9 @@
             <td>{% if req.driver %}{{ req.driver.full_name }}{% else %}—{% endif %}</td>
             <td>{% if req.vehicle %}{{ req.vehicle.reg_number }}{% else %}—{% endif %}</td>
             <td>
-                <span class="status-badge status-{{ req.status|lower }}">
-                    {{ req.get_status_display }}
-                </span>
+              <span class="status-badge status-{{ req.status|lower }}">
+                {{ req.get_status_display }}
+              </span>
             </td>
             <td>
               {% if req.financial %}
@@ -140,23 +143,25 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const calendarEl = document.getElementById('dashboard-calendar');
-  if (calendarEl) {
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      locale: 'ru',
-      initialView: 'dayGridMonth',
-      firstDay: 1,
-      height: 'auto',
-      events: {{ events_json|safe }},
-      eventClick(info) {
-        alert(
-          `Заказ: ${info.event.title}\n` +
-          `Груз: ${info.event.extendedProps.cargo}\n` +
-          `Статус: ${info.event.extendedProps.status}`
-        );
-      }
-    });
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('dashboard-calendar');
+    if (calendarEl) {
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'ru',
+        initialView: 'dayGridMonth',
+        firstDay: 1,
+        height: 'auto',
+        events: {{ events_json| safe }
+  },
+    eventClick(info) {
+    alert(
+            `Заказ: ${info.event.title
+  }\n` +
+            `Груз: ${ info.event.extendedProps.cargo }\n` +
+            `Статус: ${ info.event.extendedProps.status }`
+          );
+        }
+      });
     calendar.render();
   }
 

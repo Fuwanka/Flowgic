@@ -8,6 +8,10 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f5f7fa;
     color: #333;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 header {
@@ -17,6 +21,14 @@ header {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 0 0 auto;
+    z-index: 10;
+}
+
+main {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    /* Remove default margins/padding if necessary to let children control it */
 }
 
 header .logo {
@@ -529,7 +541,7 @@ header .logout-btn {
     /* учитываем высоту header (примерно) */
     position: sticky;
     /* остаётся видимым при скролле */
-    top: 72px;
+    top: 0;
     /* под шапкой; подкорректируй под реальную высоту header */
     background: #ffffff;
     border-right: 1px solid #eee;

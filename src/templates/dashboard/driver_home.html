@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+
+{% block main_class %}p-0{% endblock %}
+
 {% load static %}
 {% block title %}Панель водителя{% endblock %}
 
@@ -38,7 +41,7 @@
                     <tr class="{% if not order.is_viewed_by_driver %}order-unread{% endif %}">
                         <td>
                             {% if not order.is_viewed_by_driver %}
-                                <span class="badge bg-warning">НОВОЕ</span>
+                            <span class="badge bg-warning">НОВОЕ</span>
                             {% endif %}
                             <a href="{% url 'request_detail' order.id %}">{{ order.id|slice:":8" }}</a>
                         </td>
@@ -52,9 +55,9 @@
                         <td><span class="badge bg-{{ order.status|lower }}">{{ order.get_status_display }}</span></td>
                         <td>
                             <a href="{% url 'request_detail' order.id %}"
-                               class="btn btn-sm btn-outline-primary">Открыть</a>
-                            <a href="{% url 'edit_order' order.id %}"
-                               class="btn btn-sm btn-outline-warning">Обновить статус</a>
+                                class="btn btn-sm btn-outline-primary">Открыть</a>
+                            <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-outline-warning">Обновить
+                                статус</a>
                         </td>
                     </tr>
                     {% empty %}

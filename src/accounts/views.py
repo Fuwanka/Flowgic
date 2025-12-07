@@ -74,9 +74,9 @@ def home_view(request):
 
     # Берём все заказы, к которым у пользователя есть доступ
     if user.role == 'dispatcher':
-        orders_qs = Order.objects.filter(created_by=user)
+        orders_qs = Order.objects.filter(created_by__company=user.company)
     elif user.role == 'manager':
-        orders_qs = Order.objects.filter(client__company=user.company)
+        orders_qs = Order.objects.filter(created_by__company=user.company)
     elif user.role == 'driver':
         orders_qs = Order.objects.filter(driver=user)
     else:
@@ -107,7 +107,7 @@ def home_view(request):
 
     # Формируем заявки для дашборда в зависимости от роли
     if user.role == 'dispatcher':
-        requests = Order.objects.filter(created_by=user).order_by('-created_at')
+        requests = Order.objects.filter(created_by__company=user.company).order_by('-created_at')
         context = {
             'user': user,
             'requests': requests,
@@ -116,7 +116,7 @@ def home_view(request):
         template_name = 'dashboard/dispatcher_home.html'
 
     elif user.role == 'manager':
-        requests = Order.objects.filter(client__company=user.company).order_by('-created_at')
+        requests = Order.objects.filter(created_by__company=user.company).order_by('-created_at')
         context = {
             'user': user,
             'requests': requests,

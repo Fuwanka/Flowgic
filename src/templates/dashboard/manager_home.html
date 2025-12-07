@@ -1,34 +1,41 @@
 {% extends 'base.html' %}
+
+{% block main_class %}p-0{% endblock %}
+
 {% block extra_styles %}
 <style>
-    /* ========= КРАСИВЫЕ СТАТУСЫ ========= */
-    .status-badge {
-        padding: 6px 10px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-block;
-    }
-    .status-new {
-        background: #0d6efd22;
-        color: #0d6efd;
-        border: 1px solid #0d6efd55;
-    }
-    .status-in_progress {
-        background: #ffc10722;
-        color: #b58100;
-        border: 1px solid #ffc10755;
-    }
-    .status-completed {
-        background: #19875422;
-        color: #0f5132;
-        border: 1px solid #19875466;
-    }
-    .status-cancelled {
-        background: #dc354522;
-        color: #842029;
-        border: 1px solid #dc354566;
-    }
+  /* ========= КРАСИВЫЕ СТАТУСЫ ========= */
+  .status-badge {
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+  }
+
+  .status-new {
+    background: #0d6efd22;
+    color: #0d6efd;
+    border: 1px solid #0d6efd55;
+  }
+
+  .status-in_progress {
+    background: #ffc10722;
+    color: #b58100;
+    border: 1px solid #ffc10755;
+  }
+
+  .status-completed {
+    background: #19875422;
+    color: #0f5132;
+    border: 1px solid #19875466;
+  }
+
+  .status-cancelled {
+    background: #dc354522;
+    color: #842029;
+    border: 1px solid #dc354566;
+  }
 </style>
 {% endblock %}
 
@@ -72,7 +79,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for order in orders %}
+          {% for order in requests %}
           <tr>
             <td><a href="{% url 'request_detail' order.id %}">{{ order.order_number }}</a></td>
             <td>{{ order.cargo_type }}</td>
@@ -81,7 +88,7 @@
             <td>{% if order.vehicle %}{{ order.vehicle.reg_number }}{% else %}—{% endif %}</td>
             <td>
               <span class="status-badge status-{{ order.status|lower }}">
-                  {{ order.get_status_display }}
+                {{ order.get_status_display }}
               </span>
             </td>
             <td>
@@ -131,25 +138,26 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const calendarEl = document.getElementById('dashboard-calendar');
-  if (calendarEl) {
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      locale: 'ru',
-      initialView: 'dayGridMonth',
-      firstDay: 1,
-      height: 'auto',
-      events: {{ chart_data|default:"[]"|safe }},
-      eventClick: function(info) {
-        alert(
-          `Заказ: ${info.event.title}\n` +
-          `Груз: ${info.event.extendedProps?.cargo || '—'}\n` +
-          `Статус: ${info.event.extendedProps?.status || '—'}`
-        );
-      }
-    });
-    calendar.render();
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('dashboard-calendar');
+    if (calendarEl) {
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'ru',
+        initialView: 'dayGridMonth',
+        firstDay: 1,
+        height: 'auto',
+        events: {{ events_json| safe }
+  },
+    eventClick: function (info) {
+      alert(
+        `Заказ: ${info.event.title}\n` +
+        `Груз: ${info.event.extendedProps?.cargo || '—'}\n` +
+        `Статус: ${info.event.extendedProps?.status || '—'}`
+      );
+    }
+      });
+  calendar.render();
+    }
 
   const btn = document.getElementById('openCalendarBtn');
   if (btn) {
@@ -158,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
       modal.show();
     });
   }
-});
+  });
 </script>
 {% endblock %}
-
