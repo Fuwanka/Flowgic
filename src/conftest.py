@@ -1,4 +1,6 @@
 import pytest
+import os
+import re
 from django.contrib.auth import get_user_model
 from decimal import Decimal
 from django.utils import timezone
@@ -6,6 +8,9 @@ from datetime import timedelta
 
 from logistics.models import Company, Client, Vehicle, Order, Financial, OrderEvent
 from accounts.models import User
+
+# Allow Django ORM operations in async context (required for Playwright tests)
+os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 
 User = get_user_model()
 
@@ -243,3 +248,48 @@ def manager_client(client, manager_a):
     """Return a Django test client authenticated as manager A"""
     client.force_login(manager_a)
     return client
+
+
+# Browser-based test fixtures for Playwright
+@pytest.fixture
+def authenticated_browser_session(page, live_server, dispatcher_a, db):
+    """
+    Returns a Playwright page with an authenticated dispatcher session
+    Logs in as dispatcher_a and navigates to home page
+    """
+    # Navigate to login page
+    page.goto(f"{live_server.url}/login/")
+    
+    # Fill in login form
+    page.fill('input[name="email"]', dispatcher_a.email)
+    page.fill('input[name="password"]', 'testpass123')
+    
+    # Click login button
+    page.click('button[type="submit"]')
+    
+    # Wait for navigation to complete
+    page.wait_for_url(re.compile(r".*/home.*"), timeout=5000)
+    
+    return page
+
+
+@pytest.fixture
+def driver_browser_session(page, live_server, driver_a, db):
+    """
+    Returns a Playwright page with an authenticated driver session
+    Logs in as driver_a
+    """
+    # Navigate to login page
+    page.goto(f"{live_server.url}/login/")
+    
+    # Fill in login form
+    page.fill('input[name="email"]', driver_a.email)
+    page.fill('input[name="password"]', 'testpass123')
+    
+    # Click login button  
+    page.click('button[type="submit"]')
+    
+    # Wait for navigation to complete
+    page.wait_for_url(re.compile(r".*/home.*"), timeout=5000)
+    
+    return page
