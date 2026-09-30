@@ -29,3 +29,9 @@ python src\manage.py migrate
 ---
 ### Готово к работе!
 
+
+
+
+### rthtrhthjtr
+
+
