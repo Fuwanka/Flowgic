@@ -265,3 +265,55 @@ def create_vehicle_view(request):
         form = VehicleForm()
     
     return render(request, 'logistics/new_vehicle.html', {'form': form})
+
+
+def toggle_theme_view(request):
+    """
+    Switch or toggle between light and dark themes.
+    Works for both authenticated users and guests.
+    Supports GET, POST (form or JSON), and AJAX.
+    """
+    import json
+    from django.http import JsonResponse
+
+    target_theme = None
+
+    if request.method == 'POST':
+        if request.content_type and 'application/json' in request.content_type and request.body:
+            try:
+                payload = json.loads(request.body)
+                target_theme = payload.get('theme')
+            except Exception:
+                pass
+        if not target_theme:
+            target_theme = request.POST.get('theme')
+    else:
+        target_theme = request.GET.get('theme')
+
+    if target_theme not in ('light', 'dark'):
+        # Determine current theme to toggle
+        if request.user.is_authenticated and hasattr(request.user, 'theme') and request.user.theme:
+            current = request.user.theme
+        else:
+            current = request.COOKIES.get('flowgic_theme', 'light')
+        target_theme = 'dark' if current == 'light' else 'light'
+
+    # Save to user model if authenticated
+    if request.user.is_authenticated and hasattr(request.user, 'theme'):
+        request.user.theme = target_theme
+        request.user.save(update_fields=['theme'])
+
+    is_ajax = (
+        request.headers.get('x-requested-with') == 'XMLHttpRequest' or
+        'application/json' in (request.headers.get('accept') or '') or
+        (request.content_type and 'application/json' in request.content_type)
+    )
+
+    if is_ajax:
+        response = JsonResponse({'status': 'ok', 'theme': target_theme})
+    else:
+        referer = request.META.get('HTTP_REFERER') or '/'
+        response = redirect(referer)
+
+    response.set_cookie('flowgic_theme', target_theme, max_age=365*24*60*60, samesite='Lax')
+    return response

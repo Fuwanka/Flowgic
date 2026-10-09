@@ -1,12 +1,25 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="{{ current_theme|default:'light' }}" data-bs-theme="{{ current_theme|default:'light' }}">
 
 <head>
     <meta charset="UTF-8">
     <title>Заказ {{ order.id }}</title>
+
+    <!-- Instant theme application to prevent FOUC -->
+    <script>
+        (function() {
+            var t = localStorage.getItem('flowgic_theme');
+            if (t === 'dark' || t === 'light') {
+                document.documentElement.setAttribute('data-theme', t);
+                document.documentElement.setAttribute('data-bs-theme', t);
+            }
+        })();
+    </script>
+
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/request_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 </head>
 
 <body>
@@ -31,6 +44,11 @@
                 {% endif %}
             </div>
             <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+                <button type="button" class="theme-toggle-btn" id="theme-toggle" aria-label="Переключить тему" title="Переключить тему">
+                    <span class="theme-icon theme-icon-sun" style="display:none;">☀️</span>
+                    <span class="theme-icon theme-icon-moon">🌙</span>
+                    <span class="theme-toggle-label">Тёмная тема</span>
+                </button>
                 <span class="text-muted" style="font-size:0.9rem;">
                     Создан {{ order.created_at|date:"d M, H:i" }} {% if order.created_by %} пользователем {{ order.created_by.full_name|default:order.created_by.get_full_name|default:order.created_by.email }}{% else %}Неизвестно{% endif %}
                 </span>
@@ -228,5 +246,6 @@
 
     <!-- JS скрипты для статуса и финансов оставляем без изменений -->
     <script src="{% static 'js/request_detail.js' %}"></script>
+    <script src="{% static 'js/theme.js' %}"></script>
 </body>
 </html>

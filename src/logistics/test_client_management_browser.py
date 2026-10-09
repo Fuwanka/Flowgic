@@ -1,18 +1,10 @@
-"""
-Browser-based automated tests for Client Management module using Playwright
-Tests complete user workflows including authentication, CRUD operations, and validation
-"""
 import pytest
 from playwright.sync_api import Page, expect
 import re
 
-
 @pytest.mark.browser
 class TestAuthentication:
-    """Test authentication and access control for client management"""
-    
     def test_login_as_dispatcher_success(self, page: Page, live_server, dispatcher_a):
-        """Test successful login as dispatcher"""
         # Navigate to login page
         page.goto(f"{live_server.url}/login/")
         
@@ -31,7 +23,6 @@ class TestAuthentication:
         expect(page).to_have_url(re.compile(r".*/home.*"))
     
     def test_redirect_to_login_when_not_authenticated(self, page: Page, live_server):
-        """Test that unauthenticated users are redirected to login page"""
         # Try to access clients list without authentication
         page.goto(f"{live_server.url}/logistics/dashboard/clients/")
         
@@ -40,19 +31,14 @@ class TestAuthentication:
         expect(page).to_have_url(re.compile(r".*/login.*"))
     
     def test_driver_cannot_access_client_management(self, driver_browser_session: Page, live_server):
-        """Test that drivers cannot access client management"""
         # Try to navigate to clients page as driver
         driver_browser_session.goto(f"{live_server.url}/logistics/dashboard/clients/")
         
-        # Driver should either be blocked or see no content
-        # This depends on the implementation - adjust as needed
-        # For now, just verify the page loads (permission check may vary)
         driver_browser_session.wait_for_load_state('networkidle')
 
 
 @pytest.mark.browser
 class TestClientListView:
-    """Test client list view functionality"""
     
     def test_clients_list_displays_correctly(self, authenticated_browser_session: Page, live_server, client_a):
         """Test that clients list displays correctly for dispatcher"""
@@ -106,10 +92,8 @@ class TestClientListView:
 
 @pytest.mark.browser
 class TestCreateNewClient:
-    """Test creating a new client workflow"""
     
     def test_complete_client_creation_workflow(self, authenticated_browser_session: Page, live_server, company_a):
-        """Test complete workflow for creating a new client"""
         # Navigate to new client page
         authenticated_browser_session.goto(f"{live_server.url}/client/new/")
         authenticated_browser_session.wait_for_load_state('networkidle')
@@ -135,7 +119,6 @@ class TestCreateNewClient:
         expect(authenticated_browser_session.locator(f'text={test_client_name}')).to_be_visible()
     
     def test_form_validation_required_fields(self, authenticated_browser_session: Page, live_server):
-        """Test form validation for required fields"""
         authenticated_browser_session.goto(f"{live_server.url}/logistics/new-client/")
         authenticated_browser_session.wait_for_load_state('networkidle')
         

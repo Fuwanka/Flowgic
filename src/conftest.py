@@ -5,19 +5,15 @@ from django.contrib.auth import get_user_model
 from decimal import Decimal
 from django.utils import timezone
 from datetime import timedelta
-
 from logistics.models import Company, Client, Vehicle, Order, Financial, OrderEvent
 from accounts.models import User
 
-# Allow Django ORM operations in async context (required for Playwright tests)
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 
 User = get_user_model()
 
-
 @pytest.fixture
 def company_a(db):
-    """Create a test company A"""
     return Company.objects.create(
         name='Company A',
         inn='1234567890',
@@ -31,10 +27,8 @@ def company_a(db):
         }
     )
 
-
 @pytest.fixture
 def company_b(db):
-    """Create a test company B for isolation testing"""
     return Company.objects.create(
         name='Company B',
         inn='0987654321',

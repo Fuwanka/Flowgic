@@ -1,15 +1,29 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="{{ current_theme|default:'light' }}" data-bs-theme="{{ current_theme|default:'light' }}">
 <head>
     <meta charset="UTF-8">
     <title>FlowGic — Управление логистикой</title>
+
+    <!-- Instant theme application to prevent FOUC -->
+    <script>
+        (function() {
+            var t = localStorage.getItem('flowgic_theme');
+            if (t === 'dark' || t === 'light') {
+                document.documentElement.setAttribute('data-theme', t);
+                document.documentElement.setAttribute('data-bs-theme', t);
+            }
+        })();
+    </script>
 
     <!-- Основные стили сайта -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     <!-- Стили для лендинга -->
     <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+
+    <!-- Стили темной/светлой темы -->
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 </head>
 
 <body>
@@ -20,7 +34,12 @@
         <span>FlowGic</span>
     </div>
 
-    <div class="user-panel">
+    <div class="user-panel" style="display:flex; align-items:center; gap:10px;">
+        <button type="button" class="theme-toggle-btn" id="theme-toggle" aria-label="Переключить тему" title="Переключить тему">
+            <span class="theme-icon theme-icon-sun" style="display:none;">☀️</span>
+            <span class="theme-icon theme-icon-moon">🌙</span>
+            <span class="theme-toggle-label">Тёмная тема</span>
+        </button>
         <a href="{% url 'login' %}" class="btn-secondary">Войти</a>
         <a href="{% url 'register' %}" class="btn-primary">Регистрация</a>
     </div>
@@ -54,5 +73,6 @@
     FlowGic © {{ year }} — Платформа для логистики
 </footer>
 
+<script src="{% static 'js/theme.js' %}"></script>
 </body>
 </html>

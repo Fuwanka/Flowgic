@@ -146,3 +146,124 @@ class TestPasswordResetCode:
         
         # Expired code should be invalid
         assert code.is_valid() is False
+
+
+@pytest.mark.unit
+class TestThemeSwitching:
+    """Unit tests for theme switching functionality"""
+
+    def test_user_theme_default_and_choice(self, db, company_a):
+        """Test default theme is light and can be updated to dark"""
+        user = User.objects.create(
+            email='theme_test@test.com',
+            company=company_a,
+            role=User.Role.Dispatcher
+        )
+        assert user.theme == User.Theme.LIGHT
+
+        user.theme = User.Theme.DARK
+        user.save()
+        user.refresh_from_db()
+        assert user.theme == 'dark'
+
+    def test_anonymous_toggle_theme_get(self, client):
+        """Test anonymous user toggles theme via GET and gets cookie"""
+        response = client.get('/toggle-theme/')
+        assert response.status_code == 302
+        assert 'flowgic_theme' in response.cookies
+        assert response.cookies['flowgic_theme'].value == 'dark'
+
+    def test_anonymous_set_theme_json(self, client):
+        """Test anonymous user sets theme via JSON POST"""
+        response = client.post(
+            '/toggle-theme/',
+            data='{"theme": "dark"}',
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data['status'] == 'ok'
+        assert data['theme'] == 'dark'
+        assert response.cookies['flowgic_theme'].value == 'dark'
+
+    def test_authenticated_user_theme_toggle(self, client, dispatcher_a):
+        """Test authenticated user toggling theme updates database and cookie"""
+        client.force_login(dispatcher_a)
+        assert dispatcher_a.theme == 'light'
+
+        # Toggle to dark
+        response = client.post(
+            '/toggle-theme/',
+            data='{"theme": "dark"}',
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+        dispatcher_a.refresh_from_db()
+        assert dispatcher_a.theme == 'dark'
+        assert response.cookies['flowgic_theme'].value == 'dark'
+
+        # Toggle back to light
+        response = client.post(
+            '/toggle-theme/',
+            data='{"theme": "light"}',
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+        dispatcher_a.refresh_from_db()
+        assert dispatcher_a.theme == 'light'
+        assert response.cookies['flowgic_theme'].value == 'light'
+
+    def test_theme_context_processor(self, db, dispatcher_a):
+        """Test theme_context processor returns user theme or cookie theme"""
+        from django.test import RequestFactory
+        from django.contrib.auth.models import AnonymousUser
+        from accounts.context_processors import theme_context
+
+        factory = RequestFactory()
+
+        # Anonymous with no cookie
+        request = factory.get('/')
+        request.user = AnonymousUser()
+        assert theme_context(request) == {'current_theme': 'light'}
+
+        # Anonymous with cookie
+        request.COOKIES['flowgic_theme'] = 'dark'
+        assert theme_context(request) == {'current_theme': 'dark'}
+
+        # Authenticated user
+        request = factory.get('/')
+        dispatcher_a.theme = 'dark'
+        dispatcher_a.save()
+        request.user = dispatcher_a
+        assert theme_context(request) == {'current_theme': 'dark'}
+
+    def test_landing_page_renders_theme_attribute(self, client):
+        """Test landing page HTML includes data-theme attribute and theme assets"""
+        response = client.get('/')
+        assert response.status_code == 200
+        content = response.content.decode('utf-8')
+        assert 'data-theme="light"' in content
+        assert 'theme.css' in content
+        assert 'theme.js' in content
+        assert 'theme-toggle' in content
+
+        # With dark theme cookie
+        client.cookies['flowgic_theme'] = 'dark'
+        response_dark = client.get('/')
+        content_dark = response_dark.content.decode('utf-8')
+        assert 'data-theme="dark"' in content_dark
+
+    def test_dashboard_renders_user_preferred_theme(self, client, dispatcher_a):
+        """Test dashboard renders user's saved dark theme preference"""
+        dispatcher_a.theme = 'dark'
+        dispatcher_a.save()
+        client.force_login(dispatcher_a)
+
+        response = client.get('/home/')
+        assert response.status_code == 200
+        content = response.content.decode('utf-8')
+        assert 'data-theme="dark"' in content
+        assert 'theme-toggle' in content
+        assert 'menu-theme-toggle' in content
+
+

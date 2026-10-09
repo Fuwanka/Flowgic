@@ -70,6 +70,18 @@ class User(AbstractUser):
         verbose_name='Статус аккаунта'
     )
     
+    class Theme(models.TextChoices):
+        LIGHT = 'light', 'Светлая'
+        DARK = 'dark', 'Тёмная'
+
+    # Тема интерфейса
+    theme = models.CharField(
+        max_length=10,
+        choices=Theme.choices,
+        default=Theme.LIGHT,
+        verbose_name='Тема оформления'
+    )
+    
     # Password уже есть в AbstractUser
     # last_login уже есть в AbstractUser
     # date_joined (created_at) уже есть в AbstractUser как date_joined
