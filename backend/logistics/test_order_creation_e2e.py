@@ -31,7 +31,7 @@ class TestOrderCreationWorkflow:
             'distance_km': '700'
         }
         
-        response = authenticated_client.post('/logistics/new-request/', order_data)
+        response = authenticated_client.post('/logistics/new/', order_data)
         
         # Order should be created (redirect or success response)
         assert response.status_code in [200, 302]
@@ -110,7 +110,7 @@ class TestOrderCreationWorkflow:
             'distance_km': '1200'
         }
         
-        response = authenticated_client.post('/logistics/new-request/', order_data)
+        response = authenticated_client.post('/logistics/new/', order_data)
         
         if response.status_code in [200, 302]:
             order = Order.objects.filter(

@@ -7,7 +7,12 @@
         {% include 'dashboard/_sidebar.html' %}
         <div class="dashboard-content">
             {% block dashboard_content %}
-            <h2 class="mb-3">Наши клиенты</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Наши клиенты</h2>
+                {% if user.role == 'dispatcher' or user.role == 'manager' %}
+                <a href="{% url 'create_client' %}" class="btn btn-primary">Новый клиент</a>
+                {% endif %}
+            </div>
             <table class="table table-hover">
                 <thead>
                     <tr>

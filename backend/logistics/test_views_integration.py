@@ -3,7 +3,6 @@ Integration tests for view workflows
 Tests payment updates, order status changes, and financial operations
 """
 import pytest
-from django.test import Client as TestClient
 from decimal import Decimal
 from django.urls import reverse
 import json

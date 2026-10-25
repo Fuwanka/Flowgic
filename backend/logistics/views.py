@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.utils import timezone
 from accounts.decorators import role_required
 from .models import Order, Vehicle, Company, Client, Financial
+from .selectors import get_user_orders
 from decimal import Decimal
 from accounts.models import User
 from django.shortcuts import get_object_or_404, render
@@ -34,6 +35,7 @@ def customer_dashboard(request):
 
 
 @login_required
+@role_required(['dispatcher', 'manager'])
 def new_request(request):
     """View for creating a new order/request"""
     from .forms import OrderForm
@@ -57,7 +59,7 @@ def new_request(request):
 @login_required
 def request_detail(request, order_id):
     """View for displaying order details"""
-    order = get_object_or_404(Order.objects.select_related('driver', 'vehicle', 'client__company', 'created_by', 'financial'), id=order_id)
+    order = get_object_or_404(get_user_orders(request.user), id=order_id)
 
     # Always create Financial if not exists
     Financial.objects.get_or_create(
@@ -90,7 +92,7 @@ def request_detail(request, order_id):
 @login_required
 def edit_order(request, order_id):
     """View for editing order - dispatchers can edit driver/status, drivers can edit status only"""
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(get_user_orders(request.user), id=order_id)
     
     # Determine which form to use based on role
     if request.user.role == 'dispatcher':
@@ -103,14 +105,15 @@ def edit_order(request, order_id):
         messages.error(request, 'You do not have permission to edit this order')
         return redirect('request_detail', order_id=order.id)
     
+    form_kwargs = {'user': request.user} if request.user.role == 'dispatcher' else {}
     if request.method == 'POST':
-        form = FormClass(request.POST, instance=order)
+        form = FormClass(request.POST, instance=order, **form_kwargs)
         if form.is_valid():
             form.save()
             messages.success(request, 'Order updated successfully!')
             return redirect('request_detail', order_id=order.id)
     else:
-        form = FormClass(instance=order)
+        form = FormClass(instance=order, **form_kwargs)
     
     context = {
         'form': form,
@@ -134,7 +137,7 @@ def update_payment_status(request, order_id):
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
     
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(get_user_orders(request.user), id=order_id)
     
     try:
         fully_paid = request.POST.get('fully_paid') == 'true'
@@ -210,7 +213,7 @@ def update_order_status(request, order_id):
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
     
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(get_user_orders(request.user), id=order_id)
     
     try:
         new_status = request.POST.get('status', '').strip()
@@ -257,7 +260,7 @@ def update_order_status(request, order_id):
 def update_financials(request, order_id):
     from .models import OrderEvent
 
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(get_user_orders(request.user), id=order_id)
 
     # Обязательно создаём Financial, если его нет
     financial, created = Financial.objects.get_or_create(
@@ -328,7 +331,7 @@ def dashboard_vehicles(request):
 
 @login_required
 def vehicle_detail(request, vehicle_id):
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    vehicle = get_object_or_404(Vehicle.objects.filter(company=request.user.company), id=vehicle_id)
 
     # связанные заказы (если есть)
     orders = vehicle.orders.all() if hasattr(vehicle, 'orders') else []
@@ -360,7 +363,7 @@ def vehicle_detail(request, vehicle_id):
 @require_POST
 def vehicle_update_status(request, vehicle_id):
     """Обновление статуса ТС (доступно диспетчеру/менеджеру)."""
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    vehicle = get_object_or_404(Vehicle.objects.filter(company=request.user.company), id=vehicle_id)
     new_status = request.POST.get('status', '').strip()
     valid_statuses = [choice[0] for choice in Vehicle.Status.choices]
     if new_status not in valid_statuses:
@@ -374,7 +377,7 @@ def vehicle_update_status(request, vehicle_id):
 @require_POST
 def vehicle_plan_maintenance(request, vehicle_id):
     """Планирование ТО (минимальная версия: обновить дату last_maintenance и комментарий в истории)."""
-    vehicle = get_object_or_404(Vehicle, id=vehicle_id)
+    vehicle = get_object_or_404(Vehicle.objects.filter(company=request.user.company), id=vehicle_id)
     date_str = request.POST.get('date', '').strip()
     note = request.POST.get('note', '').strip()
     if not date_str:
@@ -403,15 +406,15 @@ def dashboard_clients(request):
 @login_required
 def client_detail(request, client_id):
     """Карточка клиента: данные, история взаимодействий (по заказам)."""
-    client = get_object_or_404(Client, id_client=client_id)
-    orders = client.orders.all().order_by('-created_at')
+    client = get_object_or_404(Client.objects.filter(company=request.user.company), id_client=client_id)
+    orders = get_user_orders(request.user).filter(client=client).order_by('-created_at')
     return render(request, 'logistics/client_detail.html', {'client': client, 'orders': orders})
 
 @login_required
 @role_required(['dispatcher', 'manager'])
 def client_edit(request, client_id):
     """Редактирование клиента (имя/телефон/email)."""
-    client = get_object_or_404(Client, id_client=client_id)
+    client = get_object_or_404(Client.objects.filter(company=request.user.company), id_client=client_id)
     from accounts.forms import ClientForm
     if request.method == 'POST':
         form = ClientForm(request.POST, instance=client)
@@ -437,13 +440,14 @@ def dashboard_drivers(request):
 @login_required
 def driver_detail(request, user_id):
     """Карточка водителя: данные, историй заказов."""
-    driver = get_object_or_404(User, id=user_id, role='driver')
-    orders = Order.objects.filter(driver=driver).order_by('-created_at')
+    driver = get_object_or_404(User.objects.filter(company=request.user.company), id=user_id, role='driver')
+    orders = get_user_orders(request.user).filter(driver=driver).order_by('-created_at')
     return render(request, 'logistics/driver_detail.html', {'driver': driver, 'orders': orders})
 
 
+@login_required
 def calendar_view(request):
-    orders = Order.objects.all()
+    orders = get_user_orders(request.user)
     
     events = []
     for order in orders:
@@ -461,7 +465,7 @@ def calendar_view(request):
     
     events_json = json.dumps(events, cls=DjangoJSONEncoder, ensure_ascii=False)
     
-    return render(request, 'logistics/calendar.html', {'events_json': events_json})
+    return render(request, 'logistics/calendar_modal.html', {'events_json': events_json})
 
 @login_required
 @role_required(['manager'])

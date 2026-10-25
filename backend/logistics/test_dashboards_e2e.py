@@ -17,7 +17,7 @@ class TestDispatcherDashboard:
     
     def test_dispatcher_dashboard_loads(self, db, authenticated_client, dispatcher_a):
         """Test dispatcher dashboard loads successfully"""
-        response = authenticated_client.get('/dispatcher/')
+        response = authenticated_client.get('/home/')
         
         assert response.status_code == 200
     
@@ -33,10 +33,10 @@ class TestDispatcherDashboard:
             created_by=dispatcher_a
         )
         
-        response = authenticated_client.get('/dispatcher/')
+        response = authenticated_client.get('/home/')
         
-        if response.status_code == 200 and 'orders' in response.context:
-            orders = list(response.context['orders'])
+        if response.status_code == 200 and 'requests' in response.context:
+            orders = list(response.context['requests'])
             order_ids = [o.id for o in orders]
             
             # Should see all company orders
@@ -64,7 +64,7 @@ class TestDispatcherDashboard:
         )
         
         # Filter by status
-        response = authenticated_client.get('/dispatcher/', {'status': 'in_transit'})
+        response = authenticated_client.get('/home/', {'status': 'in_transit'})
         
         if response.status_code == 200:
             # Dashboard should filter orders
@@ -74,7 +74,7 @@ class TestDispatcherDashboard:
         """Test dispatcher can perform quick actions from dashboard"""
         # Assign driver
         response = authenticated_client.post(
-            f'/logistics/edit-order/{order_a.id}/',
+            f'/logistics/order/{order_a.id}/edit/',
             {
                 'driver': str(driver_a.id),
                 'status': Order.Status.ASSIGNED
@@ -92,7 +92,7 @@ class TestDriverDashboard:
     
     def test_driver_dashboard_loads(self, db, driver_client, driver_a):
         """Test driver dashboard loads successfully"""
-        response = driver_client.get('/driver/')
+        response = driver_client.get('/home/')
         
         assert response.status_code == 200
     
@@ -108,11 +108,11 @@ class TestDriverDashboard:
             driver=None
         )
         
-        response = driver_client.get('/driver/')
+        response = driver_client.get('/home/')
         
         if response.status_code == 200:
             # Driver should see only their orders
-            active_orders = response.context.get('active_orders', [])
+            active_orders = response.context.get('requests', [])
             
             # Filter for driver's orders
             driver_order_ids = [o.id for o in active_orders if o.driver == driver_a]
@@ -147,7 +147,7 @@ class TestDriverDashboard:
         
         # Update to loading
         response = driver_client.post(
-            f'/logistics/edit-order/{order_a.id}/',
+            f'/logistics/order/{order_a.id}/edit/',
             {'status': Order.Status.LOADING}
         )
         
@@ -162,7 +162,7 @@ class TestManagerDashboard:
     
     def test_manager_dashboard_loads(self, db, manager_client, manager_a):
         """Test manager dashboard loads successfully"""
-        response = manager_client.get('/manager/')
+        response = manager_client.get('/home/')
         
         assert response.status_code == 200
     
@@ -184,15 +184,15 @@ class TestManagerDashboard:
             )
         ]
         
-        response = manager_client.get('/manager/')
+        response = manager_client.get('/home/')
         
         if response.status_code == 200:
             # Manager dashboard should show statistics
             context = response.context
             
             # Check for company orders
-            if 'orders' in context:
-                visible_orders = list(context['orders'])
+            if 'requests' in context:
+                visible_orders = list(context['requests'])
                 
                 # All should be from manager's company
                 for order in visible_orders:
@@ -214,7 +214,7 @@ class TestManagerDashboard:
                 payment_status=Financial.PaymentStatus.PAID if i % 2 == 0 else Financial.PaymentStatus.UNPAID
             )
         
-        response = manager_client.get('/manager/')
+        response = manager_client.get('/home/')
         
         if response.status_code == 200:
             # Dashboard should include statistics
@@ -223,7 +223,7 @@ class TestManagerDashboard:
     
     def test_manager_can_view_all_vehicles(self, db, manager_client, manager_a, vehicle_a):
         """Test manager can see all company vehicles"""
-        response = manager_client.get('/logistics/vehicles/')
+        response = manager_client.get('/logistics/dashboard/vehicles/')
         
         if response.status_code == 200 and 'vehicles' in response.context:
             vehicles = response.context['vehicles']
@@ -284,7 +284,7 @@ class TestDashboardPerformance:
                 created_by=dispatcher_a
             )
         
-        response = authenticated_client.get('/dispatcher/')
+        response = authenticated_client.get('/home/')
         
         # Should still load successfully
         assert response.status_code == 200
@@ -307,7 +307,7 @@ class TestDashboardPerformance:
                     payment_status=Financial.PaymentStatus.PAID
                 )
         
-        response = manager_client.get('/manager/')
+        response = manager_client.get('/home/')
         
         # Should complete in reasonable time
         assert response.status_code == 200

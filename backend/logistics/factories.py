@@ -86,7 +86,7 @@ class VehicleFactory:
         if company is None:
             company = CompanyFactory.create()
         
-        reg_number = reg_number or f'T{uuid.uuid4().int % 1000:03d}XX77'
+        reg_number = reg_number or f'T{uuid.uuid4().hex[:12].upper()}'
         
         return Vehicle.objects.create(
             company=company,
@@ -104,8 +104,9 @@ class OrderFactory:
     
     @staticmethod
     def create(client=None, created_by=None, vehicle=None, driver=None, **kwargs):
+        client_company = kwargs.pop('client__company', None)
         if client is None:
-            company = CompanyFactory.create()
+            company = client_company or (created_by.company if created_by else CompanyFactory.create())
             client = ClientFactory.create(company=company)
         else:
             company = client.company

@@ -3,7 +3,6 @@ Integration tests for data isolation (multi-tenancy)
 Tests that users from one company cannot access data from another company
 """
 import pytest
-from django.test import Client as TestClient
 from decimal import Decimal
 
 from logistics.models import Order, Client, Vehicle, Financial
@@ -72,13 +71,13 @@ class TestDashboardDataIsolation:
     
     def test_dispatcher_dashboard_shows_only_company_orders(self, db, authenticated_client, dispatcher_a, order_a, order_b):
         """Test dispatcher dashboard filters by company"""
-        response = authenticated_client.get('/dispatcher/')
+        response = authenticated_client.get('/home/')
         
         # Should be successful
         assert response.status_code == 200
         
         # Should contain Company A orders
-        orders = response.context.get('orders', [])
+        orders = response.context.get('requests', [])
         
         # Filter by dispatcher's company
         company_orders = [o for o in orders if o.client.company == dispatcher_a.company]
@@ -93,12 +92,12 @@ class TestDashboardDataIsolation:
         order_a.driver = driver_a
         order_a.save()
         
-        response = driver_client.get('/driver/')
+        response = driver_client.get('/home/')
         
         assert response.status_code == 200
         
         # Driver should only see their assigned orders
-        orders = response.context.get('active_orders', [])
+        orders = response.context.get('requests', [])
         for order in orders:
             assert order.driver == driver_a or order.driver is None
 
@@ -142,7 +141,7 @@ class TestClientListAccessControl:
     
     def test_client_list_shows_only_company_clients(self, db, authenticated_client, dispatcher_a, client_a, client_b):
         """Test client list is filtered by company"""
-        response = authenticated_client.get('/logistics/clients/')
+        response = authenticated_client.get('/logistics/dashboard/clients/')
         
         # If view exists and returns clients
         if response.status_code == 200 and 'clients' in response.context:
@@ -165,7 +164,7 @@ class TestVehicleListAccessControl:
     
     def test_vehicle_list_shows_only_company_vehicles(self, db, authenticated_client, dispatcher_a, vehicle_a, vehicle_b):
         """Test vehicle list is filtered by company"""
-        response = authenticated_client.get('/logistics/vehicles/')
+        response = authenticated_client.get('/logistics/dashboard/vehicles/')
         
         # If view exists and returns vehicles
         if response.status_code == 200 and 'vehicles' in response.context:
@@ -189,7 +188,7 @@ class TestRoleBasedAccessControl:
     def test_driver_cannot_access_dispatcher_functions(self, db, driver_client):
         """Test driver cannot access dispatcher-only functions"""
         # Try to access dispatcher dashboard
-        response = driver_client.get('/dispatcher/')
+        response = driver_client.get('/logistics/dispatcher/')
         
         # Should be forbidden or redirected
         assert response.status_code in [302, 403, 404]
@@ -208,7 +207,7 @@ class TestRoleBasedAccessControl:
             'delivery_datetime': '2025-12-21 10:00:00'
         }
         
-        response = driver_client.post('/logistics/new-request/', order_data)
+        response = driver_client.post('/logistics/new/', order_data)
         
         # Should be forbidden or redirected (drivers can't create orders)
         assert response.status_code in [302, 403, 404]
@@ -229,21 +228,21 @@ class TestRoleBasedAccessControl:
             'distance_km': '700'
         }
         
-        response = authenticated_client.post('/logistics/new-request/', order_data, follow=True)
+        response = authenticated_client.post('/logistics/new/', order_data, follow=True)
         
         # Should be successful (200 or redirect to order detail)
         assert response.status_code == 200
     
     def test_manager_has_full_company_visibility(self, db, manager_client, manager_a, order_a):
         """Test manager can see all company orders"""
-        response = manager_client.get('/manager/')
+        response = manager_client.get('/home/')
         
         # Manager dashboard should be accessible
         assert response.status_code == 200
         
         # Manager should see company orders
-        if 'orders' in response.context:
-            orders = response.context['orders']
+        if 'requests' in response.context:
+            orders = response.context['requests']
             
             # All orders should be from manager's company
             for order in orders:

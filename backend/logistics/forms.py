@@ -22,8 +22,11 @@ class OrderEditForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        # Filter drivers
+        company = user.company if user and user.company_id else None
+        self.fields['driver'].queryset = User.objects.filter(company=company, role='driver') if company else User.objects.none()
+        self.fields['vehicle'].queryset = Vehicle.objects.filter(company=company) if company else Vehicle.objects.none()
 
 
 class OrderForm(forms.ModelForm):
@@ -105,7 +108,9 @@ class OrderForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         # Filter drivers to only show users with role='driver'
-        self.fields['driver'].queryset = User.objects.filter(role='driver')
+        company = user.company if user and user.company_id else None
+        self.fields['driver'].queryset = User.objects.filter(company=company, role='driver') if company else User.objects.none()
+        self.fields['vehicle'].queryset = Vehicle.objects.filter(company=company) if company else Vehicle.objects.none()
         self.fields['driver'].required = False
         
         # Make vehicle optional
@@ -113,8 +118,7 @@ class OrderForm(forms.ModelForm):
         self.fields['agreed_price'].required = False
         
         # Filter clients by user's company if user is provided
-        if user and user.company:
-            self.fields['client'].queryset = Client.objects.filter(company=user.company)
+        self.fields['client'].queryset = Client.objects.filter(company=company) if company else Client.objects.none()
 
 
 """

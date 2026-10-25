@@ -1,0 +1,99 @@
+name: flowgic
+
+x-app: &app
+  image: flowgic-backend:dev
+  build:
+    context: ./backend
+    target: runtime
+  env_file: .env
+  environment: &app-env
+    DB_HOST: db
+    DB_PORT: "5432"
+    REDIS_URL: redis://redis:6379/0
+    CELERY_BROKER_URL: redis://redis:6379/1
+    CELERY_RESULT_BACKEND: redis://redis:6379/2
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${DB_NAME:-flowgic}
+      POSTGRES_USER: ${POSTGRES_USER:-flowgic_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      DB_USER: ${DB_USER:-flowgic_app}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      DB_TEST_USER: ${DB_TEST_USER:-flowgic_test}
+      DB_TEST_PASSWORD: ${DB_TEST_PASSWORD:?Set DB_TEST_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:${DB_PUBLISHED_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/20-flowgic.sh:/docker-entrypoint-initdb.d/20-flowgic.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:${REDIS_PUBLISHED_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  migrate:
+    <<: *app
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  backend:
+    <<: *app
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  celery:
+    <<: *app
+    command: ["celery", "-A", "flowgic", "worker", "--loglevel=info", "--concurrency=2"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  test:
+    <<: *app
+    image: flowgic-test:dev
+    build:
+      context: ./backend
+      target: test
+    profiles: ["test"]
+    environment:
+      <<: *app-env
+      DB_USER: ${DB_TEST_USER:-flowgic_test}
+      DB_PASSWORD: ${DB_TEST_PASSWORD:?Set DB_TEST_PASSWORD in .env}
+    command: ["python", "-m", "pytest", "--migrations", "--create-db", "--tb=short"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:

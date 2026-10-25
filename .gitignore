@@ -1,26 +1,38 @@
-# Python
+# Python and test artifacts
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-
-# Django
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+test-results/
+playwright-report/
 *.log
-*.pot
-*.pyc
-*.sqlite3
-/media/
-staticfiles/
 
-# Virtual environment
+# Local data and secrets
+.env
+.env.*
+!.env.example
+*.sqlite3
+*.sqlite3-*
+.local/
+**/media/
+**/staticfiles/
+*.pot
+
+# Dependencies and build output
 venv/
+.venv/
 env/
 ENV/
+node_modules/
+dist/
+build/
+.dart_tool/
 
-# VSCode / IDE
+# Editors and OS
 .vscode/
 .idea/
-
-# OS
 .DS_Store
 Thumbs.db

@@ -80,7 +80,9 @@ class TestClientListView:
         authenticated_browser_session.wait_for_load_state('networkidle')
         
         # Click on client name or detail link
-        client_link = authenticated_browser_session.locator(f'a:has-text("{client_a.name}")').first
+        client_link = authenticated_browser_session.locator(
+            f'a[href="/logistics/dashboard/clients/{client_a.id_client}/"]'
+        )
         client_link.click()
         
         # Should navigate to client detail page
@@ -119,7 +121,7 @@ class TestCreateNewClient:
         expect(authenticated_browser_session.locator(f'text={test_client_name}')).to_be_visible()
     
     def test_form_validation_required_fields(self, authenticated_browser_session: Page, live_server):
-        authenticated_browser_session.goto(f"{live_server.url}/logistics/new-client/")
+        authenticated_browser_session.goto(f"{live_server.url}/client/new/")
         authenticated_browser_session.wait_for_load_state('networkidle')
         
         # Try to submit empty form
@@ -134,7 +136,7 @@ class TestCreateNewClient:
     
     def test_phone_number_validation(self, authenticated_browser_session: Page, live_server):
         """Test phone number format validation"""
-        authenticated_browser_session.goto(f"{live_server.url}/logistics/new-client/")
+        authenticated_browser_session.goto(f"{live_server.url}/client/new/")
         authenticated_browser_session.wait_for_load_state('networkidle')
         
         # Fill with invalid phone
@@ -151,7 +153,7 @@ class TestCreateNewClient:
     
     def test_email_validation(self, authenticated_browser_session: Page, live_server):
         """Test email format validation"""
-        authenticated_browser_session.goto(f"{live_server.url}/logistics/new-client/")
+        authenticated_browser_session.goto(f"{live_server.url}/client/new/")
         authenticated_browser_session.wait_for_load_state('networkidle')
         
         # Fill with invalid email
@@ -299,7 +301,7 @@ class TestErrorHandling:
     
     def test_duplicate_email_handling(self, authenticated_browser_session: Page, live_server, client_a):
         """Test handling of duplicate email addresses"""
-        authenticated_browser_session.goto(f"{live_server.url}/logistics/new-client/")
+        authenticated_browser_session.goto(f"{live_server.url}/client/new/")
         authenticated_browser_session.wait_for_load_state('networkidle')
         
         # Try to create client with existing email

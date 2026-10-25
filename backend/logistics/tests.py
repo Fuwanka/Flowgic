@@ -56,12 +56,13 @@ class TestFinancialModel:
             distance_km=Decimal('700.00')  # 700 km
         )
         
-        # Create financial without fuel_expenses (should auto-calculate)
+        # None explicitly requests the existing automatic fuel calculation.
         financial = Financial.objects.create(
             order=order,
             client_cost=Decimal('50000.00'),
             driver_cost=Decimal('15000.00'),
-            third_party_cost=Decimal('2000.00')
+            third_party_cost=Decimal('2000.00'),
+            fuel_expenses=None
         )
         
         # Expected fuel: (700 / 100) * 30 L/100km * 82 RUB/L = 17220
