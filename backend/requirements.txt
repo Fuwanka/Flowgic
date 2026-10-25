@@ -1,4 +1,8 @@
 Django==5.2.18
+django-ninja==1.7.1
+django-ninja-jwt==5.4.5
+django-ninja-extra==0.31.7
+pydantic==2.14.1
 celery[redis]==5.6.3
 psycopg[binary]==3.3.6
 python-dotenv==1.2.4

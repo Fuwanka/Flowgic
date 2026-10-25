@@ -70,5 +70,17 @@ jobs:
         run: |
           python backend/manage.py check
           python backend/manage.py makemigrations --check --dry-run
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.18.0"
+          cache: npm
+          cache-dependency-path: frontend-web/package-lock.json
+      - name: Validate OpenAPI and generated TypeScript client
+        run: |
+          python backend/manage.py export_openapi --output backend/openapi.json
+          npm ci --prefix frontend-web --ignore-scripts --no-audit --no-fund
+          npm run generate-api --prefix frontend-web
+          npm run typecheck --prefix frontend-web
+          git diff --exit-code -- backend/openapi.json frontend-web/src/client
       - name: Full suite with migrations on fresh PostgreSQL/PostGIS
         run: python -m pytest --migrations --create-db --browser chromium --tb=short

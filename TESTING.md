@@ -40,6 +40,10 @@ docker compose run --rm backend python manage.py makemigrations --check --dry-ru
 ## Состав
 
 - `backend/accounts/tests.py`: пользователи, роли, пароли, тема.
+- `backend/accounts/test_api.py`: Ninja TestClient, JWT, профиль, регистрация,
+  одноразовый сброс пароля, лимиты Redis, отзыв токенов и HTTP/OpenAPI.
+- `backend/accounts/test_legacy_auth.py`: общие сервисы старых HTML-страниц,
+  регистрация отдельной компании и изоляция панелей.
 - `backend/logistics/tests.py`: заказы, клиенты, ТС, компании, события, расчёты Financial.
 - `backend/logistics/test_data_isolation.py`: границы компаний и роли.
 - `backend/logistics/test_tenant_regressions.py`: чужие заказы, ресурсы формы и календарь.

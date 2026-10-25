@@ -1,5 +1,8 @@
 # Архитектура после этапа 1
 
+Это снимок этапа 1. Изменения accounts на этапе 2 описаны в
+[accounts-api.md](accounts-api.md), результаты — в [accounts-verification.md](accounts-verification.md).
+
 ## Существующий продукт
 
 Изучены дерево исходников и индекс Git, конфигурация, URL, модели, формы,

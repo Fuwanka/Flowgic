@@ -52,6 +52,14 @@ docker compose run --rm test
 включая браузерные, работают на настоящем PostGIS; миграции включены.
 Подробные команды: [TESTING.md](TESTING.md).
 
+## Accounts API
+
+Этап 2 для accounts добавляет JWT API: регистрация отдельной компании, вход,
+ротация refresh, выход, профиль, смена и восстановление пароля. Старые страницы
+используют те же сервисы. Документация работающего API: http://localhost:8000/api/docs.
+Контракт и правила: [docs/accounts-api.md](docs/accounts-api.md).
+Типизированный клиент: [frontend-web/README.md](frontend-web/README.md).
+
 ## Структура
 
 ```text
