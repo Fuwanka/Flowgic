@@ -5,6 +5,47 @@ export type ClientOptions = {
 };
 
 /**
+ * Category
+ */
+export type Category = 'INSURANCE' | 'FUEL' | 'FACTORING' | 'TELEMATICS';
+
+/**
+ * ClickIn
+ */
+export type ClickIn = {
+    /**
+     * Order Id
+     */
+    order_id?: string | null;
+};
+
+/**
+ * ClickOut
+ */
+export type ClickOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Offer Id
+     */
+    offer_id: string;
+    /**
+     * Order Id
+     */
+    order_id: string | null;
+    /**
+     * Target Url
+     */
+    target_url: string;
+};
+
+/**
  * CompanyOut
  */
 export type CompanyOut = {
@@ -61,6 +102,20 @@ export type LoginIn = {
 };
 
 /**
+ * MarketplaceErrorOut
+ */
+export type MarketplaceErrorOut = {
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Detail
+     */
+    detail: string;
+};
+
+/**
  * MessageOut
  */
 export type MessageOut = {
@@ -68,6 +123,119 @@ export type MessageOut = {
      * Detail
      */
     detail: string;
+};
+
+/**
+ * OfferOut
+ */
+export type OfferOut = {
+    category: Category;
+    /**
+     * Description
+     */
+    description: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Is Demo
+     */
+    is_demo: boolean;
+    /**
+     * Target Url
+     */
+    target_url: string;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * OrderCreateIn
+ */
+export type OrderCreateIn = {
+    /**
+     * Agreed Price
+     */
+    agreed_price?: number | string | null;
+    /**
+     * Cargo Mass Kg
+     */
+    cargo_mass_kg: number;
+    /**
+     * Cargo Type
+     */
+    cargo_type: string;
+    /**
+     * Client Id
+     */
+    client_id: string;
+    /**
+     * Delivery Datetime
+     */
+    delivery_datetime: string;
+    /**
+     * Destination
+     */
+    destination?: string | null;
+    /**
+     * Distance Km
+     */
+    distance_km?: number | string | null;
+    /**
+     * Driver Id
+     */
+    driver_id?: number | null;
+    /**
+     * Origin
+     */
+    origin?: string | null;
+    /**
+     * Pickup Datetime
+     */
+    pickup_datetime: string;
+    status?: Status;
+    /**
+     * Vehicle Id
+     */
+    vehicle_id?: string | null;
+};
+
+/**
+ * OrderOut
+ */
+export type OrderOut = {
+    /**
+     * Agreed Price
+     */
+    agreed_price: string | null;
+    /**
+     * Cargo Type
+     */
+    cargo_type: string;
+    /**
+     * Client Id
+     */
+    client_id: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Driver Id
+     */
+    driver_id: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    status: Status;
+    /**
+     * Vehicle Id
+     */
+    vehicle_id: string | null;
 };
 
 /**
@@ -101,6 +269,38 @@ export type PasswordResetConfirmIn = {
      */
     new_password: string;
 };
+
+/**
+ * PlanOut
+ */
+export type PlanOut = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Iot Enabled
+     */
+    iot_enabled: boolean;
+    /**
+     * Max Orders Per Month
+     */
+    max_orders_per_month: number | null;
+    /**
+     * Max Vehicles
+     */
+    max_vehicles: number | null;
+    /**
+     * Name
+     */
+    name: string;
+    plan_type: PlanType;
+};
+
+/**
+ * PlanType
+ */
+export type PlanType = 'FREE' | 'PRO' | 'ENTERPRISE';
 
 /**
  * ProfileOut
@@ -141,6 +341,33 @@ export type ProfileUpdateIn = {
      */
     phone?: string | null;
     theme?: Theme | null;
+};
+
+/**
+ * QuotaErrorOut
+ */
+export type QuotaErrorOut = {
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Current
+     */
+    current: number;
+    /**
+     * Detail
+     */
+    detail: string;
+    /**
+     * Limit
+     */
+    limit: number;
+    plan_type: PlanType;
+    /**
+     * Resource
+     */
+    resource: string;
 };
 
 /**
@@ -196,7 +423,19 @@ export type Role = 'dispatcher' | 'manager' | 'driver';
 /**
  * Status
  */
-export type Status = 'active' | 'invited' | 'blocked';
+export type Status = 'available' | 'in_trip' | 'maintenance' | 'blocked';
+
+/**
+ * SubscriptionOut
+ */
+export type SubscriptionOut = {
+    /**
+     * Company Id
+     */
+    company_id: string;
+    plan: PlanOut;
+    usage: UsageOut;
+};
 
 /**
  * Theme
@@ -215,6 +454,85 @@ export type TokenPairOut = {
      * Refresh
      */
     refresh: string;
+};
+
+/**
+ * UsageOut
+ */
+export type UsageOut = {
+    /**
+     * Orders
+     */
+    orders: number;
+    /**
+     * Period End
+     */
+    period_end: string;
+    /**
+     * Period Start
+     */
+    period_start: string;
+    /**
+     * Vehicles
+     */
+    vehicles: number;
+};
+
+/**
+ * VehicleCreateIn
+ */
+export type VehicleCreateIn = {
+    /**
+     * Capacity Kg
+     */
+    capacity_kg: number;
+    /**
+     * Last Maintenance
+     */
+    last_maintenance?: string | null;
+    /**
+     * Model
+     */
+    model?: string | null;
+    /**
+     * Reg Number
+     */
+    reg_number: string;
+    status?: Status;
+    /**
+     * Type
+     */
+    type: string;
+};
+
+/**
+ * VehicleOut
+ */
+export type VehicleOut = {
+    /**
+     * Capacity Kg
+     */
+    capacity_kg: number;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Reg Number
+     */
+    reg_number: string;
+    status: Status;
+    /**
+     * Type
+     */
+    type: string;
+};
+
+/**
+ * VehicleStatusIn
+ */
+export type VehicleStatusIn = {
+    status: Status;
 };
 
 /**
@@ -487,3 +805,320 @@ export type VerifyTokenResponses = {
 };
 
 export type VerifyTokenResponse = VerifyTokenResponses[keyof VerifyTokenResponses];
+
+export type ListSubscriptionPlansData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/billing/plans';
+};
+
+export type ListSubscriptionPlansErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type ListSubscriptionPlansError = ListSubscriptionPlansErrors[keyof ListSubscriptionPlansErrors];
+
+export type ListSubscriptionPlansResponses = {
+    /**
+     * Response
+     *
+     * OK
+     */
+    200: Array<PlanOut>;
+};
+
+export type ListSubscriptionPlansResponse = ListSubscriptionPlansResponses[keyof ListSubscriptionPlansResponses];
+
+export type GetCompanySubscriptionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/billing/subscription';
+};
+
+export type GetCompanySubscriptionErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type GetCompanySubscriptionError = GetCompanySubscriptionErrors[keyof GetCompanySubscriptionErrors];
+
+export type GetCompanySubscriptionResponses = {
+    /**
+     * OK
+     */
+    200: SubscriptionOut;
+};
+
+export type GetCompanySubscriptionResponse = GetCompanySubscriptionResponses[keyof GetCompanySubscriptionResponses];
+
+export type CreateOrderData = {
+    body: OrderCreateIn;
+    path?: never;
+    query?: never;
+    url: '/api/logistics/orders';
+};
+
+export type CreateOrderErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Payment Required
+     */
+    402: QuotaErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type CreateOrderError = CreateOrderErrors[keyof CreateOrderErrors];
+
+export type CreateOrderResponses = {
+    /**
+     * Created
+     */
+    201: OrderOut;
+};
+
+export type CreateOrderResponse = CreateOrderResponses[keyof CreateOrderResponses];
+
+export type DownloadOrderDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: string;
+    };
+    query?: {
+        /**
+         * Document Type
+         */
+        document_type?: 'application' | 'ttn';
+    };
+    url: '/api/logistics/orders/{order_id}/document/docx';
+};
+
+export type DownloadOrderDocumentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type DownloadOrderDocumentError = DownloadOrderDocumentErrors[keyof DownloadOrderDocumentErrors];
+
+export type DownloadOrderDocumentResponses = {
+    /**
+     * Заполненный редактируемый DOCX
+     */
+    200: Blob | File;
+};
+
+export type DownloadOrderDocumentResponse = DownloadOrderDocumentResponses[keyof DownloadOrderDocumentResponses];
+
+export type CreateVehicleData = {
+    body: VehicleCreateIn;
+    path?: never;
+    query?: never;
+    url: '/api/logistics/vehicles';
+};
+
+export type CreateVehicleErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Payment Required
+     */
+    402: QuotaErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type CreateVehicleError = CreateVehicleErrors[keyof CreateVehicleErrors];
+
+export type CreateVehicleResponses = {
+    /**
+     * Created
+     */
+    201: VehicleOut;
+};
+
+export type CreateVehicleResponse = CreateVehicleResponses[keyof CreateVehicleResponses];
+
+export type UpdateVehicleStatusData = {
+    body: VehicleStatusIn;
+    path: {
+        /**
+         * Vehicle Id
+         */
+        vehicle_id: string;
+    };
+    query?: never;
+    url: '/api/logistics/vehicles/{vehicle_id}/status';
+};
+
+export type UpdateVehicleStatusErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Payment Required
+     */
+    402: QuotaErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type UpdateVehicleStatusError = UpdateVehicleStatusErrors[keyof UpdateVehicleStatusErrors];
+
+export type UpdateVehicleStatusResponses = {
+    /**
+     * OK
+     */
+    200: VehicleOut;
+};
+
+export type UpdateVehicleStatusResponse = UpdateVehicleStatusResponses[keyof UpdateVehicleStatusResponses];
+
+export type GetContextualOffersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Context Type
+         */
+        context_type?: 'dashboard' | 'order_detail' | 'fleet' | 'finance';
+        /**
+         * Order Id
+         */
+        order_id?: string | null;
+    };
+    url: '/api/marketplace/offers';
+};
+
+export type GetContextualOffersErrors = {
+    /**
+     * Bad Request
+     */
+    400: MarketplaceErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: MarketplaceErrorOut;
+    /**
+     * Not Found
+     */
+    404: MarketplaceErrorOut;
+};
+
+export type GetContextualOffersError = GetContextualOffersErrors[keyof GetContextualOffersErrors];
+
+export type GetContextualOffersResponses = {
+    /**
+     * Response
+     *
+     * OK
+     */
+    200: Array<OfferOut>;
+};
+
+export type GetContextualOffersResponse = GetContextualOffersResponses[keyof GetContextualOffersResponses];
+
+export type RecordOfferClickData = {
+    body: ClickIn;
+    path: {
+        /**
+         * Offer Id
+         */
+        offer_id: string;
+    };
+    query?: never;
+    url: '/api/marketplace/offers/{offer_id}/click';
+};
+
+export type RecordOfferClickErrors = {
+    /**
+     * Bad Request
+     */
+    400: MarketplaceErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: MarketplaceErrorOut;
+    /**
+     * Not Found
+     */
+    404: MarketplaceErrorOut;
+};
+
+export type RecordOfferClickError = RecordOfferClickErrors[keyof RecordOfferClickErrors];
+
+export type RecordOfferClickResponses = {
+    /**
+     * Created
+     */
+    201: ClickOut;
+};
+
+export type RecordOfferClickResponse = RecordOfferClickResponses[keyof RecordOfferClickResponses];

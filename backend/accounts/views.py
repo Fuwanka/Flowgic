@@ -11,6 +11,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 
 from logistics import services as logistics_services
 from logistics.forms import VehicleForm
+from billing.exceptions import QuotaExceededError
 
 from . import selectors, services
 from .exceptions import AccountError
@@ -122,6 +123,9 @@ def create_vehicle_view(request):
     if request.method == 'POST' and form.is_valid():
         try:
             vehicle = logistics_services.create_vehicle(request.user, **form.cleaned_data)
+        except QuotaExceededError as error:
+            form.add_error(None, error.detail)
+            return render(request, 'logistics/new_vehicle.html', {'form': form}, status=402)
         except ValidationError as error:
             form.add_error(None, error)
         else:

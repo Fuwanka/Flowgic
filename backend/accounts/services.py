@@ -239,3 +239,32 @@ def change_password(user, *, current_password, new_password):
     current.set_password(new_password)
     current.save(update_fields=['password'])
     PasswordResetCode.objects.filter(user=current).delete()
+
+
+@transaction.atomic
+def provision_demo_users(company, *, password):
+    """Provision a new demo tenant through the account module's write boundary."""
+    from logistics.factories import UserFactory
+
+    if not company.is_demo or not company.demo_slug:
+        raise AccountError('Требуется демонстрационная компания.', code='demo_company_required')
+    if User.objects.filter(company=company).exists():
+        raise AccountError('Демонстрационная компания уже содержит пользователей.', code='demo_not_empty')
+    _validate_password(password, User(email=f'manager+{company.demo_slug}@demo.example.test'))
+    specifications = [
+        ('manager', User.Role.Manager, 'Демо: Елена Соколова'),
+        ('dispatcher', User.Role.Dispatcher, 'Демо: Антон Волков'),
+        ('driver1', User.Role.Driver, 'Демо: Иван Петров'),
+        ('driver2', User.Role.Driver, 'Демо: Сергей Орлов'),
+        ('driver3', User.Role.Driver, 'Демо: Алексей Кузнецов'),
+    ]
+    result = {}
+    for key, role, name in specifications:
+        email = f'{key}+{company.demo_slug}@demo.example.test'
+        if selectors.find_user_by_email(email):
+            raise AccountError('Демонстрационный email уже занят.', code='demo_email_conflict', status=409)
+        result[key] = UserFactory.create(
+            company=company, email=email, password=password, role=role,
+            full_name=name, phone='+70000000000',
+        )
+    return result

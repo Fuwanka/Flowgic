@@ -7,6 +7,8 @@ from django.utils import timezone
 from accounts.decorators import role_required
 from .models import Order, Vehicle, Company, Client, Financial
 from .selectors import get_user_orders
+from . import services
+from billing.exceptions import QuotaExceededError
 from decimal import Decimal
 from accounts.models import User
 from django.shortcuts import get_object_or_404, render
@@ -43,9 +45,17 @@ def new_request(request):
     if request.method == 'POST':
         form = OrderForm(request.POST, user=request.user)
         if form.is_valid():
-            order = form.save(commit=False)
-            order.created_by = request.user
-            order.save()
+            data = form.cleaned_data.copy()
+            client, driver, vehicle = data.pop('client'), data.pop('driver', None), data.pop('vehicle', None)
+            try:
+                order = services.create_order(
+                    request.user, client_id=client.pk,
+                    driver_id=driver.pk if driver else None,
+                    vehicle_id=vehicle.pk if vehicle else None, **data,
+                )
+            except QuotaExceededError as error:
+                form.add_error(None, error.detail)
+                return render(request, 'logistics/new_request.html', {'form': form}, status=402)
             messages.success(request, f'Order #{order.id} created successfully!')
             return redirect('request_detail', order_id=order.id)
         else:
@@ -363,14 +373,30 @@ def vehicle_detail(request, vehicle_id):
 @require_POST
 def vehicle_update_status(request, vehicle_id):
     """Обновление статуса ТС (доступно диспетчеру/менеджеру)."""
-    vehicle = get_object_or_404(Vehicle.objects.filter(company=request.user.company), id=vehicle_id)
     new_status = request.POST.get('status', '').strip()
     valid_statuses = [choice[0] for choice in Vehicle.Status.choices]
     if new_status not in valid_statuses:
         return JsonResponse({'success': False, 'error': 'Invalid status'}, status=400)
-    vehicle.status = new_status
-    vehicle.save(update_fields=['status'])
+    try:
+        vehicle = services.update_vehicle_status(request.user, vehicle_id, new_status)
+    except QuotaExceededError as error:
+        return JsonResponse({'success': False, **error.as_dict()}, status=402)
     return JsonResponse({'success': True, 'status': vehicle.status, 'status_display': vehicle.get_status_display()})
+
+
+@login_required
+def download_order_document(request, order_id, document_type):
+    from io import BytesIO
+    from django.http import FileResponse
+    from .documents import DocumentDataError, InvalidDocumentTypeError, generate_order_document
+    try:
+        document = generate_order_document(request.user, order_id, document_type)
+    except (DocumentDataError, InvalidDocumentTypeError) as error:
+        return JsonResponse({'detail': str(error), 'code': 'document_data_error'}, status=400)
+    return FileResponse(
+        BytesIO(document.content), as_attachment=True,
+        filename=document.filename, content_type=document.content_type,
+    )
 
 @login_required
 @role_required(['dispatcher', 'manager'])

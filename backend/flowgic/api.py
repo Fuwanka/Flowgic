@@ -1,11 +1,43 @@
-from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.exceptions import PermissionDenied, ValidationError as DjangoValidationError
+from django.http import Http404
 from ninja import NinjaAPI
 from ninja.errors import AuthenticationError, ValidationError
 
 from accounts.api import router as accounts_router
 from accounts.exceptions import AccountError
+from billing.api import router as billing_router
+from billing.exceptions import QuotaExceededError
+from marketplace.api import router as marketplace_router
+from marketplace.exceptions import MarketplaceError
+from logistics.api import router as logistics_router
+from logistics.documents import DocumentDataError
 
 api = NinjaAPI(title='Flowgic API', version='1.0.0')
+
+
+@api.exception_handler(PermissionDenied)
+def permission_denied(request, error):
+    return api.create_response(request, {'detail': str(error), 'code': 'permission_denied'}, status=403)
+
+
+@api.exception_handler(Http404)
+def not_found(request, error):
+    return api.create_response(request, {'detail': 'Объект не найден.', 'code': 'not_found'}, status=404)
+
+
+@api.exception_handler(DocumentDataError)
+def document_data_error(request, error):
+    return api.create_response(request, {'detail': str(error), 'code': 'document_data_error'}, status=400)
+
+
+@api.exception_handler(QuotaExceededError)
+def quota_exceeded(request, error):
+    return api.create_response(request, error.as_dict(), status=402)
+
+
+@api.exception_handler(MarketplaceError)
+def marketplace_error(request, error):
+    return api.create_response(request, {'detail': error.detail, 'code': error.code}, status=error.status)
 
 
 @api.exception_handler(AccountError)
@@ -37,3 +69,6 @@ def input_validation(request, error):
 
 
 api.add_router('/accounts', accounts_router)
+api.add_router('/billing', billing_router)
+api.add_router('/marketplace', marketplace_router)
+api.add_router('/logistics', logistics_router)

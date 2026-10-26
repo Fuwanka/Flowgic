@@ -44,6 +44,8 @@
                 {% endif %}
             </div>
             <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+                <a href="{% url 'download_order_document' order.id 'application' %}" class="btn btn-sm btn-outline-primary">Договор-заявка DOCX</a>
+                <a href="{% url 'download_order_document' order.id 'ttn' %}" class="btn btn-sm btn-outline-primary">ТТН DOCX</a>
                 <button type="button" class="theme-toggle-btn" id="theme-toggle" aria-label="Переключить тему" title="Переключить тему">
                     <span class="theme-icon theme-icon-sun" style="display:none;">☀️</span>
                     <span class="theme-icon theme-icon-moon">🌙</span>

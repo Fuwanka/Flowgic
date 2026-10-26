@@ -66,6 +66,8 @@ docker compose run --rm test
 backend/
   accounts/             пользователи, роли, профиль, восстановление пароля
   logistics/            компании, клиенты, заказы, ТС, финансы, события, документы
+  billing/              тарифы и лимиты компаний, кеш использования Redis
+  marketplace/          контекстные B2B-предложения и учёт кликов
   flowgic/              Django settings/URLs/ASGI/WSGI и Celery
   templates/ и static/  существующий веб-интерфейс
   tests/                общие и инфраструктурные проверки
@@ -76,6 +78,10 @@ infra/postgres/         первичная настройка ролей и Post
 ```
 
 Карта архитектуры, изменения тестов и границы этапа: [docs/architecture.md](docs/architecture.md).
+
+Этап 3 добавляет Freemium-квоты, контекстные партнёрские офферы, скачивание
+Договор-заявки и ТТН в DOCX и команду `python manage.py seed_demo_company`.
+Запуск, API и правила повторного наполнения: [docs/stage-3.md](docs/stage-3.md).
 
 ## Локальный Python
 

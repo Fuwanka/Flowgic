@@ -1,6 +1,79 @@
 {
   "components": {
     "schemas": {
+      "Category": {
+        "enum": [
+          "INSURANCE",
+          "FUEL",
+          "FACTORING",
+          "TELEMATICS"
+        ],
+        "title": "Category",
+        "type": "string"
+      },
+      "ClickIn": {
+        "additionalProperties": false,
+        "properties": {
+          "order_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Id"
+          }
+        },
+        "title": "ClickIn",
+        "type": "object"
+      },
+      "ClickOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "offer_id": {
+            "format": "uuid",
+            "title": "Offer Id",
+            "type": "string"
+          },
+          "order_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Id"
+          },
+          "target_url": {
+            "title": "Target Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "offer_id",
+          "order_id",
+          "created_at",
+          "target_url"
+        ],
+        "title": "ClickOut",
+        "type": "object"
+      },
       "CompanyOut": {
         "properties": {
           "id_company": {
@@ -82,6 +155,24 @@
         "title": "LoginIn",
         "type": "object"
       },
+      "MarketplaceErrorOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail",
+          "code"
+        ],
+        "title": "MarketplaceErrorOut",
+        "type": "object"
+      },
       "MessageOut": {
         "properties": {
           "detail": {
@@ -93,6 +184,243 @@
           "detail"
         ],
         "title": "MessageOut",
+        "type": "object"
+      },
+      "OfferOut": {
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_demo": {
+            "title": "Is Demo",
+            "type": "boolean"
+          },
+          "target_url": {
+            "title": "Target Url",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "category",
+          "title",
+          "description",
+          "target_url",
+          "is_demo"
+        ],
+        "title": "OfferOut",
+        "type": "object"
+      },
+      "OrderCreateIn": {
+        "additionalProperties": false,
+        "properties": {
+          "agreed_price": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agreed Price"
+          },
+          "cargo_mass_kg": {
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "Cargo Mass Kg",
+            "type": "integer"
+          },
+          "cargo_type": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Cargo Type",
+            "type": "string"
+          },
+          "client_id": {
+            "format": "uuid",
+            "title": "Client Id",
+            "type": "string"
+          },
+          "delivery_datetime": {
+            "format": "date-time",
+            "title": "Delivery Datetime",
+            "type": "string"
+          },
+          "destination": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "driver_id": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Driver Id"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "pickup_datetime": {
+            "format": "date-time",
+            "title": "Pickup Datetime",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Status"
+              }
+            ],
+            "default": "created"
+          },
+          "vehicle_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vehicle Id"
+          }
+        },
+        "required": [
+          "client_id",
+          "cargo_type",
+          "cargo_mass_kg",
+          "pickup_datetime",
+          "delivery_datetime"
+        ],
+        "title": "OrderCreateIn",
+        "type": "object"
+      },
+      "OrderOut": {
+        "properties": {
+          "agreed_price": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agreed Price"
+          },
+          "cargo_type": {
+            "title": "Cargo Type",
+            "type": "string"
+          },
+          "client_id": {
+            "format": "uuid",
+            "title": "Client Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "driver_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Driver Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "vehicle_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vehicle Id"
+          }
+        },
+        "required": [
+          "id",
+          "client_id",
+          "driver_id",
+          "vehicle_id",
+          "cargo_type",
+          "status",
+          "agreed_price",
+          "created_at"
+        ],
+        "title": "OrderOut",
         "type": "object"
       },
       "PasswordChangeIn": {
@@ -146,6 +474,66 @@
         ],
         "title": "PasswordResetConfirmIn",
         "type": "object"
+      },
+      "PlanOut": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "iot_enabled": {
+            "title": "Iot Enabled",
+            "type": "boolean"
+          },
+          "max_orders_per_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Orders Per Month"
+          },
+          "max_vehicles": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Vehicles"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "plan_type": {
+            "$ref": "#/components/schemas/PlanType"
+          }
+        },
+        "required": [
+          "id",
+          "plan_type",
+          "name",
+          "max_vehicles",
+          "max_orders_per_month",
+          "iot_enabled"
+        ],
+        "title": "PlanOut",
+        "type": "object"
+      },
+      "PlanType": {
+        "enum": [
+          "FREE",
+          "PRO",
+          "ENTERPRISE"
+        ],
+        "title": "PlanType",
+        "type": "string"
       },
       "ProfileOut": {
         "properties": {
@@ -238,6 +626,43 @@
           }
         },
         "title": "ProfileUpdateIn",
+        "type": "object"
+      },
+      "QuotaErrorOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "current": {
+            "title": "Current",
+            "type": "integer"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "plan_type": {
+            "$ref": "#/components/schemas/PlanType"
+          },
+          "resource": {
+            "title": "Resource",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail",
+          "code",
+          "resource",
+          "limit",
+          "current",
+          "plan_type"
+        ],
+        "title": "QuotaErrorOut",
         "type": "object"
       },
       "RefreshIn": {
@@ -339,12 +764,35 @@
       },
       "Status": {
         "enum": [
-          "active",
-          "invited",
+          "available",
+          "in_trip",
+          "maintenance",
           "blocked"
         ],
         "title": "Status",
         "type": "string"
+      },
+      "SubscriptionOut": {
+        "properties": {
+          "company_id": {
+            "format": "uuid",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/PlanOut"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/UsageOut"
+          }
+        },
+        "required": [
+          "company_id",
+          "plan",
+          "usage"
+        ],
+        "title": "SubscriptionOut",
+        "type": "object"
       },
       "Theme": {
         "enum": [
@@ -370,6 +818,144 @@
           "refresh"
         ],
         "title": "TokenPairOut",
+        "type": "object"
+      },
+      "UsageOut": {
+        "properties": {
+          "orders": {
+            "title": "Orders",
+            "type": "integer"
+          },
+          "period_end": {
+            "format": "date-time",
+            "title": "Period End",
+            "type": "string"
+          },
+          "period_start": {
+            "format": "date-time",
+            "title": "Period Start",
+            "type": "string"
+          },
+          "vehicles": {
+            "title": "Vehicles",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "vehicles",
+          "orders",
+          "period_start",
+          "period_end"
+        ],
+        "title": "UsageOut",
+        "type": "object"
+      },
+      "VehicleCreateIn": {
+        "additionalProperties": false,
+        "properties": {
+          "capacity_kg": {
+            "maximum": 2147483647,
+            "minimum": 0,
+            "title": "Capacity Kg",
+            "type": "integer"
+          },
+          "last_maintenance": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Maintenance"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "reg_number": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Reg Number",
+            "type": "string"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Status"
+              }
+            ],
+            "default": "available"
+          },
+          "type": {
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reg_number",
+          "type",
+          "capacity_kg"
+        ],
+        "title": "VehicleCreateIn",
+        "type": "object"
+      },
+      "VehicleOut": {
+        "properties": {
+          "capacity_kg": {
+            "title": "Capacity Kg",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "reg_number": {
+            "title": "Reg Number",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "reg_number",
+          "type",
+          "capacity_kg",
+          "status"
+        ],
+        "title": "VehicleOut",
+        "type": "object"
+      },
+      "VehicleStatusIn": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "VehicleStatusIn",
         "type": "object"
       },
       "VerifyIn": {
@@ -868,6 +1454,642 @@
         "summary": "Verify",
         "tags": [
           "accounts"
+        ]
+      }
+    },
+    "/api/billing/plans": {
+      "get": {
+        "operationId": "listSubscriptionPlans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlanOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "AccountJWTAuth": []
+          }
+        ],
+        "summary": "Plans",
+        "tags": [
+          "billing"
+        ]
+      }
+    },
+    "/api/billing/subscription": {
+      "get": {
+        "operationId": "getCompanySubscription",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "AccountJWTAuth": []
+          }
+        ],
+        "summary": "Subscription",
+        "tags": [
+          "billing"
+        ]
+      }
+    },
+    "/api/logistics/orders": {
+      "post": {
+        "operationId": "createOrder",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotaErrorOut"
+                }
+              }
+            },
+            "description": "Payment Required"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "AccountJWTAuth": []
+          }
+        ],
+        "summary": "Create Order",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/api/logistics/orders/{order_id}/document/docx": {
+      "get": {
+        "operationId": "downloadOrderDocument",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Order Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "document_type",
+            "required": false,
+            "schema": {
+              "default": "application",
+              "enum": [
+                "application",
+                "ttn"
+              ],
+              "title": "Document Type",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Заполненный редактируемый DOCX"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "AccountJWTAuth": []
+          }
+        ],
+        "summary": "Order Document",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/api/logistics/vehicles": {
+      "post": {
+        "operationId": "createVehicle",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleCreateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotaErrorOut"
+                }
+              }
+            },
+            "description": "Payment Required"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "AccountJWTAuth": []
+          }
+        ],
+        "summary": "Create Vehicle",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/api/logistics/vehicles/{vehicle_id}/status": {
+      "patch": {
+        "operationId": "updateVehicleStatus",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "vehicle_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Vehicle Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VehicleStatusIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleOut"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotaErrorOut"
+                }
+              }
+            },
+            "description": "Payment Required"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "AccountJWTAuth": []
+          }
+        ],
+        "summary": "Update Vehicle Status",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/api/marketplace/offers": {
+      "get": {
+        "operationId": "getContextualOffers",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "context_type",
+            "required": false,
+            "schema": {
+              "default": "dashboard",
+              "enum": [
+                "dashboard",
+                "order_detail",
+                "fleet",
+                "finance"
+              ],
+              "title": "Context Type",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OfferOut"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceErrorOut"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceErrorOut"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "AccountJWTAuth": []
+          }
+        ],
+        "summary": "Offers",
+        "tags": [
+          "marketplace"
+        ]
+      }
+    },
+    "/api/marketplace/offers/{offer_id}/click": {
+      "post": {
+        "operationId": "recordOfferClick",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offer_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offer Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClickIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClickOut"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceErrorOut"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceErrorOut"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketplaceErrorOut"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "AccountJWTAuth": []
+          }
+        ],
+        "summary": "Click",
+        "tags": [
+          "marketplace"
         ]
       }
     }

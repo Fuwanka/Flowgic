@@ -34,6 +34,9 @@ class Company(models.Model):
         help_text='Структурированный адрес: {region, city, street, building, postcode}'
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата регистрации')
+    is_demo = models.BooleanField(default=False, editable=False)
+    demo_slug = models.SlugField(max_length=64, null=True, blank=True, unique=True, editable=False)
+    demo_seeded_at = models.DateTimeField(null=True, blank=True, editable=False)
 
     class Meta:
         db_table = 'companies'

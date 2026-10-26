@@ -6,3 +6,5 @@ pydantic==2.14.1
 celery[redis]==5.6.3
 psycopg[binary]==3.3.6
 python-dotenv==1.2.4
+docxtpl==0.20.2
+python-docx==1.2.0

@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ConfirmPasswordResetData, ConfirmPasswordResetErrors, ConfirmPasswordResetResponses, GetProfileData, GetProfileErrors, GetProfileResponses, LoginAccountData, LoginAccountErrors, LoginAccountResponses, LogoutAccountData, LogoutAccountErrors, LogoutAccountResponses, RefreshTokensData, RefreshTokensErrors, RefreshTokensResponses, RegisterAccountData, RegisterAccountErrors, RegisterAccountResponses, RequestPasswordResetData, RequestPasswordResetResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, VerifyTokenData, VerifyTokenErrors, VerifyTokenResponses } from './types.gen';
+import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ConfirmPasswordResetData, ConfirmPasswordResetErrors, ConfirmPasswordResetResponses, CreateOrderData, CreateOrderErrors, CreateOrderResponses, CreateVehicleData, CreateVehicleErrors, CreateVehicleResponses, DownloadOrderDocumentData, DownloadOrderDocumentErrors, DownloadOrderDocumentResponses, GetCompanySubscriptionData, GetCompanySubscriptionErrors, GetCompanySubscriptionResponses, GetContextualOffersData, GetContextualOffersErrors, GetContextualOffersResponses, GetProfileData, GetProfileErrors, GetProfileResponses, ListSubscriptionPlansData, ListSubscriptionPlansErrors, ListSubscriptionPlansResponses, LoginAccountData, LoginAccountErrors, LoginAccountResponses, LogoutAccountData, LogoutAccountErrors, LogoutAccountResponses, RecordOfferClickData, RecordOfferClickErrors, RecordOfferClickResponses, RefreshTokensData, RefreshTokensErrors, RefreshTokensResponses, RegisterAccountData, RegisterAccountErrors, RegisterAccountResponses, RequestPasswordResetData, RequestPasswordResetResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateVehicleStatusData, UpdateVehicleStatusErrors, UpdateVehicleStatusResponses, VerifyTokenData, VerifyTokenErrors, VerifyTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -131,6 +131,94 @@ export const refreshTokens = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const verifyToken = <ThrowOnError extends boolean = false>(options: Options<VerifyTokenData, ThrowOnError>): RequestResult<VerifyTokenResponses, VerifyTokenErrors, ThrowOnError> => (options.client ?? client).post<VerifyTokenResponses, VerifyTokenErrors, ThrowOnError>({
     url: '/api/accounts/token/verify',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Plans
+ */
+export const listSubscriptionPlans = <ThrowOnError extends boolean = false>(options?: Options<ListSubscriptionPlansData, ThrowOnError>): RequestResult<ListSubscriptionPlansResponses, ListSubscriptionPlansErrors, ThrowOnError> => (options?.client ?? client).get<ListSubscriptionPlansResponses, ListSubscriptionPlansErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/billing/plans',
+    ...options
+});
+
+/**
+ * Subscription
+ */
+export const getCompanySubscription = <ThrowOnError extends boolean = false>(options?: Options<GetCompanySubscriptionData, ThrowOnError>): RequestResult<GetCompanySubscriptionResponses, GetCompanySubscriptionErrors, ThrowOnError> => (options?.client ?? client).get<GetCompanySubscriptionResponses, GetCompanySubscriptionErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/billing/subscription',
+    ...options
+});
+
+/**
+ * Create Order
+ */
+export const createOrder = <ThrowOnError extends boolean = false>(options: Options<CreateOrderData, ThrowOnError>): RequestResult<CreateOrderResponses, CreateOrderErrors, ThrowOnError> => (options.client ?? client).post<CreateOrderResponses, CreateOrderErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/orders',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Order Document
+ */
+export const downloadOrderDocument = <ThrowOnError extends boolean = false>(options: Options<DownloadOrderDocumentData, ThrowOnError>): RequestResult<DownloadOrderDocumentResponses, DownloadOrderDocumentErrors, ThrowOnError> => (options.client ?? client).get<DownloadOrderDocumentResponses, DownloadOrderDocumentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/orders/{order_id}/document/docx',
+    ...options
+});
+
+/**
+ * Create Vehicle
+ */
+export const createVehicle = <ThrowOnError extends boolean = false>(options: Options<CreateVehicleData, ThrowOnError>): RequestResult<CreateVehicleResponses, CreateVehicleErrors, ThrowOnError> => (options.client ?? client).post<CreateVehicleResponses, CreateVehicleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/vehicles',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update Vehicle Status
+ */
+export const updateVehicleStatus = <ThrowOnError extends boolean = false>(options: Options<UpdateVehicleStatusData, ThrowOnError>): RequestResult<UpdateVehicleStatusResponses, UpdateVehicleStatusErrors, ThrowOnError> => (options.client ?? client).patch<UpdateVehicleStatusResponses, UpdateVehicleStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/vehicles/{vehicle_id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Offers
+ */
+export const getContextualOffers = <ThrowOnError extends boolean = false>(options?: Options<GetContextualOffersData, ThrowOnError>): RequestResult<GetContextualOffersResponses, GetContextualOffersErrors, ThrowOnError> => (options?.client ?? client).get<GetContextualOffersResponses, GetContextualOffersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/marketplace/offers',
+    ...options
+});
+
+/**
+ * Click
+ */
+export const recordOfferClick = <ThrowOnError extends boolean = false>(options: Options<RecordOfferClickData, ThrowOnError>): RequestResult<RecordOfferClickResponses, RecordOfferClickErrors, ThrowOnError> => (options.client ?? client).post<RecordOfferClickResponses, RecordOfferClickErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/marketplace/offers/{offer_id}/click',
     ...options,
     headers: {
         'Content-Type': 'application/json',
