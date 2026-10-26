@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+# Следующий commit того же PR заменяет проверку устаревшего SHA.
+concurrency:
+  group: backend-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest

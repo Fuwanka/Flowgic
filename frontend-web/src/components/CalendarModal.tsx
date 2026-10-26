@@ -57,10 +57,10 @@ export function CalendarModal({
             />
           )}
           {query.isPending && <p role="status">Загрузка рейсов…</p>}
+          {/* Дата контролируется React, а режим панели остаётся у AntD: работают оба переключателя. */}
           <Calendar
             value={month}
             onChange={setMonth}
-            mode="month"
             onPanelChange={setMonth}
             cellRender={(current, info) => {
               if (info.type !== "date") return info.originNode;

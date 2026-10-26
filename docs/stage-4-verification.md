@@ -7,6 +7,7 @@
 | Полный pytest с миграциями, PostGIS/Redis и Chromium | **317 passed, 0 failed**, 611,99 с |
 | Финальные API и три сценария production SPA на отдельной новой БД | **21 passed**, 80,28 с |
 | Vitest: JWT single-flight, выход/новый вход во время refresh, JSON replay, ошибки | **9 passed** |
+| Календарь «Месяц/Год» и связанный Chromium-сценарий после уточнения режима | **1 passed**, 12,18 с |
 | Чистый `npm ci --ignore-scripts` из lock-файла | успешно |
 | TypeScript | 0 ошибок |
 | Vite production build | успешно, страницы разделены по маршрутам |
