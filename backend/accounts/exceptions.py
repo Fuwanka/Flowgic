@@ -1,3 +1,4 @@
+# Прикладная ошибка хранит безопасное описание и HTTP-код; API не раскрывает внутренний traceback.
 """Application errors shared by HTML and API adapters."""
 
 

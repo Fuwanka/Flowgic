@@ -1,3 +1,5 @@
+# Фабрики предназначены для тестов и изолированной демо-компании. Обычные операции приложения идут
+# через services и квоты.
 """
 Factory classes for generating test data
 This can be used as an alternative to fixtures for more flexible test data generation

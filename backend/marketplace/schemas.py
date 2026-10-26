@@ -1,3 +1,5 @@
+# Небольшой публичный DTO не раскрывает внутренние правила каталога, компанию-владельца или чужую
+# историю кликов.
 from datetime import datetime
 from typing import Literal
 from uuid import UUID

@@ -1,3 +1,5 @@
+# HTTP 402 передаёт структурированную квоту, чтобы SPA могла показать понятное предложение перейти
+# на другой тариф.
 from datetime import datetime
 from uuid import UUID
 

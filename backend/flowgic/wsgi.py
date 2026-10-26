@@ -1,3 +1,5 @@
+# Синхронная точка входа Django. Docker Compose пока запускает локальный runserver, а не публичный
+# production-хостинг.
 """
 WSGI config for flowgic project.
 

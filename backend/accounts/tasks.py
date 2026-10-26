@@ -1,3 +1,5 @@
+# Письмо запускается после commit, чтобы не отправить код от отменённой транзакции. Транспорт задаёт
+# EMAIL_BACKEND.
 from celery import shared_task
 from django.conf import settings
 from django.core.mail import send_mail

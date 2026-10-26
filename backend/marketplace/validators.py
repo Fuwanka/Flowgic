@@ -1,3 +1,5 @@
+# Целевой URL допускает только HTTP(S) без встроенных логина/пароля; устаревшие некорректные строки
+# также скрывает селектор.
 from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError

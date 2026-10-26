@@ -1,3 +1,4 @@
+# Проверки ролей старых сессионных страниц; JWT API отдельно проверяет права в прикладном слое.
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from functools import wraps

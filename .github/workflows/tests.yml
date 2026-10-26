@@ -45,8 +45,8 @@ jobs:
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 3s --health-retries 12
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: "3.11"
           cache: pip
@@ -70,7 +70,7 @@ jobs:
         run: |
           python backend/manage.py check
           python backend/manage.py makemigrations --check --dry-run
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: "22.18.0"
           cache: npm
@@ -81,6 +81,8 @@ jobs:
           npm ci --prefix frontend-web --ignore-scripts --no-audit --no-fund
           npm run generate-api --prefix frontend-web
           npm run typecheck --prefix frontend-web
+          npm test --prefix frontend-web
+          npm run build --prefix frontend-web
           git diff --exit-code -- backend/openapi.json frontend-web/src/client
       - name: Full suite with migrations on fresh PostgreSQL/PostGIS
         run: python -m pytest --migrations --create-db --browser chromium --tb=short

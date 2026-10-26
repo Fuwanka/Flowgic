@@ -1,3 +1,5 @@
+# Ключи Redis не раскрывают email; password stamp делает выпущенные JWT недействительными после
+# смены пароля.
 """Pure helpers; never trust role/company claims supplied by a client."""
 from django.utils.crypto import salted_hmac
 

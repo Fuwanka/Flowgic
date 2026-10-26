@@ -1,3 +1,5 @@
+# Регистрация marketplace; выбор подходящих предложений выполняется при запросе, не при старте
+# Django.
 from django.apps import AppConfig
 
 

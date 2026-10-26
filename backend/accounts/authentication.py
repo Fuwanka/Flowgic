@@ -1,3 +1,4 @@
+# JWT проверяет подпись и актуальное состояние аккаунта, включая отзыв сессии и смену пароля.
 from ninja_jwt.authentication import JWTAuth
 from ninja_jwt.exceptions import InvalidToken, TokenError
 

@@ -1,3 +1,4 @@
+# Структура quota_exceeded является контрактом HTTP 402 и окна тарифа в React.
 class QuotaExceededError(Exception):
     def __init__(self, *, resource, limit, current, plan_type):
         self.resource = resource

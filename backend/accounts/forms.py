@@ -1,3 +1,5 @@
+# Совместимость HTML-страниц: форма проверяет представление, окончательные права и запись выполняют
+# сервисы.
 from django import forms
 from logistics.models import Client
 

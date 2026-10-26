@@ -1,3 +1,5 @@
+# Каталог редактируется администратором; история кликов доступна для чтения без ручной подмены
+# записей.
 from django.contrib import admin
 
 from .models import OfferClickLog, PartnerOffer

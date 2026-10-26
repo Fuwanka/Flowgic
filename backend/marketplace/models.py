@@ -1,3 +1,5 @@
+# company=NULL — общий каталог. Демо-оффер обязательно принадлежит компании; логи кликов разделены
+# по tenant.
 import uuid
 from decimal import Decimal
 

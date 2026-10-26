@@ -1,3 +1,4 @@
+# Общий контекст Django Templates; новая SPA получает профиль отдельным типизированным запросом.
 def theme_context(request):
     """
     Context processor providing current_theme for templates.

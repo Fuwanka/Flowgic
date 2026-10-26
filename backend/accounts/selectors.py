@@ -1,3 +1,5 @@
+# Идентичность при входе ищется до определения компании; все последующие прикладные чтения
+# ограничены tenant.
 """Read-only account queries and data for the legacy dashboards."""
 import json
 
@@ -7,6 +9,12 @@ from logistics.selectors import get_user_orders
 
 from .models import PasswordResetCode, User
 from .security import normalize_email
+from .permissions import require_operator
+
+
+def get_company_drivers(user):
+    require_operator(user)
+    return User.objects.filter(company=user.company, role=User.Role.Driver).select_related('company').order_by('full_name', 'id')
 
 
 def find_user_by_email(email):

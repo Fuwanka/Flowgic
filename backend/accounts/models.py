@@ -1,3 +1,5 @@
+# Email служит логином. Nullable company сохранена для совместимости; прикладной доступ требует
+# активной компании.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.dispatch import dispatcher

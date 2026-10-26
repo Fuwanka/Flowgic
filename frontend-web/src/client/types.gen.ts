@@ -5,6 +5,20 @@ export type ClientOptions = {
 };
 
 /**
+ * CalendarOut
+ */
+export type CalendarOut = {
+    /**
+     * Items
+     */
+    items: Array<OrderRowOut>;
+    /**
+     * Truncated
+     */
+    truncated: boolean;
+};
+
+/**
  * Category
  */
 export type Category = 'INSURANCE' | 'FUEL' | 'FACTORING' | 'TELEMATICS';
@@ -46,6 +60,46 @@ export type ClickOut = {
 };
 
 /**
+ * ClientIn
+ */
+export type ClientIn = {
+    /**
+     * Email
+     */
+    email?: string | null;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Phone
+     */
+    phone?: string | null;
+};
+
+/**
+ * ClientOut
+ */
+export type ClientOut = {
+    /**
+     * Email
+     */
+    email: string | null;
+    /**
+     * Id Client
+     */
+    id_client: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Phone
+     */
+    phone: string | null;
+};
+
+/**
  * CompanyOut
  */
 export type CompanyOut = {
@@ -61,6 +115,68 @@ export type CompanyOut = {
      * Type
      */
     type: string;
+};
+
+/**
+ * DriverCreateIn
+ */
+export type DriverCreateIn = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Full Name
+     */
+    full_name: string;
+    /**
+     * Password
+     */
+    password: string;
+    /**
+     * Phone
+     */
+    phone?: string | null;
+};
+
+/**
+ * DriverOut
+ *
+ * Справочник не раскрывает пароли, служебные флаги или чужую компанию.
+ */
+export type DriverOut = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Full Name
+     */
+    full_name: string;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Phone
+     */
+    phone: string | null;
+    status: Status;
+};
+
+/**
+ * DriverUpdateIn
+ */
+export type DriverUpdateIn = {
+    /**
+     * Full Name
+     */
+    full_name: string;
+    /**
+     * Phone
+     */
+    phone?: string | null;
+    status?: Status;
 };
 
 /**
@@ -85,6 +201,80 @@ export type ErrorOut = {
      * Detail
      */
     detail: string;
+};
+
+/**
+ * EventOut
+ */
+export type EventOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Event Data
+     */
+    event_data: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Event Type
+     */
+    event_type: string;
+    /**
+     * Id
+     */
+    id: string;
+};
+
+/**
+ * FinancialIn
+ */
+export type FinancialIn = {
+    /**
+     * Client Cost
+     */
+    client_cost: number | string;
+    /**
+     * Driver Cost
+     */
+    driver_cost: number | string;
+    /**
+     * Fuel Expenses
+     */
+    fuel_expenses?: number | string | null;
+    payment_status?: PaymentStatus;
+    /**
+     * Third Party Cost
+     */
+    third_party_cost?: number | string;
+};
+
+/**
+ * FinancialOut
+ */
+export type FinancialOut = {
+    /**
+     * Client Cost
+     */
+    client_cost: string;
+    /**
+     * Driver Cost
+     */
+    driver_cost: string;
+    /**
+     * Fuel Expenses
+     */
+    fuel_expenses: string;
+    payment_status: PaymentStatus;
+    /**
+     * Profit
+     */
+    profit: string;
+    /**
+     * Third Party Cost
+     */
+    third_party_cost: string | null;
 };
 
 /**
@@ -196,11 +386,94 @@ export type OrderCreateIn = {
      * Pickup Datetime
      */
     pickup_datetime: string;
-    status?: Status;
+    status?: OrderState;
     /**
      * Vehicle Id
      */
     vehicle_id?: string | null;
+};
+
+/**
+ * OrderDetailOut
+ */
+export type OrderDetailOut = {
+    /**
+     * Agreed Price
+     */
+    agreed_price: string | null;
+    /**
+     * Cargo Mass Kg
+     */
+    cargo_mass_kg: number;
+    /**
+     * Cargo Type
+     */
+    cargo_type: string;
+    client: ClientOut;
+    /**
+     * Client Id
+     */
+    client_id: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Delay Reason
+     */
+    delay_reason: string | null;
+    /**
+     * Delivery Datetime
+     */
+    delivery_datetime: string;
+    /**
+     * Destination
+     */
+    destination: string | null;
+    /**
+     * Distance Km
+     */
+    distance_km: string | null;
+    driver: DriverOut | null;
+    /**
+     * Driver Id
+     */
+    driver_id: number | null;
+    /**
+     * Events
+     */
+    events: Array<EventOut>;
+    financial: FinancialOut | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Order Number
+     */
+    order_number: string;
+    /**
+     * Origin
+     */
+    origin: string | null;
+    /**
+     * Pickup Datetime
+     */
+    pickup_datetime: string;
+    /**
+     * Planned Route
+     */
+    planned_route: string | null;
+    status: OrderState;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    vehicle: VehicleOut | null;
+    /**
+     * Vehicle Id
+     */
+    vehicle_id: string | null;
 };
 
 /**
@@ -231,11 +504,199 @@ export type OrderOut = {
      * Id
      */
     id: string;
-    status: Status;
+    status: OrderState;
     /**
      * Vehicle Id
      */
     vehicle_id: string | null;
+};
+
+/**
+ * OrderPageOut
+ */
+export type OrderPageOut = {
+    /**
+     * Items
+     */
+    items: Array<OrderRowOut>;
+    /**
+     * Page
+     */
+    page: number;
+    /**
+     * Page Size
+     */
+    page_size: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * OrderRowOut
+ */
+export type OrderRowOut = {
+    /**
+     * Agreed Price
+     */
+    agreed_price: string | null;
+    /**
+     * Cargo Mass Kg
+     */
+    cargo_mass_kg: number;
+    /**
+     * Cargo Type
+     */
+    cargo_type: string;
+    client: ClientOut;
+    /**
+     * Client Id
+     */
+    client_id: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Delivery Datetime
+     */
+    delivery_datetime: string;
+    /**
+     * Destination
+     */
+    destination: string | null;
+    /**
+     * Distance Km
+     */
+    distance_km: string | null;
+    driver: DriverOut | null;
+    /**
+     * Driver Id
+     */
+    driver_id: number | null;
+    financial: FinancialOut | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Order Number
+     */
+    order_number: string;
+    /**
+     * Origin
+     */
+    origin: string | null;
+    /**
+     * Pickup Datetime
+     */
+    pickup_datetime: string;
+    status: OrderState;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    vehicle: VehicleOut | null;
+    /**
+     * Vehicle Id
+     */
+    vehicle_id: string | null;
+};
+
+/**
+ * OrderState
+ */
+export type OrderState = 'created' | 'assigned' | 'loading' | 'in_transit' | 'delivered' | 'completed' | 'cancelled' | 'delayed';
+
+/**
+ * OrderStatusIn
+ */
+export type OrderStatusIn = {
+    /**
+     * Delay Reason
+     */
+    delay_reason?: string | null;
+    status: OrderState;
+};
+
+/**
+ * OrderUpdateIn
+ *
+ * Полное редактирование карточки; принадлежность компании не принимается.
+ */
+export type OrderUpdateIn = {
+    /**
+     * Agreed Price
+     */
+    agreed_price?: number | string | null;
+    /**
+     * Cargo Mass Kg
+     */
+    cargo_mass_kg: number;
+    /**
+     * Cargo Type
+     */
+    cargo_type: string;
+    /**
+     * Client Id
+     */
+    client_id: string;
+    /**
+     * Delivery Datetime
+     */
+    delivery_datetime: string;
+    /**
+     * Destination
+     */
+    destination?: string | null;
+    /**
+     * Distance Km
+     */
+    distance_km?: number | string | null;
+    /**
+     * Driver Id
+     */
+    driver_id?: number | null;
+    /**
+     * Origin
+     */
+    origin?: string | null;
+    /**
+     * Pickup Datetime
+     */
+    pickup_datetime: string;
+    status?: OrderState;
+    /**
+     * Vehicle Id
+     */
+    vehicle_id?: string | null;
+};
+
+/**
+ * OverviewOut
+ */
+export type OverviewOut = {
+    /**
+     * Active
+     */
+    active: number;
+    /**
+     * Completed
+     */
+    completed: number;
+    /**
+     * Monthly Revenue
+     */
+    monthly_revenue: string;
+    /**
+     * Overdue
+     */
+    overdue: number;
+    /**
+     * Total
+     */
+    total: number;
 };
 
 /**
@@ -269,6 +730,11 @@ export type PasswordResetConfirmIn = {
      */
     new_password: string;
 };
+
+/**
+ * PaymentStatus
+ */
+export type PaymentStatus = 'unpaid' | 'partially_paid' | 'paid';
 
 /**
  * PlanOut
@@ -423,7 +889,7 @@ export type Role = 'dispatcher' | 'manager' | 'driver';
 /**
  * Status
  */
-export type Status = 'available' | 'in_trip' | 'maintenance' | 'blocked';
+export type Status = 'active' | 'invited' | 'blocked';
 
 /**
  * SubscriptionOut
@@ -498,7 +964,7 @@ export type VehicleCreateIn = {
      * Reg Number
      */
     reg_number: string;
-    status?: Status;
+    status?: VehicleState;
     /**
      * Type
      */
@@ -518,10 +984,18 @@ export type VehicleOut = {
      */
     id: string;
     /**
+     * Last Maintenance
+     */
+    last_maintenance: string | null;
+    /**
+     * Model
+     */
+    model: string | null;
+    /**
      * Reg Number
      */
     reg_number: string;
-    status: Status;
+    status: VehicleState;
     /**
      * Type
      */
@@ -529,10 +1003,15 @@ export type VehicleOut = {
 };
 
 /**
+ * VehicleState
+ */
+export type VehicleState = 'available' | 'in_trip' | 'maintenance' | 'blocked';
+
+/**
  * VehicleStatusIn
  */
 export type VehicleStatusIn = {
-    status: Status;
+    status: VehicleState;
 };
 
 /**
@@ -544,6 +1023,116 @@ export type VerifyIn = {
      */
     token: string;
 };
+
+export type ListDriversData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/accounts/drivers';
+};
+
+export type ListDriversErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type ListDriversError = ListDriversErrors[keyof ListDriversErrors];
+
+export type ListDriversResponses = {
+    /**
+     * Response
+     *
+     * OK
+     */
+    200: Array<DriverOut>;
+};
+
+export type ListDriversResponse = ListDriversResponses[keyof ListDriversResponses];
+
+export type CreateDriverData = {
+    body: DriverCreateIn;
+    path?: never;
+    query?: never;
+    url: '/api/accounts/drivers';
+};
+
+export type CreateDriverErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Conflict
+     */
+    409: ErrorOut;
+};
+
+export type CreateDriverError = CreateDriverErrors[keyof CreateDriverErrors];
+
+export type CreateDriverResponses = {
+    /**
+     * Created
+     */
+    201: DriverOut;
+};
+
+export type CreateDriverResponse = CreateDriverResponses[keyof CreateDriverResponses];
+
+export type UpdateDriverData = {
+    body: DriverUpdateIn;
+    path: {
+        /**
+         * Driver Id
+         */
+        driver_id: number;
+    };
+    query?: never;
+    url: '/api/accounts/drivers/{driver_id}';
+};
+
+export type UpdateDriverErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type UpdateDriverError = UpdateDriverErrors[keyof UpdateDriverErrors];
+
+export type UpdateDriverResponses = {
+    /**
+     * OK
+     */
+    200: DriverOut;
+};
+
+export type UpdateDriverResponse = UpdateDriverResponses[keyof UpdateDriverResponses];
 
 export type LogoutAccountData = {
     body: RefreshIn;
@@ -866,6 +1455,197 @@ export type GetCompanySubscriptionResponses = {
 
 export type GetCompanySubscriptionResponse = GetCompanySubscriptionResponses[keyof GetCompanySubscriptionResponses];
 
+export type GetCalendarData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Start
+         */
+        start: string;
+        /**
+         * End
+         */
+        end: string;
+    };
+    url: '/api/logistics/calendar';
+};
+
+export type GetCalendarErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type GetCalendarError = GetCalendarErrors[keyof GetCalendarErrors];
+
+export type GetCalendarResponses = {
+    /**
+     * OK
+     */
+    200: CalendarOut;
+};
+
+export type GetCalendarResponse = GetCalendarResponses[keyof GetCalendarResponses];
+
+export type ListClientsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/logistics/clients';
+};
+
+export type ListClientsErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type ListClientsError = ListClientsErrors[keyof ListClientsErrors];
+
+export type ListClientsResponses = {
+    /**
+     * Response
+     *
+     * OK
+     */
+    200: Array<ClientOut>;
+};
+
+export type ListClientsResponse = ListClientsResponses[keyof ListClientsResponses];
+
+export type CreateClientData = {
+    body: ClientIn;
+    path?: never;
+    query?: never;
+    url: '/api/logistics/clients';
+};
+
+export type CreateClientErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type CreateClientError = CreateClientErrors[keyof CreateClientErrors];
+
+export type CreateClientResponses = {
+    /**
+     * Created
+     */
+    201: ClientOut;
+};
+
+export type CreateClientResponse = CreateClientResponses[keyof CreateClientResponses];
+
+export type UpdateClientData = {
+    body: ClientIn;
+    path: {
+        /**
+         * Client Id
+         */
+        client_id: string;
+    };
+    query?: never;
+    url: '/api/logistics/clients/{client_id}';
+};
+
+export type UpdateClientErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type UpdateClientError = UpdateClientErrors[keyof UpdateClientErrors];
+
+export type UpdateClientResponses = {
+    /**
+     * OK
+     */
+    200: ClientOut;
+};
+
+export type UpdateClientResponse = UpdateClientResponses[keyof UpdateClientResponses];
+
+export type ListOrdersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        status?: OrderState | null;
+        /**
+         * Q
+         */
+        q?: string;
+        /**
+         * Page
+         */
+        page?: number;
+        /**
+         * Page Size
+         */
+        page_size?: number;
+    };
+    url: '/api/logistics/orders';
+};
+
+export type ListOrdersErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type ListOrdersError = ListOrdersErrors[keyof ListOrdersErrors];
+
+export type ListOrdersResponses = {
+    /**
+     * OK
+     */
+    200: OrderPageOut;
+};
+
+export type ListOrdersResponse = ListOrdersResponses[keyof ListOrdersResponses];
+
 export type CreateOrderData = {
     body: OrderCreateIn;
     path?: never;
@@ -906,6 +1686,82 @@ export type CreateOrderResponses = {
 };
 
 export type CreateOrderResponse = CreateOrderResponses[keyof CreateOrderResponses];
+
+export type GetOrderData = {
+    body?: never;
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/api/logistics/orders/{order_id}';
+};
+
+export type GetOrderErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type GetOrderError = GetOrderErrors[keyof GetOrderErrors];
+
+export type GetOrderResponses = {
+    /**
+     * OK
+     */
+    200: OrderDetailOut;
+};
+
+export type GetOrderResponse = GetOrderResponses[keyof GetOrderResponses];
+
+export type UpdateOrderData = {
+    body: OrderUpdateIn;
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/api/logistics/orders/{order_id}';
+};
+
+export type UpdateOrderErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type UpdateOrderError = UpdateOrderErrors[keyof UpdateOrderErrors];
+
+export type UpdateOrderResponses = {
+    /**
+     * OK
+     */
+    200: OrderDetailOut;
+};
+
+export type UpdateOrderResponse = UpdateOrderResponses[keyof UpdateOrderResponses];
 
 export type DownloadOrderDocumentData = {
     body?: never;
@@ -950,6 +1806,192 @@ export type DownloadOrderDocumentResponses = {
 
 export type DownloadOrderDocumentResponse = DownloadOrderDocumentResponses[keyof DownloadOrderDocumentResponses];
 
+export type SaveFinancialsData = {
+    body: FinancialIn;
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/api/logistics/orders/{order_id}/financial';
+};
+
+export type SaveFinancialsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type SaveFinancialsError = SaveFinancialsErrors[keyof SaveFinancialsErrors];
+
+export type SaveFinancialsResponses = {
+    /**
+     * OK
+     */
+    200: FinancialOut;
+};
+
+export type SaveFinancialsResponse = SaveFinancialsResponses[keyof SaveFinancialsResponses];
+
+export type PreviewFinancialsData = {
+    body: FinancialIn;
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/api/logistics/orders/{order_id}/financial/preview';
+};
+
+export type PreviewFinancialsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type PreviewFinancialsError = PreviewFinancialsErrors[keyof PreviewFinancialsErrors];
+
+export type PreviewFinancialsResponses = {
+    /**
+     * OK
+     */
+    200: FinancialOut;
+};
+
+export type PreviewFinancialsResponse = PreviewFinancialsResponses[keyof PreviewFinancialsResponses];
+
+export type ChangeOrderStatusData = {
+    body: OrderStatusIn;
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/api/logistics/orders/{order_id}/status';
+};
+
+export type ChangeOrderStatusErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type ChangeOrderStatusError = ChangeOrderStatusErrors[keyof ChangeOrderStatusErrors];
+
+export type ChangeOrderStatusResponses = {
+    /**
+     * OK
+     */
+    200: OrderDetailOut;
+};
+
+export type ChangeOrderStatusResponse = ChangeOrderStatusResponses[keyof ChangeOrderStatusResponses];
+
+export type GetOverviewData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/logistics/overview';
+};
+
+export type GetOverviewErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type GetOverviewError = GetOverviewErrors[keyof GetOverviewErrors];
+
+export type GetOverviewResponses = {
+    /**
+     * OK
+     */
+    200: OverviewOut;
+};
+
+export type GetOverviewResponse = GetOverviewResponses[keyof GetOverviewResponses];
+
+export type ListVehiclesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/logistics/vehicles';
+};
+
+export type ListVehiclesErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+};
+
+export type ListVehiclesError = ListVehiclesErrors[keyof ListVehiclesErrors];
+
+export type ListVehiclesResponses = {
+    /**
+     * Response
+     *
+     * OK
+     */
+    200: Array<VehicleOut>;
+};
+
+export type ListVehiclesResponse = ListVehiclesResponses[keyof ListVehiclesResponses];
+
 export type CreateVehicleData = {
     body: VehicleCreateIn;
     path?: never;
@@ -986,6 +2028,52 @@ export type CreateVehicleResponses = {
 };
 
 export type CreateVehicleResponse = CreateVehicleResponses[keyof CreateVehicleResponses];
+
+export type UpdateVehicleData = {
+    body: VehicleCreateIn;
+    path: {
+        /**
+         * Vehicle Id
+         */
+        vehicle_id: string;
+    };
+    query?: never;
+    url: '/api/logistics/vehicles/{vehicle_id}';
+};
+
+export type UpdateVehicleErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Payment Required
+     */
+    402: QuotaErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+};
+
+export type UpdateVehicleError = UpdateVehicleErrors[keyof UpdateVehicleErrors];
+
+export type UpdateVehicleResponses = {
+    /**
+     * OK
+     */
+    200: VehicleOut;
+};
+
+export type UpdateVehicleResponse = UpdateVehicleResponses[keyof UpdateVehicleResponses];
 
 export type UpdateVehicleStatusData = {
     body: VehicleStatusIn;

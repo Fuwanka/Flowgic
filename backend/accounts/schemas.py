@@ -1,3 +1,5 @@
+# Входные DTO запрещают лишние поля: браузер не может передать company, is_staff или произвольное
+# повышение роли.
 from typing import Literal
 from uuid import UUID
 
@@ -111,3 +113,24 @@ class MessageOut(Schema):
 class ErrorOut(Schema):
     detail: str
     code: str
+
+
+class DriverOut(Schema):
+    """Справочник не раскрывает пароли, служебные флаги или чужую компанию."""
+    id: int
+    email: str
+    full_name: str
+    phone: str | None
+    status: User.Status
+
+
+class DriverCreateIn(EmailIn):
+    full_name: str = Field(min_length=1, max_length=255)
+    phone: str | None = Field(default=None, max_length=20)
+    password: str = Field(min_length=8, max_length=128)
+
+
+class DriverUpdateIn(InputSchema):
+    full_name: str = Field(min_length=1, max_length=255)
+    phone: str | None = Field(default=None, max_length=20)
+    status: User.Status = User.Status.ACTIVE

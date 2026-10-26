@@ -3,7 +3,8 @@ name: flowgic
 x-app: &app
   image: flowgic-backend:dev
   build:
-    context: ./backend
+    context: .
+    dockerfile: backend/Dockerfile
     target: runtime
   env_file: .env
   environment: &app-env
@@ -76,11 +77,24 @@ services:
       redis:
         condition: service_healthy
 
+  # Браузер открывает SPA; /api проксируется во внутренний backend без CORS.
+  frontend:
+    image: flowgic-frontend:dev
+    build:
+      context: .
+      dockerfile: frontend-web/Dockerfile
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      backend:
+        condition: service_started
+
   test:
     <<: *app
     image: flowgic-test:dev
     build:
-      context: ./backend
+      context: .
+      dockerfile: backend/Dockerfile
       target: test
     profiles: ["test"]
     environment:

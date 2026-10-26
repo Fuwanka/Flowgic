@@ -1,3 +1,5 @@
+# Клик сохраняется синхронно до перехода пользователя. Сервер не обращается к сайту партнёра и не
+# отправляет внешние лиды.
 from decimal import Decimal
 
 from django.db import transaction

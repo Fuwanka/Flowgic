@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ConfirmPasswordResetData, ConfirmPasswordResetErrors, ConfirmPasswordResetResponses, CreateOrderData, CreateOrderErrors, CreateOrderResponses, CreateVehicleData, CreateVehicleErrors, CreateVehicleResponses, DownloadOrderDocumentData, DownloadOrderDocumentErrors, DownloadOrderDocumentResponses, GetCompanySubscriptionData, GetCompanySubscriptionErrors, GetCompanySubscriptionResponses, GetContextualOffersData, GetContextualOffersErrors, GetContextualOffersResponses, GetProfileData, GetProfileErrors, GetProfileResponses, ListSubscriptionPlansData, ListSubscriptionPlansErrors, ListSubscriptionPlansResponses, LoginAccountData, LoginAccountErrors, LoginAccountResponses, LogoutAccountData, LogoutAccountErrors, LogoutAccountResponses, RecordOfferClickData, RecordOfferClickErrors, RecordOfferClickResponses, RefreshTokensData, RefreshTokensErrors, RefreshTokensResponses, RegisterAccountData, RegisterAccountErrors, RegisterAccountResponses, RequestPasswordResetData, RequestPasswordResetResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateVehicleStatusData, UpdateVehicleStatusErrors, UpdateVehicleStatusResponses, VerifyTokenData, VerifyTokenErrors, VerifyTokenResponses } from './types.gen';
+import type { ChangeOrderStatusData, ChangeOrderStatusErrors, ChangeOrderStatusResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ConfirmPasswordResetData, ConfirmPasswordResetErrors, ConfirmPasswordResetResponses, CreateClientData, CreateClientErrors, CreateClientResponses, CreateDriverData, CreateDriverErrors, CreateDriverResponses, CreateOrderData, CreateOrderErrors, CreateOrderResponses, CreateVehicleData, CreateVehicleErrors, CreateVehicleResponses, DownloadOrderDocumentData, DownloadOrderDocumentErrors, DownloadOrderDocumentResponses, GetCalendarData, GetCalendarErrors, GetCalendarResponses, GetCompanySubscriptionData, GetCompanySubscriptionErrors, GetCompanySubscriptionResponses, GetContextualOffersData, GetContextualOffersErrors, GetContextualOffersResponses, GetOrderData, GetOrderErrors, GetOrderResponses, GetOverviewData, GetOverviewErrors, GetOverviewResponses, GetProfileData, GetProfileErrors, GetProfileResponses, ListClientsData, ListClientsErrors, ListClientsResponses, ListDriversData, ListDriversErrors, ListDriversResponses, ListOrdersData, ListOrdersErrors, ListOrdersResponses, ListSubscriptionPlansData, ListSubscriptionPlansErrors, ListSubscriptionPlansResponses, ListVehiclesData, ListVehiclesErrors, ListVehiclesResponses, LoginAccountData, LoginAccountErrors, LoginAccountResponses, LogoutAccountData, LogoutAccountErrors, LogoutAccountResponses, PreviewFinancialsData, PreviewFinancialsErrors, PreviewFinancialsResponses, RecordOfferClickData, RecordOfferClickErrors, RecordOfferClickResponses, RefreshTokensData, RefreshTokensErrors, RefreshTokensResponses, RegisterAccountData, RegisterAccountErrors, RegisterAccountResponses, RequestPasswordResetData, RequestPasswordResetResponses, SaveFinancialsData, SaveFinancialsErrors, SaveFinancialsResponses, UpdateClientData, UpdateClientErrors, UpdateClientResponses, UpdateDriverData, UpdateDriverErrors, UpdateDriverResponses, UpdateOrderData, UpdateOrderErrors, UpdateOrderResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateVehicleData, UpdateVehicleErrors, UpdateVehicleResponses, UpdateVehicleStatusData, UpdateVehicleStatusErrors, UpdateVehicleStatusResponses, VerifyTokenData, VerifyTokenErrors, VerifyTokenResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,6 +17,41 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
+
+/**
+ * Drivers
+ */
+export const listDrivers = <ThrowOnError extends boolean = false>(options?: Options<ListDriversData, ThrowOnError>): RequestResult<ListDriversResponses, ListDriversErrors, ThrowOnError> => (options?.client ?? client).get<ListDriversResponses, ListDriversErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/accounts/drivers',
+    ...options
+});
+
+/**
+ * Create Driver
+ */
+export const createDriver = <ThrowOnError extends boolean = false>(options: Options<CreateDriverData, ThrowOnError>): RequestResult<CreateDriverResponses, CreateDriverErrors, ThrowOnError> => (options.client ?? client).post<CreateDriverResponses, CreateDriverErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/accounts/drivers',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update Driver
+ */
+export const updateDriver = <ThrowOnError extends boolean = false>(options: Options<UpdateDriverData, ThrowOnError>): RequestResult<UpdateDriverResponses, UpdateDriverErrors, ThrowOnError> => (options.client ?? client).patch<UpdateDriverResponses, UpdateDriverErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/accounts/drivers/{driver_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Logout
@@ -157,11 +192,86 @@ export const getCompanySubscription = <ThrowOnError extends boolean = false>(opt
 });
 
 /**
+ * Calendar
+ */
+export const getCalendar = <ThrowOnError extends boolean = false>(options: Options<GetCalendarData, ThrowOnError>): RequestResult<GetCalendarResponses, GetCalendarErrors, ThrowOnError> => (options.client ?? client).get<GetCalendarResponses, GetCalendarErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/calendar',
+    ...options
+});
+
+/**
+ * Clients
+ */
+export const listClients = <ThrowOnError extends boolean = false>(options?: Options<ListClientsData, ThrowOnError>): RequestResult<ListClientsResponses, ListClientsErrors, ThrowOnError> => (options?.client ?? client).get<ListClientsResponses, ListClientsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/clients',
+    ...options
+});
+
+/**
+ * Create Client
+ */
+export const createClient = <ThrowOnError extends boolean = false>(options: Options<CreateClientData, ThrowOnError>): RequestResult<CreateClientResponses, CreateClientErrors, ThrowOnError> => (options.client ?? client).post<CreateClientResponses, CreateClientErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/clients',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Edit Client
+ */
+export const updateClient = <ThrowOnError extends boolean = false>(options: Options<UpdateClientData, ThrowOnError>): RequestResult<UpdateClientResponses, UpdateClientErrors, ThrowOnError> => (options.client ?? client).put<UpdateClientResponses, UpdateClientErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/clients/{client_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Orders
+ */
+export const listOrders = <ThrowOnError extends boolean = false>(options?: Options<ListOrdersData, ThrowOnError>): RequestResult<ListOrdersResponses, ListOrdersErrors, ThrowOnError> => (options?.client ?? client).get<ListOrdersResponses, ListOrdersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/orders',
+    ...options
+});
+
+/**
  * Create Order
  */
 export const createOrder = <ThrowOnError extends boolean = false>(options: Options<CreateOrderData, ThrowOnError>): RequestResult<CreateOrderResponses, CreateOrderErrors, ThrowOnError> => (options.client ?? client).post<CreateOrderResponses, CreateOrderErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/logistics/orders',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Order
+ */
+export const getOrder = <ThrowOnError extends boolean = false>(options: Options<GetOrderData, ThrowOnError>): RequestResult<GetOrderResponses, GetOrderErrors, ThrowOnError> => (options.client ?? client).get<GetOrderResponses, GetOrderErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/orders/{order_id}',
+    ...options
+});
+
+/**
+ * Edit Order
+ */
+export const updateOrder = <ThrowOnError extends boolean = false>(options: Options<UpdateOrderData, ThrowOnError>): RequestResult<UpdateOrderResponses, UpdateOrderErrors, ThrowOnError> => (options.client ?? client).put<UpdateOrderResponses, UpdateOrderErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/orders/{order_id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -179,11 +289,81 @@ export const downloadOrderDocument = <ThrowOnError extends boolean = false>(opti
 });
 
 /**
+ * Financials
+ */
+export const saveFinancials = <ThrowOnError extends boolean = false>(options: Options<SaveFinancialsData, ThrowOnError>): RequestResult<SaveFinancialsResponses, SaveFinancialsErrors, ThrowOnError> => (options.client ?? client).put<SaveFinancialsResponses, SaveFinancialsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/orders/{order_id}/financial',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Preview Financials
+ */
+export const previewFinancials = <ThrowOnError extends boolean = false>(options: Options<PreviewFinancialsData, ThrowOnError>): RequestResult<PreviewFinancialsResponses, PreviewFinancialsErrors, ThrowOnError> => (options.client ?? client).post<PreviewFinancialsResponses, PreviewFinancialsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/orders/{order_id}/financial/preview',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Order Status
+ */
+export const changeOrderStatus = <ThrowOnError extends boolean = false>(options: Options<ChangeOrderStatusData, ThrowOnError>): RequestResult<ChangeOrderStatusResponses, ChangeOrderStatusErrors, ThrowOnError> => (options.client ?? client).patch<ChangeOrderStatusResponses, ChangeOrderStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/orders/{order_id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Overview
+ */
+export const getOverview = <ThrowOnError extends boolean = false>(options?: Options<GetOverviewData, ThrowOnError>): RequestResult<GetOverviewResponses, GetOverviewErrors, ThrowOnError> => (options?.client ?? client).get<GetOverviewResponses, GetOverviewErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/overview',
+    ...options
+});
+
+/**
+ * Vehicles
+ */
+export const listVehicles = <ThrowOnError extends boolean = false>(options?: Options<ListVehiclesData, ThrowOnError>): RequestResult<ListVehiclesResponses, ListVehiclesErrors, ThrowOnError> => (options?.client ?? client).get<ListVehiclesResponses, ListVehiclesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/vehicles',
+    ...options
+});
+
+/**
  * Create Vehicle
  */
 export const createVehicle = <ThrowOnError extends boolean = false>(options: Options<CreateVehicleData, ThrowOnError>): RequestResult<CreateVehicleResponses, CreateVehicleErrors, ThrowOnError> => (options.client ?? client).post<CreateVehicleResponses, CreateVehicleErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/logistics/vehicles',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Edit Vehicle
+ */
+export const updateVehicle = <ThrowOnError extends boolean = false>(options: Options<UpdateVehicleData, ThrowOnError>): RequestResult<UpdateVehicleResponses, UpdateVehicleErrors, ThrowOnError> => (options.client ?? client).put<UpdateVehicleResponses, UpdateVehicleErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/logistics/vehicles/{vehicle_id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',

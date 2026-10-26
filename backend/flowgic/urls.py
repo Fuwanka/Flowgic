@@ -1,3 +1,5 @@
+# Старые HTML-маршруты и /api существуют параллельно. Nginx SPA проксирует только /api на этот
+# backend.
 """
 URL configuration for flowgic project.
 

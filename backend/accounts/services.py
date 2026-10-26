@@ -1,3 +1,5 @@
+# Граница записи accounts: пароли, пользователи и токены меняются здесь; другие модули вызывают
+# публичные функции.
 """Account business rules shared by the JWT API and existing HTML views."""
 import secrets
 import time
@@ -20,6 +22,41 @@ from .exceptions import AccountError, authentication_failed
 from .models import PasswordResetCode, User
 from .security import normalize_email, password_stamp, private_cache_key
 from .tasks import send_password_reset_email
+from .permissions import require_operator
+
+
+@transaction.atomic
+def create_driver(user, *, email, full_name, password, phone=None):
+    require_operator(user)
+    email, full_name = normalize_email(email), full_name.strip()
+    if not full_name:
+        raise AccountError('Укажите ФИО водителя.')
+    if selectors.find_user_by_email(email):
+        raise AccountError('Этот email уже используется.', code='email_exists', status=409)
+    driver = User(company=user.company, email=email, full_name=full_name, phone=phone,
+                  role=User.Role.Driver, status=User.Status.ACTIVE)
+    _validate_password(password, driver)
+    driver.set_password(password)
+    try:
+        with transaction.atomic():
+            driver.save()
+    except IntegrityError as error:
+        raise AccountError('Этот email уже используется.', code='email_exists', status=409) from error
+    return driver
+
+
+@transaction.atomic
+def update_driver(user, driver_id, *, full_name, phone=None, status='active'):
+    from django.shortcuts import get_object_or_404
+    require_operator(user)
+    driver = get_object_or_404(
+        User.objects.filter(company=user.company, role=User.Role.Driver).select_for_update(), pk=driver_id,
+    )
+    if status not in User.Status.values or not full_name.strip():
+        raise AccountError('Укажите ФИО и корректный статус водителя.')
+    driver.full_name, driver.phone, driver.status = full_name.strip(), phone, status
+    driver.save(update_fields=['full_name', 'phone', 'status'])
+    return driver
 
 
 def _ensure_active(user):

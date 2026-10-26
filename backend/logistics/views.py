@@ -1,3 +1,5 @@
+# Сессионные HTML-страницы сохранены для совместимости. Новая SPA работает через logistics/api.py и
+# сервисный слой.
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required

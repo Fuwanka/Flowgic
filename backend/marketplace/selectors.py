@@ -1,3 +1,5 @@
+# Контекст учитывает только собственные финансы и автопарк. Чужие заказы исключаются до формирования
+# ответа.
 """Read-only access to the shared/tenant catalog and company click history."""
 from decimal import Decimal
 

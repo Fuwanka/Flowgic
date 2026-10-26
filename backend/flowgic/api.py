@@ -1,3 +1,5 @@
+# Единая точка сборки модулей и формата ошибок. Общие обработчики не возвращают traceback, пароли
+# или значения JWT.
 from django.core.exceptions import PermissionDenied, ValidationError as DjangoValidationError
 from django.http import Http404
 from ninja import NinjaAPI

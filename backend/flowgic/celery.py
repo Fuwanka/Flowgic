@@ -1,3 +1,5 @@
+# Worker получает настройки Django и Redis из окружения. Фоновые задачи не определяют разрешение на
+# превышение квоты.
 """Celery application; connection settings are shared with Django."""
 import os
 

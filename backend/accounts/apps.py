@@ -1,3 +1,4 @@
+# Регистрация Django-приложения accounts; бизнес-правила не выполняются при импорте конфигурации.
 from django.apps import AppConfig
 
 

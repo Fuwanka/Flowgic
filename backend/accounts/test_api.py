@@ -366,4 +366,4 @@ def test_http_routes_and_openapi(db, client):
     assert schema['paths']['/api/accounts/token']['post']['operationId'] == 'loginAccount'
     assert schema['paths']['/api/accounts/me']['get']['security']
     account_paths = {path for path in schema['paths'] if path.startswith('/api/accounts/')}
-    assert len(account_paths) == 9
+    assert len(account_paths) == 11

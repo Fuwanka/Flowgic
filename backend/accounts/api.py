@@ -1,3 +1,5 @@
+# Публичные операции входа не требуют JWT. Профиль и водители используют jwt_auth; company из
+# payload не принимается.
 """Transport adapters only: validation, authentication, application calls, output."""
 from ninja import Router, Status
 
@@ -7,10 +9,26 @@ from .schemas import (
     EmailIn, ErrorOut, LoginIn, MessageOut, PasswordChangeIn,
     PasswordResetConfirmIn, ProfileOut, ProfileUpdateIn, RefreshIn,
     RegistrationIn, RegistrationOut, TokenPairOut, VerifyIn,
+    DriverCreateIn, DriverOut, DriverUpdateIn,
 )
 
 router = Router(tags=['accounts'])
 RESET_MESSAGE = 'Если аккаунт существует, письмо с кодом будет отправлено.'
+
+
+@router.get('/drivers', auth=jwt_auth, response={200: list[DriverOut], 401: ErrorOut, 403: ErrorOut}, operation_id='listDrivers')
+def drivers(request):
+    return selectors.get_company_drivers(request.auth)
+
+
+@router.post('/drivers', auth=jwt_auth, response={201: DriverOut, 400: ErrorOut, 401: ErrorOut, 403: ErrorOut, 409: ErrorOut}, operation_id='createDriver')
+def create_driver(request, payload: DriverCreateIn):
+    return Status(201, services.create_driver(request.auth, **payload.model_dump()))
+
+
+@router.patch('/drivers/{driver_id}', auth=jwt_auth, response={200: DriverOut, 400: ErrorOut, 401: ErrorOut, 403: ErrorOut, 404: ErrorOut}, operation_id='updateDriver')
+def update_driver(request, driver_id: int, payload: DriverUpdateIn):
+    return services.update_driver(request.auth, driver_id, **payload.model_dump())
 
 
 @router.post('/register', response={201: RegistrationOut, 400: ErrorOut, 409: ErrorOut}, operation_id='registerAccount')

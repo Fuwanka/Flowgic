@@ -1,3 +1,5 @@
+# Селекторы не создают FREE-подписку: ленивое подключение и любые записи остаются в публичных
+# сервисах.
 """Read-only queries; a caller must supply its already-authorized company."""
 from .models import CompanySubscription, SubscriptionPlan
 

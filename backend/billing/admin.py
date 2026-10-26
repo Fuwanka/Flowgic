@@ -1,3 +1,4 @@
+# Планы и подписки изменяет администратор; list_select_related заранее загружает связи для таблицы.
 from django.contrib import admin
 
 from .models import CompanySubscription, SubscriptionPlan

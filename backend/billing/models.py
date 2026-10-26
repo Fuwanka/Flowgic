@@ -1,3 +1,5 @@
+# Планы — общий каталог; CompanySubscription — строго одна подписка компании. NULL лимита означает
+# отсутствие ограничения.
 from django.db import models
 
 

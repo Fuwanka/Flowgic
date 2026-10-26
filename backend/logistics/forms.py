@@ -1,3 +1,5 @@
+# ModelChoiceField получает только ресурсы своей компании; изменение HTML/select в браузере не
+# расширяет queryset.
 from django import forms
 from .models import Order, Client
 from accounts.models import User

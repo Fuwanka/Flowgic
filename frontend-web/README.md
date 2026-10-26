@@ -1,7 +1,26 @@
-# Типизированный клиент Flowgic
+# Frontend Flowgic
 
-На этапе 2 здесь размещены только генератор и API-клиент. SPA React/Vite относится
-к следующему этапу. Требуется Node.js 22.18 или новее.
+React + Vite + TypeScript, Ant Design, TanStack Query и React Router.
+Требуется Node.js 22.18 или новее. Docker frontend доступен на http://localhost:5173.
+
+```powershell
+cd frontend-web
+npm ci --ignore-scripts
+npm run dev
+# Проверки и production-бандл:
+npm test
+npm run build
+```
+
+Backend должен работать на localhost:8000. Vite проксирует `/api`; адрес можно
+изменить через `API_PROXY_TARGET`. Docker использует Nginx с таким же proxy.
+Если порт 5173 занят контейнером, остановите frontend или используйте `--port 5174`.
+
+`src/pages` — экраны; `src/components` — формы и блоки; `src/lib` — JWT-сессия,
+ошибки и форматирование; `src/client` — сгенерированный SDK. Подробная архитектура,
+правила кеша/refresh и инструкция пользователя: [TRANSFORMATION.md](../TRANSFORMATION.md).
+
+## Генерация типизированного клиента
 
 Из корня репозитория:
 

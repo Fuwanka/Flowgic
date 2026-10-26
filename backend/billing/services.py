@@ -1,3 +1,5 @@
+# Redis ускоряет отображение, но не разрешает запись: решение о квоте принимает PostgreSQL под
+# транзакционной блокировкой.
 """Freemium rules, subscription writes and Redis-backed usage presentation.
 
 Quota checks deliberately count authoritative rows while the caller holds the

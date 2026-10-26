@@ -39,6 +39,19 @@ docker compose run --rm backend python manage.py makemigrations --check --dry-ru
 
 ## Состав
 
+- `frontend-web/src/lib/*.test.ts`: единая ротация JWT, выход во время refresh,
+  смена аккаунта, истечение сессии, сетевые/валидационные ошибки и HTTP 402.
+- `backend/logistics/test_spa_api.py`: API карточки, списков/календаря,
+  финансового предпросмотра и справочников; изоляция и транзакционный откат.
+- `backend/tests/test_spa_browser.py`: production React SPA через живой Django API,
+  создание заказа/клиента/водителя, финансовый расчёт, DOCX, квота, новый tenant,
+  reload, мобильная навигация и ограничение водительской роли.
+
+Docker test сам собирает SPA из исходников. Для pytest на хосте сначала выполните
+`npm ci --prefix frontend-web`, `npm run build --prefix frontend-web` и установите
+системные зависимости GeoDjango и Chromium. Путь к готовому бандлу можно указать
+в `SPA_DIST`. Не подменяйте API в этих сквозных тестах фиктивными ответами.
+
 - `backend/accounts/tests.py`: пользователи, роли, пароли, тема.
 - `backend/accounts/test_api.py`: Ninja TestClient, JWT, профиль, регистрация,
   одноразовый сброс пароля, лимиты Redis, отзыв токенов и HTTP/OpenAPI.

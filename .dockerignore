@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+.local
+venv
+.venv
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/dist
+**/test-results
+**/*.sqlite3*
+**/*.log
+**/staticfiles
+**/media
+.codex
+.agents

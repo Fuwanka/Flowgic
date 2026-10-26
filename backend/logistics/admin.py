@@ -1,3 +1,5 @@
+# Административная работа с доменными данными; штатные пользователи SPA работают через tenant-scoped
+# API.
 from django.contrib import admin
 from .models import Company, Vehicle, Order
 

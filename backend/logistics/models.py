@@ -1,3 +1,6 @@
+# Расчёт Financial.save сохраняет исходное правило: клиент минус водитель минус топливо;
+# third_party_cost хранится отдельно.
+"""Доменная схема TMS; принадлежность заказа определяется через client.company."""
 import uuid
 from django.db import models
 from django.conf import settings
@@ -427,19 +430,13 @@ class Financial(models.Model):
         verbose_name_plural = 'Финансовые данные'
 
     def save(self, *args, **kwargs):
-        """Автоматически вычисляем прибыль при сохранении"""
-        # --- Расчёт топлива ---
-        if self.fuel_expenses is None:
-            if self.order.distance_km and self.order.distance_km > 0:
-                AVERAGE_FUEL_CONSUMPTION_L_PER_100KM = Decimal('30.0')
-                DIESEL_PRICE_PER_LITER = Decimal('82.0')
-                fuel_liters = (self.order.distance_km / 100) * AVERAGE_FUEL_CONSUMPTION_L_PER_100KM
-                self.fuel_expenses = fuel_liters * DIESEL_PRICE_PER_LITER
-            else:
-                self.fuel_expenses = Decimal('0.00')
-
-        # --- Расчёт прибыли ---
-        self.profit = self.client_cost - self.fuel_expenses - self.driver_cost
+        """Одинаковый результат при записи из SPA, старой формы или фабрики."""
+        from .calculations import calculate_financials
+        result = calculate_financials(
+            client_cost=self.client_cost, driver_cost=self.driver_cost,
+            fuel_expenses=self.fuel_expenses, distance_km=self.order.distance_km,
+        )
+        self.fuel_expenses, self.profit = result['fuel_expenses'], result['profit']
         super().save(*args, **kwargs)
 
     def __str__(self):

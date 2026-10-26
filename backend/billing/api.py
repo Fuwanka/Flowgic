@@ -1,3 +1,5 @@
+# Каталог доступен операторам; подписка и счётчики всегда относятся к request.auth.company, а не к
+# параметрам URL.
 from ninja import Router
 
 from accounts.authentication import jwt_auth
