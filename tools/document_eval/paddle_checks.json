@@ -1,0 +1,28 @@
+{
+  "scope":"Predeclared visual text anchors, not complete business-field gold labels. Bounds are x,y,width,height in percent. Numeric punctuation is preserved; whitespace and letter case are ignored.",
+  "annotation_corrections":"Source review corrected two FORMZ monetary ROIs, retained source thousands apostrophes, widened TORG sender ROI to its full printed line, corrected two passport ROI positions and the HSE amount ROI. Original draft kept locally in checks-before-source-review.json. This is a smoke test, not a blinded benchmark.",
+  "checks":[
+    {"id":"ttn-number","file":"images/pickform-ttn-example-p001.png","bbox":[81,16,11,4],"expected":"126"},
+    {"id":"ttn-russian-cargo","file":"images/pickform-ttn-example-p001.png","bbox":[32,44,27,7],"expected":"Телевизор"},
+    {"id":"ttn-net-mass","file":"images/pickform-ttn-example-p001.png","bbox":[56,54,8,5],"expected":"0,53"},
+    {"id":"ttn-gross-mass","file":"images/pickform-ttn-example-p001.png","bbox":[56,59,8,5],"expected":"0,6"},
+    {"id":"upd-number","file":"images/vrnlom-upd-p001.png","bbox":[21,12,7,5],"expected":"703"},
+    {"id":"upd-sender-inn","file":"images/vrnlom-upd-p001.png","bbox":[24,26,14,5],"expected":"3600000000"},
+    {"id":"upd-recipient-inn","file":"images/vrnlom-upd-p001.png","bbox":[67,24,23,5],"expected":"3664063243"},
+    {"id":"upd-mass","file":"images/vrnlom-upd-p001.png","bbox":[37,49,5,5],"expected":"20,930"},
+    {"id":"upd-cargo-amount","file":"images/vrnlom-upd-p001.png","bbox":[49,49,7,5],"expected":"535808,00"},
+    {"id":"upd-russian-cargo","file":"images/vrnlom-upd-p001.png","bbox":[12,49,20,10],"expected":"Лом и отходы черных металлов"},
+    {"id":"torg-russian-cargo","file":"images/itokna-torg12-p001.png","bbox":[6,52,28,4],"expected":"Подоконник ПВХ 500мм"},
+    {"id":"torg-decimal-price","file":"images/itokna-torg12-p001.png","bbox":[61,44,7,4],"expected":"29952,87"},
+    {"id":"torg-date","file":"images/itokna-torg12-p001.png","bbox":[45,33,10,4],"expected":"03.10.2016"},
+    {"id":"torg-sender-inn","file":"images/itokna-torg12-p001.png","bbox":[12,7,70,5],"expected":"4205191385"},
+    {"id":"formz-leading-zeros","file":"images/formz-ttn-p001.png","bbox":[83,14,10,5],"expected":"000289"},
+    {"id":"formz-amount","file":"images/formz-ttn-p001.png","bbox":[78,69,9,5],"expected":"40'516.18"},
+    {"id":"formz-freight","file":"images/formz-ttn-p001.png","bbox":[78,62,9,5],"expected":"3'000.00"},
+    {"id":"negative-passport-title","file":"images/tinert-quality-passport-p001.png","bbox":[22,24,14,4],"expected":"Паспорт"},
+    {"id":"negative-passport-cargo","file":"images/tinert-quality-passport-p001.png","bbox":[5,29,42,4],"expected":"Щебень доломитовый"},
+    {"id":"blank-request-title","file":"images/agt-request-p001.png","bbox":[3,3,32,5],"expected":"ДОГОВОР-ЗАЯВКА"},
+    {"id":"hse-upd-number","file":"images/hse-upd-p024.png","bbox":[31,8,7,4],"expected":"243"},
+    {"id":"hse-upd-amount","file":"images/hse-upd-p024.png","bbox":[72,24,7,6],"expected":"19200,00"}
+  ]
+}

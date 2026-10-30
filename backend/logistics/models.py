@@ -267,6 +267,7 @@ class OrderEvent(models.Model):
         TEMPERATURE_VIOLATION = 'temperature_violation', 'Нарушение температурного режима'
         DELIVERED = 'delivered', 'Доставлен'
         DOCUMENT_SIGNED = 'document_signed', 'Документ подписан'
+        DOCUMENT_REVIEWED = 'document_reviewed', 'Реквизиты документа проверены'
         STATUS_CHANGED = 'status_changed', 'Изменение статуса'
         PAYMENT_UPDATED = 'payment_updated', 'Обновление оплаты'
         LOCATION_UPDATE = 'location_update', 'Обновление местоположения'

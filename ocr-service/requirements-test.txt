@@ -1,0 +1,6 @@
+# HTTP/decoder tests deliberately do not install Paddle weights or frameworks.
+fastapi==0.162.0
+python-multipart==0.0.32
+pypdfium2==5.14.0
+Pillow==13.0.0
+httpx==0.28.1

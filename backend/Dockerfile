@@ -15,7 +15,8 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends binutils gdal-bin libgeos-c1v5 libproj25 \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --create-home --uid 1000 app
+    && useradd --create-home --uid 1000 app \
+    && mkdir /ocr-private && chown app:app /ocr-private
 COPY backend/requirements.txt .
 RUN pip install -r requirements.txt
 

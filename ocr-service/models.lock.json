@@ -1,0 +1,56 @@
+[
+  {
+    "repository": "PaddlePaddle/PP-OCRv5_mobile_det",
+    "revision": "0d63e78e2b680928f6b1747d76a08db6e645efb7",
+    "license": "apache-2.0",
+    "files": [
+      {
+        "file": "README.md",
+        "sha256": "4cc20ad6d41af86b3ce9885ffb0956e152574a2eb14179aeb07fd2d3956161ca",
+        "bytes": 16243
+      },
+      {
+        "file": "inference.json",
+        "sha256": "05feef1acb00aa4cd7362b15f7f501fc4f99d7b1fa73c1c871e0c7b1504b0f5c",
+        "bytes": 229777
+      },
+      {
+        "file": "inference.pdiparams",
+        "sha256": "afa1820cb16c1fd0dad589d0f8b389139061c1ef6d68019685fd07be997dda5b",
+        "bytes": 4692937
+      },
+      {
+        "file": "inference.yml",
+        "sha256": "98069072e1b6b37d727fd9d9f11725faa46d6ea0de012f2ed26caea011c37699",
+        "bytes": 903
+      }
+    ]
+  },
+  {
+    "repository": "PaddlePaddle/eslav_PP-OCRv5_mobile_rec",
+    "revision": "7553801264d3379d8d2e854971989e5e26c22e03",
+    "license": "apache-2.0",
+    "files": [
+      {
+        "file": "README.md",
+        "sha256": "94d07e4ca7feb869cad02e41dece52ed64ad93df4340bd8dd901d644067090e5",
+        "bytes": 6765
+      },
+      {
+        "file": "inference.json",
+        "sha256": "3fb6e2e658f5139ff16e35260de8f0577f106a9505c902e1dfc1f4f1d03cc9cb",
+        "bytes": 217712
+      },
+      {
+        "file": "inference.pdiparams",
+        "sha256": "f11057b05d8517868bca505271278973d706600d9dcc184cbcf5c4512091c32b",
+        "bytes": 7811519
+      },
+      {
+        "file": "inference.yml",
+        "sha256": "025039bac23eb4a308efcefa4d58eab3af440767815c6ba6938468bf6353ee5a",
+        "bytes": 4538
+      }
+    ]
+  }
+]

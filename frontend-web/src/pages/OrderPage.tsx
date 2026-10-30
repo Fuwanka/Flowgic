@@ -37,6 +37,7 @@ import {
 import { OrderForm } from "../components/OrderForm";
 import { FinancialPanel } from "../components/FinancialPanel";
 import { OfferPanel } from "../components/OfferPanel";
+import { DocumentProcessingPanel } from "../components/DocumentProcessingPanel";
 
 export function OrderPage() {
   const { id = "" } = useParams();
@@ -271,6 +272,7 @@ export function OrderPage() {
           </section>
         </aside>
       </div>
+      <DocumentProcessingPanel orderId={id} />
       <OfferPanel orderId={id} />
       <OrderForm open={edit} onClose={() => setEdit(false)} order={order} />
     </>

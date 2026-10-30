@@ -1,0 +1,4 @@
+# Evaluation only. Keep ML dependencies out of the Django application's environment.
+paddlepaddle==3.2.1
+paddleocr==3.7.0
+paddlex==3.7.2

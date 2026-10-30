@@ -1,0 +1,16 @@
+[
+  {"id":"fura-tn-ttn","title":"FURA: примеры ТН и ТТН","url":"https://legal.fura.ru/Образец заполнения ТТН и ТН.pdf","family":"mixed_tn_ttn","kind":"published_example","industry":"general","pages":"all"},
+  {"id":"formz-ttn","title":"FORMZ: заполненная ТТН 1-Т","url":"https://www.formz.ru/media/formz/samples/ttn.pdf","family":"ttn_1t","kind":"published_example","industry":"general","pages":"all"},
+  {"id":"pickform-ttn-example","title":"Pickform: образец ТТН 1-Т","url":"https://pickform.ru/wp-content/uploads/dokumenti/documentstransportation/TTN--obrazec.pdf","family":"ttn_1t","kind":"published_example","industry":"unknown","pages":"all"},
+  {"id":"pickform-ttn-blank","title":"Pickform: пустая ТТН 1-Т","url":"https://pickform.ru/wp-content/uploads/dokumenti/documentstransportation/TTN--blank.pdf","family":"ttn_1t","kind":"blank_template","industry":"not_applicable","pages":"all"},
+  {"id":"vrnlom-upd","title":"Воронеж-Втормет: образец УПД на лом металлов","url":"https://vrnlom.ru/wp-content/uploads/2023/01/upd.pdf","family":"upd","kind":"published_example","industry":"industrial_metals","pages":"all"},
+  {"id":"itokna-torg12","title":"IT Окна: ТОРГ-12 с отделочными материалами","url":"https://www.itokna.ru/images/ksb-torg12.pdf","family":"torg12","kind":"published_example","industry":"construction","pages":"all"},
+  {"id":"itt-request","title":"Негабарит18: частично заполненная заявка на металлопрокат","url":"https://itt18.ru/static/documents/dogovor-zayavka.pdf","family":"transport_request","kind":"partially_filled_template","industry":"construction_metals","pages":"all"},
+  {"id":"agt-request","title":"АГТ: бланк договора-заявки","url":"https://www.agtspb.ru/doc/dokument/dogovor-zayavka_na_perevozku.pdf","family":"transport_request","kind":"blank_template","industry":"general","pages":"all"},
+  {"id":"tinert-quality-passport","title":"ТИНЕРТ: паспорт щебня 20–40, смежный документ","url":"https://tinert.ru/wp-content/uploads/2025/02/passport_sheben_iz_20_40.pdf","family":"quality_passport","kind":"partially_filled_template","industry":"construction_aggregates","pages":"all"},
+  {"id":"rosnou-logistics","title":"РосНОУ: учебные транспортные документы, включая стройсмеси","url":"https://rosnou.ru/uploads/file/c/4/d/c4d2e0f4723611d19f23e70d511de222.pdf","family":"reference_handbook","kind":"educational_material","industry":"construction_and_general","pages":[]},
+  {"id":"hse-documents","title":"НИУ ВШЭ: памятка с примерами ТОРГ-12 и УПД","url":"https://www.hse.ru/mirror/pubs/share/446835304.pdf","family":"reference_handbook","kind":"educational_material","industry":"general","pages":[]},
+  {"id":"metro-torg12","title":"METRO: макет ТОРГ-12 для поставщиков","url":"https://supplier-support.metro-cc.ru/Документы/TORG_12.pdf","family":"torg12","kind":"partially_filled_template","industry":"retail","pages":"all"},
+  {"id":"metro-upd","title":"METRO: макет УПД для ТЦ и PAXD","url":"https://supplier-support.metro-cc.ru/Документы/UPD-obrazets-01.07.2021.pdf","family":"upd","kind":"partially_filled_template","industry":"retail","pages":"all"},
+  {"id":"metro-upd-bbxd","title":"METRO: макет УПД для BBXD","url":"https://supplier-support.metro-cc.ru/Документы/UPD-BBXD-obrazets-01.07.2021.pdf","family":"upd","kind":"partially_filled_template","industry":"retail","pages":"all"}
+]

@@ -118,6 +118,30 @@ export type CompanyOut = {
 };
 
 /**
+ * ConfirmIn
+ */
+export type ConfirmIn = {
+    /**
+     * Apply To Order
+     */
+    apply_to_order?: boolean;
+    /**
+     * Document Type
+     */
+    document_type: 'tn' | 'ttn' | 'torg12' | 'upd' | 'request' | 'other';
+    /**
+     * Fields
+     */
+    fields: {
+        [key: string]: string | null;
+    };
+    /**
+     * Version
+     */
+    version: number;
+};
+
+/**
  * DriverCreateIn
  */
 export type DriverCreateIn = {
@@ -225,6 +249,50 @@ export type EventOut = {
      * Id
      */
     id: string;
+};
+
+/**
+ * EvidenceOut
+ */
+export type EvidenceOut = {
+    /**
+     * Bbox
+     */
+    bbox: Array<number>;
+    /**
+     * Page
+     */
+    page: number;
+    /**
+     * Text
+     */
+    text: string;
+};
+
+/**
+ * ExtractedFieldOut
+ */
+export type ExtractedFieldOut = {
+    /**
+     * Confidence
+     */
+    confidence?: number | null;
+    /**
+     * Evidence
+     */
+    evidence?: Array<EvidenceOut>;
+    /**
+     * Raw Text
+     */
+    raw_text?: string | null;
+    /**
+     * Review Required
+     */
+    review_required?: boolean;
+    /**
+     * Value
+     */
+    value?: string | null;
 };
 
 /**
@@ -340,6 +408,20 @@ export type OfferOut = {
      * Title
      */
     title: string;
+};
+
+/**
+ * OrderChangeOut
+ */
+export type OrderChangeOut = {
+    /**
+     * Current
+     */
+    current: string | null;
+    /**
+     * Proposed
+     */
+    proposed: string | null;
 };
 
 /**
@@ -767,6 +849,86 @@ export type PlanOut = {
  * PlanType
  */
 export type PlanType = 'FREE' | 'PRO' | 'ENTERPRISE';
+
+/**
+ * ProcessingListOut
+ */
+export type ProcessingListOut = {
+    /**
+     * Items
+     */
+    items: Array<ProcessingOut>;
+};
+
+/**
+ * ProcessingOut
+ */
+export type ProcessingOut = {
+    /**
+     * Confirmed At
+     */
+    confirmed_at: string | null;
+    /**
+     * Confirmed By Id
+     */
+    confirmed_by_id: number | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Document Type
+     */
+    document_type: 'auto' | 'tn' | 'ttn' | 'torg12' | 'upd' | 'request' | 'other';
+    /**
+     * Engine
+     */
+    engine: string | null;
+    /**
+     * Error
+     */
+    error: string | null;
+    /**
+     * Fields
+     */
+    fields: {
+        [key: string]: ExtractedFieldOut;
+    };
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Order Changes
+     */
+    order_changes: {
+        [key: string]: OrderChangeOut;
+    };
+    /**
+     * Order Id
+     */
+    order_id: string;
+    /**
+     * Original Filename
+     */
+    original_filename: string;
+    /**
+     * Status
+     */
+    status: 'queued' | 'processing' | 'needs_review' | 'confirmed' | 'failed';
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    /**
+     * Version
+     */
+    version: number;
+    /**
+     * Warnings
+     */
+    warnings: Array<string>;
+};
 
 /**
  * ProfileOut
@@ -1454,6 +1616,348 @@ export type GetCompanySubscriptionResponses = {
 };
 
 export type GetCompanySubscriptionResponse = GetCompanySubscriptionResponses[keyof GetCompanySubscriptionResponses];
+
+export type GetProcessedDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * Document Id
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/api/document-processing/documents/{document_id}';
+};
+
+export type GetProcessedDocumentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+    /**
+     * Conflict
+     */
+    409: ErrorOut;
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorOut;
+    /**
+     * Too Many Requests
+     */
+    429: ErrorOut;
+};
+
+export type GetProcessedDocumentError = GetProcessedDocumentErrors[keyof GetProcessedDocumentErrors];
+
+export type GetProcessedDocumentResponses = {
+    /**
+     * OK
+     */
+    200: ProcessingOut;
+};
+
+export type GetProcessedDocumentResponse = GetProcessedDocumentResponses[keyof GetProcessedDocumentResponses];
+
+export type ConfirmProcessedDocumentData = {
+    body: ConfirmIn;
+    path: {
+        /**
+         * Document Id
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/api/document-processing/documents/{document_id}/confirm';
+};
+
+export type ConfirmProcessedDocumentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+    /**
+     * Conflict
+     */
+    409: ErrorOut;
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorOut;
+    /**
+     * Too Many Requests
+     */
+    429: ErrorOut;
+};
+
+export type ConfirmProcessedDocumentError = ConfirmProcessedDocumentErrors[keyof ConfirmProcessedDocumentErrors];
+
+export type ConfirmProcessedDocumentResponses = {
+    /**
+     * OK
+     */
+    200: ProcessingOut;
+};
+
+export type ConfirmProcessedDocumentResponse = ConfirmProcessedDocumentResponses[keyof ConfirmProcessedDocumentResponses];
+
+export type DownloadProcessedDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * Document Id
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/api/document-processing/documents/{document_id}/file';
+};
+
+export type DownloadProcessedDocumentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+    /**
+     * Conflict
+     */
+    409: ErrorOut;
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorOut;
+    /**
+     * Too Many Requests
+     */
+    429: ErrorOut;
+};
+
+export type DownloadProcessedDocumentError = DownloadProcessedDocumentErrors[keyof DownloadProcessedDocumentErrors];
+
+export type DownloadProcessedDocumentResponses = {
+    /**
+     * Response
+     *
+     * OK
+     */
+    200: Blob | File;
+};
+
+export type DownloadProcessedDocumentResponse = DownloadProcessedDocumentResponses[keyof DownloadProcessedDocumentResponses];
+
+export type RetryProcessedDocumentData = {
+    body?: never;
+    path: {
+        /**
+         * Document Id
+         */
+        document_id: string;
+    };
+    query?: never;
+    url: '/api/document-processing/documents/{document_id}/retry';
+};
+
+export type RetryProcessedDocumentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+    /**
+     * Conflict
+     */
+    409: ErrorOut;
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorOut;
+    /**
+     * Too Many Requests
+     */
+    429: ErrorOut;
+};
+
+export type RetryProcessedDocumentError = RetryProcessedDocumentErrors[keyof RetryProcessedDocumentErrors];
+
+export type RetryProcessedDocumentResponses = {
+    /**
+     * OK
+     */
+    200: ProcessingOut;
+};
+
+export type RetryProcessedDocumentResponse = RetryProcessedDocumentResponses[keyof RetryProcessedDocumentResponses];
+
+export type ListOrderDocumentsData = {
+    body?: never;
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/api/document-processing/orders/{order_id}/documents';
+};
+
+export type ListOrderDocumentsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+    /**
+     * Conflict
+     */
+    409: ErrorOut;
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorOut;
+    /**
+     * Too Many Requests
+     */
+    429: ErrorOut;
+};
+
+export type ListOrderDocumentsError = ListOrderDocumentsErrors[keyof ListOrderDocumentsErrors];
+
+export type ListOrderDocumentsResponses = {
+    /**
+     * OK
+     */
+    200: ProcessingListOut;
+};
+
+export type ListOrderDocumentsResponse = ListOrderDocumentsResponses[keyof ListOrderDocumentsResponses];
+
+export type UploadOrderDocumentData = {
+    /**
+     * MultiPartBodyParams
+     */
+    body: {
+        /**
+         * Document Type
+         */
+        document_type?: 'auto' | 'tn' | 'ttn' | 'torg12' | 'upd' | 'request' | 'other';
+        /**
+         * File
+         */
+        file: Blob | File;
+        /**
+         * Upload Key
+         */
+        upload_key: string;
+    };
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: string;
+    };
+    query?: never;
+    url: '/api/document-processing/orders/{order_id}/documents';
+};
+
+export type UploadOrderDocumentErrors = {
+    /**
+     * Bad Request
+     */
+    400: ErrorOut;
+    /**
+     * Unauthorized
+     */
+    401: ErrorOut;
+    /**
+     * Forbidden
+     */
+    403: ErrorOut;
+    /**
+     * Not Found
+     */
+    404: ErrorOut;
+    /**
+     * Conflict
+     */
+    409: ErrorOut;
+    /**
+     * Unprocessable Entity
+     */
+    422: ErrorOut;
+    /**
+     * Too Many Requests
+     */
+    429: ErrorOut;
+};
+
+export type UploadOrderDocumentError = UploadOrderDocumentErrors[keyof UploadOrderDocumentErrors];
+
+export type UploadOrderDocumentResponses = {
+    /**
+     * OK
+     */
+    200: ProcessingOut;
+};
+
+export type UploadOrderDocumentResponse = UploadOrderDocumentResponses[keyof UploadOrderDocumentResponses];
 
 export type GetCalendarData = {
     body?: never;

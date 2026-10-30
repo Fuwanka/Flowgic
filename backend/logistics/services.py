@@ -15,6 +15,37 @@ from .calculations import calculate_financials
 from decimal import Decimal, ROUND_HALF_UP
 
 
+class OrderReviewConflict(Exception):
+    pass
+
+
+@transaction.atomic
+def record_reviewed_document(user, order_id, *, document_id, changes, baseline):
+    """Public boundary for reviewed OCR imports; financial rows stay independently managed."""
+    _require_operator(user)
+    order = get_object_or_404(Order.objects.filter(client__company=user.company).select_for_update(), pk=order_id)
+    if set(changes) - {'cargo_type', 'cargo_mass_kg', 'origin', 'destination', 'agreed_price'}:
+        raise ValidationError('Недопустимые поля импорта документа.')
+    applied = {}
+    for key, value in changes.items():
+        previous = getattr(order, key)
+        current = None if previous is None else str(previous)
+        proposed = None if value is None else str(value)
+        if current == proposed:
+            continue
+        if current != baseline.get(key):
+            raise OrderReviewConflict('Заказ изменён после загрузки документа. Подтвердите реквизиты без переноса и внесите изменения в актуальную карточку заказа.')
+        applied[key] = {'before': current, 'after': proposed}
+        setattr(order, key, value)
+    if applied:
+        order.full_clean()
+        order.save(update_fields=[*applied, 'updated_at'])
+    OrderEvent.objects.create(order=order, event_type=OrderEvent.EventType.DOCUMENT_REVIEWED, event_data={
+        'document_id': str(document_id), 'actor_id': user.pk, 'changes': applied,
+    })
+    return applied
+
+
 def _validate_dates(data):
     if data['delivery_datetime'] < data['pickup_datetime']:
         raise ValidationError('Доставка не может быть раньше погрузки.')

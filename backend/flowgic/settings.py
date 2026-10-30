@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'logistics',
     'billing',
     'marketplace',
+    'document_processing',
 ]
 
 MIDDLEWARE = [
@@ -118,6 +119,12 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TASK_ROUTES = {'document_processing.tasks.*': {'queue': 'documents'}}
+# Private originals are deliberately outside public MEDIA_ROOT.
+OCR_PRIVATE_ROOT = Path(os.getenv('OCR_PRIVATE_ROOT', str(BASE_DIR.parent / '.local' / 'private-documents')))
+OCR_SERVICE_URL = os.getenv('OCR_SERVICE_URL', 'http://ocr:8090')
+OCR_SERVICE_KEY = os.getenv('OCR_SERVICE_KEY', '')
+OCR_SERVICE_TIMEOUT = int(os.getenv('OCR_SERVICE_TIMEOUT', '600'))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

@@ -1,0 +1,18 @@
+[
+  {"id":"fura-ttn","source":"fura-tn-ttn","pages":[1,2],"family":"ttn_1t","kind":"published_filled_example","note":"Скан с подписями и печатями. Публичная публикация не доказывает реальность сделки."},
+  {"id":"fura-tn","source":"fura-tn-ttn","pages":[3,4,5],"family":"tn_paper_archive","kind":"partially_filled_template","note":"Частично заполненная ТН. Страница 6 источника пуста и исключена."},
+  {"id":"formz-ttn","source":"formz-ttn","pages":[1,2],"family":"ttn_1t","kind":"published_filled_example","note":"Учебный пример. Сохранить ведущие нули номера; разделять товар, перевозку и НДС."},
+  {"id":"pickform-ttn-example","source":"pickform-ttn-example","pages":[1,2],"family":"ttn_1t","kind":"published_filled_example","note":"Учебная ТТН с разными нетто и брутто. Цифры не исправлять ради арифметической согласованности."},
+  {"id":"pickform-ttn-blank","source":"pickform-ttn-blank","pages":[1,2],"family":"ttn_1t","kind":"blank_template","note":"Отрицательная проверка ложного заполнения. Пустой бланк не считать положительным рейсом."},
+  {"id":"vrnlom-upd","source":"vrnlom-upd","pages":[1],"family":"upd","kind":"published_filled_example","note":"Образец по лому металлов, не строительная накладная. Жёлтые подсказки и особый текст НДС; стоимость товара не равна плате за перевозку."},
+  {"id":"itokna-torg12","source":"itokna-torg12","pages":[1,2],"family":"torg12","kind":"published_filled_example","note":"Строительный срез: отделочные материалы и монтажные услуги, разные единицы, незаполненные цены. Проверка всего комплекта ещё требуется."},
+  {"id":"agt-request","source":"agt-request","pages":[1],"family":"transport_request","kind":"blank_template","note":"Пустая заявка с напечатанным годом 2020. Штраф 20% не является ставкой НДС."},
+  {"id":"tinert-quality-passport","source":"tinert-quality-passport","pages":[1],"family":"quality_passport","kind":"negative_adjacent_document","note":"Паспорт щебня, два блока на листе; плотность и показатели качества не являются массой перевозимого груза."},
+  {"id":"rosnou-ttn","source":"rosnou-logistics","pages":[61,62],"family":"ttn_1t","kind":"educational_embedded_example","note":"ВАЖНО: условие задачи говорит о стройсмесях 15 т, но вставленная ТТН показывает чайник Bosch. Размечать изображение формы отдельно от условия, не переносить 15 т в ответ."},
+  {"id":"rosnou-waybill","source":"rosnou-logistics","pages":[64],"family":"vehicle_waybill","kind":"negative_adjacent_document","note":"Путевой лист легкового автомобиля с пояснениями. Не транспортная накладная на груз."},
+  {"id":"hse-torg12","source":"hse-documents","pages":[23],"family":"torg12","kind":"educational_embedded_example","note":"Скан ТОРГ-12 встроен в памятку. Текст инструкций за пределами формы не является её реквизитами."},
+  {"id":"hse-upd","source":"hse-documents","pages":[24],"family":"upd","kind":"educational_embedded_example","note":"Скан УПД с печатями и рукописными датами. Заголовок следующего раздела не является частью формы."},
+  {"id":"metro-torg12","source":"metro-torg12","pages":[1],"family":"torg12","kind":"published_filled_example","note":"Пищевая розница, несколько ставок НДС. Сохранить редакцию/дату образца, не считать актуальной формой по имени файла."},
+  {"id":"metro-upd","source":"metro-upd","pages":[1],"family":"upd","kind":"partially_filled_template","note":"Контрагент заполнен, строки товаров пусты, формулы дают нули. Это шаблон, не поставка с нулевой стоимостью."},
+  {"id":"metro-upd-bbxd","source":"metro-upd-bbxd","pages":[1],"family":"upd","kind":"partially_filled_template","note":"Отдельный розничный макет BBXD; номера заказа/поставщика/отгрузки различаются по смыслу."}
+]

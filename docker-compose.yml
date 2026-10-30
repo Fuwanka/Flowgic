@@ -13,6 +13,9 @@ x-app: &app
     REDIS_URL: redis://redis:6379/0
     CELERY_BROKER_URL: redis://redis:6379/1
     CELERY_RESULT_BACKEND: redis://redis:6379/2
+    OCR_PRIVATE_ROOT: /ocr-private
+  volumes:
+    - private_documents:/ocr-private
 
 services:
   db:
@@ -77,6 +80,32 @@ services:
       redis:
         condition: service_healthy
 
+  # OCR is optional for ordinary CRM work: docker compose --profile ocr up -d --build.
+  ocr:
+    profiles: ["ocr"]
+    build:
+      context: ./ocr-service
+    environment:
+      OCR_SERVICE_KEY: ${OCR_SERVICE_KEY:-}
+      OCR_MODEL_ROOT: /models
+    volumes:
+      - ${OCR_MODELS_DIR:-./.local/paddle-eval/models-mobile}:/models:ro
+    mem_limit: 3g
+    cpus: 4
+    restart: unless-stopped
+
+  celery-documents:
+    <<: *app
+    profiles: ["ocr"]
+    command: ["celery", "-A", "flowgic", "worker", "--loglevel=info", "--concurrency=1", "--queues=documents", "--prefetch-multiplier=1", "--hostname=documents@%h"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      ocr:
+        condition: service_healthy
+
   # Браузер открывает SPA; /api проксируется во внутренний backend без CORS.
   frontend:
     image: flowgic-frontend:dev
@@ -111,3 +140,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  private_documents:

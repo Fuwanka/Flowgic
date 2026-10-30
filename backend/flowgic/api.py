@@ -13,8 +13,15 @@ from marketplace.api import router as marketplace_router
 from marketplace.exceptions import MarketplaceError
 from logistics.api import router as logistics_router
 from logistics.documents import DocumentDataError
+from document_processing.api import router as document_processing_router
+from document_processing.exceptions import ProcessingError
 
 api = NinjaAPI(title='Flowgic API', version='1.0.0')
+
+
+@api.exception_handler(ProcessingError)
+def processing_error(request, error):
+    return api.create_response(request, {'detail': error.detail, 'code': error.code}, status=error.status)
 
 
 @api.exception_handler(PermissionDenied)
@@ -74,3 +81,4 @@ api.add_router('/accounts', accounts_router)
 api.add_router('/billing', billing_router)
 api.add_router('/marketplace', marketplace_router)
 api.add_router('/logistics', logistics_router)
+api.add_router('/document-processing', document_processing_router)
